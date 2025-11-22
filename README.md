@@ -8,7 +8,6 @@
 | Nombre y Apellido | Módulos (Objetivos) a Desarrollar | Fecha Inicio | Fecha Fin |
 |-------------------|----------------------------------|--------------|-----------|
 | Sasha Lospalluto  | [Lista de funcionalidades]       | [Fecha]      | [Fecha]   |
-| Sofia Quinteros   | [Lista de funcionalidades]       | [Fecha]      | [Fecha]   |
 | Santiago Ambricca | [Lista de funcionalidades]       | [Fecha]      | [Fecha]   |
 
 ---
