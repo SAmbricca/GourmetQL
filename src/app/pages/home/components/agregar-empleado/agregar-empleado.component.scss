@@ -1,0 +1,118 @@
+ion-content {
+  --background: linear-gradient(135deg, #f09850 0%, #cc480b 100%);
+}
+
+.empleado-container {
+  padding: 20px;
+
+  form {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #333;
+    margin: 20px 0 15px 0;
+    font-family: 'Times New Roman', Times, serif;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  .foto-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+
+    .avatar-grande {
+      width: 120px;
+      height: 120px;
+      cursor: pointer;
+      position: relative;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+
+      &.avatar-vacio {
+        border: 2px dashed #ccc;
+      }
+
+      .camera-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 2rem;
+        color: #999;
+      }
+    }
+
+    .btn-foto {
+      --border-radius: 10px;
+    }
+
+    .error-text {
+      font-size: 0.85rem;
+      margin: 0;
+      text-align: center;
+    }
+  }
+
+  .qr-button {
+    margin-bottom: 20px;
+    --border-radius: 10px;
+  }
+
+  .input-container {
+    margin-bottom: 15px;
+
+    ion-input,
+    ion-select {
+      --border-radius: 10px;
+    }
+
+    .error-text {
+      font-size: 0.85rem;
+      margin: 5px 0 0 10px;
+    }
+  }
+
+  .button-container {
+    margin-top: 25px;
+
+    .register-button {
+      --border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    .cancel-button {
+      --border-radius: 10px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .empleado-container {
+    padding: 15px;
+
+    form {
+      padding: 20px;
+    }
+
+    .section-title {
+      font-size: 1rem;
+    }
+
+    .foto-container {
+      .avatar-grande {
+        width: 100px;
+        height: 100px;
+      }
+    }
+  }
+}

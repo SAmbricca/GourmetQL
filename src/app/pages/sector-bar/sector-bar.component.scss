@@ -1,0 +1,110 @@
+ion-content {
+  --background: #2c2c2e;
+  ion-title{
+    font-size: 1.5rem;
+    padding-top: 16px;
+  }
+}
+
+ion-button {
+  width: 36px;
+  height: 36px;
+  padding-top: 20px;
+}
+.empty-msg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 70vh;
+  color: #8e8e93;
+  
+  .icon-container {
+    font-size: 4rem;
+    margin-bottom: 20px;
+  }
+  
+  h3 { color: white; margin: 0; }
+}
+
+ion-card {
+  --background: #1c1c1e; // Tarjeta oscura
+  color: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+  margin-bottom: 15px;
+  border: 1px solid #3a3a3c;
+
+  &.en-preparacion {
+    border: 2px solid #5260ff; // Borde Azul neón cuando se prepara
+    box-shadow: 0 0 15px rgba(82, 96, 255, 0.3);
+  }
+}
+
+.header-ticket {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #3a3a3c;
+  padding-bottom: 10px;
+
+  .mesa-badge {
+    background-color: #ff9f0a; // Naranja
+    color: black;
+    font-weight: 900;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+  }
+}
+
+.producto-body {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+
+  .cantidad-badge {
+    background: #323232;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    font-weight: bold;
+    border: 2px solid #ff9f0a;
+  }
+
+  .nombre-producto {
+    font-size: 1.3rem;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+}
+
+.estado-preparando {
+  color: #5260ff; // Azul
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+  from { text-shadow: 0 0 5px rgba(82, 96, 255, 0.2); }
+  to { text-shadow: 0 0 15px rgba(82, 96, 255, 0.6); }
+}
+
+.acciones {
+  ion-button {
+    height: 45px;
+    font-weight: bold;
+    --border-radius: 12px;
+  }
+}

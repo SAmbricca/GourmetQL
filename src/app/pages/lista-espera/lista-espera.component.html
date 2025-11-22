@@ -1,0 +1,192 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="volverAlHome()">
+        <img src="assets/volver-icono.png" alt="Volver" class="volver-icon">
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">
+      Lista de Espera
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrarSesion()">
+        <img src="assets/salir-icono.jpeg" alt="Salir" class="salir-icon">
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="listas-container">
+    <div class="seccion-lista">
+      <ion-text class="ion-text-center" color="medium">
+        <h2>Clientes Registrados</h2>
+      </ion-text>
+
+      @if (cargando) {
+        <ion-card>
+          <ion-card-content>
+            <ion-text class="ion-text-center">
+              <p>Cargando...</p>
+            </ion-text>
+          </ion-card-content>
+        </ion-card>
+      } @else if (clientesEnEspera.length === 0) {
+        <ion-card>
+          <ion-card-content>
+            <ion-text class="ion-text-center" color="medium">
+              <p>No hay clientes registrados en espera</p>
+            </ion-text>
+          </ion-card-content>
+        </ion-card>
+      } @else {
+        <ion-grid>
+          <ion-row>
+            @for (item of clientesEnEspera; track item.id) {
+              <ion-col size="12" size-md="6">
+                <ion-card>
+                  <ion-card-header>
+                    <div class="cliente-header">
+                      <ion-card-title>{{ obtenerNombreCliente(item) }}</ion-card-title>
+                      <div class="tiempo-info">
+                        <ion-text color="medium">
+                          <small>Ingreso: {{ formatearHora(item.fecha_ingreso) }}</small>
+                        </ion-text>
+                      </div>
+                    </div>
+                  </ion-card-header>
+                  <ion-card-content>
+                    <div class="acciones-botones">
+                      @if (mesaSeleccionadaId !== item.id) {
+                        <ion-button 
+                          expand="block" 
+                          color="success" 
+                          (click)="mostrarInputMesa(item.id)">
+                          Asignar mesa
+                        </ion-button>
+                      } @else {
+                        <div class="input-mesa-container">
+                          <input 
+                            #inputMesa
+                            type="number" 
+                            class="input-numero-mesa"
+                            placeholder="Nº de mesa"
+                            min="1"
+                            [(ngModel)]="numeroMesaInput"
+                            (keyup.enter)="confirmarAsignacion(item.id, false)">
+                          <div class="botones-confirmacion">
+                            <ion-button 
+                              size="small"
+                              color="success" 
+                              (click)="confirmarAsignacion(item.id, false)">
+                              ✓
+                            </ion-button>
+                            <ion-button 
+                              size="small"
+                              color="medium" 
+                              (click)="cancelarAsignacion()">
+                              ✕
+                            </ion-button>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </ion-card-content>
+                </ion-card>
+              </ion-col>
+            }
+          </ion-row>
+        </ion-grid>
+      }
+    </div>
+
+    <!-- Clientes Anónimos en Espera -->
+    <div class="seccion-lista">
+      <ion-text class="ion-text-center" color="medium">
+        <h2>Clientes Anónimos</h2>
+      </ion-text>
+
+      @if (cargando) {
+        <ion-card>
+          <ion-card-content>
+            <ion-text class="ion-text-center">
+              <p>Cargando...</p>
+            </ion-text>
+          </ion-card-content>
+        </ion-card>
+      } @else if (clientesAnonimosEnEspera.length === 0) {
+        <ion-card>
+          <ion-card-content>
+            <ion-text class="ion-text-center" color="medium">
+              <p>No hay clientes anónimos en espera</p>
+            </ion-text>
+          </ion-card-content>
+        </ion-card>
+      } @else {
+        <ion-grid>
+          <ion-row>
+            @for (item of clientesAnonimosEnEspera; track item.id) {
+              <ion-col size="12" size-md="6">
+                <ion-card>
+                  <ion-card-header>
+                    <div class="cliente-header">
+                      <div class="cliente-info-anonimo">
+                        <ion-card-title>{{ obtenerNombreCliente(item) }}</ion-card-title>
+                      </div>
+                      <div class="tiempo-info">
+                        <ion-text color="medium">
+                          <small>Ingreso: {{ formatearHora(item.fecha_ingreso) }}</small>
+                        </ion-text>
+                      </div>
+                    </div>
+                  </ion-card-header>
+                  <ion-card-content>
+                    <div class="acciones-botones">
+                      @if (mesaSeleccionadaId !== item.id) {
+                        <ion-button 
+                          expand="block" 
+                          color="success" 
+                          (click)="mostrarInputMesa(item.id)">
+                          Asignar mesa
+                        </ion-button>
+                      } @else {
+                        <div class="input-mesa-container">
+                          <input 
+                            #inputMesa
+                            type="number" 
+                            class="input-numero-mesa"
+                            placeholder="Nº de mesa"
+                            min="1"
+                            [(ngModel)]="numeroMesaInput"
+                            (keyup.enter)="confirmarAsignacion(item.id, true)">
+                          <div class="botones-confirmacion">
+                            <ion-button 
+                              size="small"
+                              color="success" 
+                              (click)="confirmarAsignacion(item.id, true)">
+                              ✓
+                            </ion-button>
+                            <ion-button 
+                              size="small"
+                              color="medium" 
+                              (click)="cancelarAsignacion()">
+                              ✕
+                            </ion-button>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </ion-card-content>
+                </ion-card>
+              </ion-col>
+            }
+          </ion-row>
+        </ion-grid>
+      }
+    </div>
+  </div>
+</ion-content>

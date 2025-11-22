@@ -1,0 +1,107 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title class="ion-text-center bienvenido-title">
+      Bienvenido
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrarSesion()">
+        <img src="assets/salir-icono.jpeg" alt="Salir" class="salir-icon">
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="user-info-container">
+    <ion-card>
+      <ion-card-header>
+        <div class="user-details">
+          <div class="avatar-container">
+            <img 
+              [src]="clienteActual?.foto_url || 'assets/avatar-default.png'" 
+              alt="Foto de perfil"
+              class="user-avatar"
+            >
+          </div>
+          <ion-card-title>{{ nombreCliente }}</ion-card-title>
+          
+          @if (verificandoEstado) {
+            <div class="estado-container">
+              <ion-spinner name="crescent"></ion-spinner>
+              <p class="estado-text">Verificando estado...</p>
+            </div>
+          } @else {
+            <div class="estado-container">
+              <div class="estado-badge" [style.background]="estadoColorHex">
+                <span>{{ estadoTexto }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      </ion-card-header>
+    </ion-card>
+  </div>
+
+  <div class="opciones-container">
+    <ion-text class="ion-text-center" color="medium">
+      <h2>Acciones disponibles</h2>
+    </ion-text>
+
+    <ion-grid>
+      <ion-row>
+        @for (opcion of opcionesDisponibles; track opcion.titulo) {
+          <ion-col size="12" size-md="6">
+            <ion-card 
+              button 
+              (click)="!opcion.deshabilitado && opcion.accion()"
+              [class.card-disabled]="opcion.deshabilitado"
+            >
+              <ion-card-header>
+                <div class="opcion-header">
+                  <div class="titulo-container">
+                    <ion-card-title>{{ opcion.titulo }}</ion-card-title>
+                    @if (opcion.badge && opcion.badge > 0) {
+                      <ion-badge color="danger" class="notification-badge">
+                        {{ opcion.badge }}
+                      </ion-badge>
+                    }
+                  </div>
+                  
+                  @if (opcion.descripcion) {
+                    <p class="opcion-descripcion" 
+                       [class.deshabilitada]="opcion.deshabilitado">
+                      {{ opcion.descripcion }}
+                    </p>
+                  }
+                  
+                  @if (opcion.deshabilitado) {
+                    <p class="opcion-deshabilitada">No disponible actualmente</p>
+                  }
+                </div>
+              </ion-card-header>
+            </ion-card>
+          </ion-col>
+        }
+      </ion-row>
+    </ion-grid>
+  </div>
+
+  <!-- Indicador de estado del flujo -->
+  <div class="flujo-info">
+    <ion-text color="medium">
+      <p class="flujo-texto">
+        @switch (estadoActual) {
+          @case ('sin_registrar') {
+            <span>Escanee el QR de ingreso para unirse a la lista de espera</span>
+          }
+          @case ('esperando_mesa') {
+            <span>Aguarde mientras le asignan una mesa. Recibirá una notificación</span>
+          }
+          @case ('mesa_asignada') {
+            <span>¡Mesa asignada! Escanee el QR de su mesa para continuar</span>
+          }
+        }
+      </p>
+    </ion-text>
+  </div>
+</ion-content>

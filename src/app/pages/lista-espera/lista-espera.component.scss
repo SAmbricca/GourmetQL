@@ -1,0 +1,213 @@
+ion-content {
+  --background: linear-gradient(135deg, #f09850 0%, #cc480b 100%);
+}
+
+.salir-icon,
+.volver-icon {
+  width: 36px;
+  height: 36px;
+}
+
+.listas-container {
+  padding: 20px;
+}
+
+.seccion-lista {
+  margin-bottom: 40px;
+
+  h2 {
+    margin-bottom: 20px;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    font-size: 2rem;
+  }
+
+  ion-card {
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    margin-bottom: 15px;
+
+    .cliente-header {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      ion-card-title {
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .cliente-info-anonimo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        .foto-cliente {
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 3px solid #f09850;
+        }
+      }
+
+      .tiempo-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 5px;
+        border-top: 1px solid #e0e0e0;
+
+        small {
+          font-size: 0.85rem;
+        }
+      }
+    }
+
+    ion-card-content {
+      .acciones-botones {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding-top: 10px;
+
+        ion-button {
+          margin: 0;
+          font-weight: bold;
+          --border-radius: 12px;
+        }
+
+        .input-mesa-container {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          animation: slideIn 0.3s ease-out;
+
+          .input-numero-mesa {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #f09850;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-align: center;
+            outline: none;
+            transition: all 0.3s ease;
+
+            &:focus {
+              border-color: #cc480b;
+              box-shadow: 0 0 0 3px rgba(240, 152, 80, 0.2);
+            }
+
+            &::placeholder {
+              color: #999;
+              font-weight: normal;
+            }
+          }
+
+          .botones-confirmacion {
+            display: flex;
+            gap: 8px;
+
+            ion-button {
+              --padding-start: 16px;
+              --padding-end: 16px;
+              font-size: 1.2rem;
+              font-weight: bold;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .listas-container {
+    padding: 15px;
+  }
+
+  .seccion-lista {
+    h2 {
+      font-size: 1.5rem;
+    }
+
+    ion-card {
+      .cliente-header {
+        ion-card-title {
+          font-size: 1.2rem;
+        }
+
+        .cliente-info-anonimo {
+          .foto-cliente {
+            width: 40px;
+            height: 40px;
+          }
+        }
+
+        .tiempo-info {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+        }
+      }
+
+      ion-card-content {
+        .acciones-botones {
+          .input-mesa-container {
+            flex-direction: column;
+
+            .input-numero-mesa {
+              width: 100%;
+            }
+
+            .botones-confirmacion {
+              width: 100%;
+              justify-content: center;
+
+              ion-button {
+                flex: 1;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 769px) {
+  .seccion-lista {
+    ion-card {
+      transition: all 0.3s ease;
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+      }
+
+      ion-card-content {
+        .acciones-botones {
+          flex-direction: row;
+          gap: 15px;
+
+          ion-button {
+            flex: 1;
+          }
+        }
+      }
+    }
+  }
+}

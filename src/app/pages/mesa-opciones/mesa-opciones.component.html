@@ -1,0 +1,121 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title class="ion-text-center">Mesa {{ numeroMesa }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="dashboard-container">
+    
+    <div class="welcome-header">
+      <h2>Hola, {{ clienteNombre }}</h2>
+    </div>
+
+    <div class="actions-grid">
+      <ion-text color="medium" class="section-title">
+        <h3>¿Qué deseas hacer?</h3>
+      </ion-text>
+
+      <ion-grid class="ion-no-padding">
+        <ion-row>
+          
+          <ion-col size="12">
+             <ion-card class="action-card featured" button (click)="irAlMenu()">
+               <div class="card-content-row">
+                 <div class="icon-wrapper warning">
+                   <ion-icon name="restaurant-outline"></ion-icon> 
+                 </div>
+                 <div class="text-wrapper">
+                   <ion-card-title>Ver el Menú</ion-card-title>
+                   <p>¡Realizá o modificá tu pedido!</p>
+                 </div>
+                 <ion-icon name="chevron-forward-outline" color="medium"></ion-icon>
+               </div>
+             </ion-card>
+          </ion-col>
+
+          <ion-col size="12">
+            <ion-card class="action-card featured" button (click)="verDetallePedido()">
+              <div class="card-content-row">
+                <div class="icon-wrapper secondary">
+                   <ion-icon name="receipt-outline"></ion-icon>
+                </div>
+                <div class="text-wrapper">
+                  <ion-card-title>Ver mi Pedido</ion-card-title>
+                  <p>Revisá el estado de tu pedido</p>
+                </div>
+                <ion-icon name="chevron-forward-outline" color="medium"></ion-icon>
+              </div>
+            </ion-card>
+          </ion-col>
+
+          <ion-col size="12">
+            <ion-card class="action-card featured" button (click)="irAlChat()">
+              <div class="card-content-row">
+                <div class="icon-wrapper primary">
+                   <ion-icon name="chatbubbles-outline"></ion-icon>
+                </div>
+                <div class="text-wrapper">
+                  <ion-card-title>Chatear con un Mozo</ion-card-title>
+                  <p>¿Necesitás ayuda?</p>
+                </div>
+                <ion-icon name="chevron-forward-outline" color="medium"></ion-icon>
+              </div>
+            </ion-card>
+          </ion-col>
+
+          @if (mostrarJuegos) {
+            <ion-col size="12">
+              <ion-card class="action-card featured" button (click)="irAJuegos()">
+                <div class="card-content-row">
+                  <div class="icon-wrapper danger"> <ion-icon name="game-controller-outline"></ion-icon>
+                  </div>
+                  <div class="text-wrapper">
+                    <ion-card-title>Juegos</ion-card-title>
+                    <p>¡Gana descuentos jugando!</p>
+                  </div>
+                  <ion-badge color="danger" class="ion-margin-end">OFF%</ion-badge>
+                  <ion-icon name="chevron-forward-outline" color="medium"></ion-icon>
+                </div>
+              </ion-card>
+            </ion-col>
+          }
+
+          @if (mostrarEncuesta) {
+            <ion-col size="12">
+              <ion-card class="action-card featured" button (click)="irAEncuesta()">
+                <div class="card-content-row">
+                  <div class="icon-wrapper tertiary">
+                     <ion-icon name="star-outline"></ion-icon>
+                  </div>
+                  <div class="text-wrapper">
+                    <ion-card-title>Encuesta</ion-card-title>
+                    <p>Calificá nuestra atención</p>
+                  </div>
+                  <ion-icon name="chevron-forward-outline" color="medium"></ion-icon>
+                </div>
+              </ion-card>
+            </ion-col>
+          }
+
+          @if (mostrarCuenta) {
+            <ion-col size="12">
+              <ion-card class="action-card featured" button (click)="pedirCuenta()">
+                <div class="card-content-row">
+                  <div class="icon-wrapper success">
+                     <ion-icon name="cash-outline"></ion-icon>
+                  </div>
+                  <div class="text-wrapper">
+                    <ion-card-title>Pedir Cuenta</ion-card-title>
+                    <p>Finalizar servicio</p>
+                  </div>
+                  <ion-icon name="chevron-forward-outline" color="medium"></ion-icon>
+                </div>
+              </ion-card>
+            </ion-col>
+          }
+        </ion-row>
+      </ion-grid>
+    </div>
+  </div>
+</ion-content>

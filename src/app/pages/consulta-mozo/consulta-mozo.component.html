@@ -1,0 +1,88 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()">
+        <img src="assets/volver-icono.png" alt="Volver" class="volver-icon" />
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center consulta-title">
+      Consulta con Mozo
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button style="visibility: hidden;">
+        <img src="assets/volver-icono.png" alt="Volver" class="volver-icon" />
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <ion-toolbar class="info-toolbar">
+    <ion-text class="mesa-info">
+      <ion-icon name="restaurant-outline"></ion-icon>
+      {{ obtenerInfoMesa() }}
+    </ion-text>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="gestion-content">
+  @if (cargando) {
+    <div class="loading-container">
+      <ion-text>
+        <h3>Cargando conversación...</h3>
+      </ion-text>
+    </div>
+  } @else {
+    <div class="chat-container">
+      @if (mensajes.length === 0) {
+        <div class="empty-state">
+          <ion-icon name="chatbubbles-outline"></ion-icon>
+          <ion-text>
+            <h3>Inicia una conversación</h3>
+            <p>Escribe tu consulta y un mozo te responderá pronto</p>
+          </ion-text>
+        </div>
+      } @else {
+        <!-- Usamos track mensaje.id o index si id es undefined al inicio -->
+        @for (mensaje of mensajes; track mensaje.id) {
+          <div [class]="mensaje.emisor_tipo === 'cliente' ? 'mensaje mensaje-cliente' : 'mensaje mensaje-mozo'">
+            <div class="mensaje-contenido">
+              <div class="mensaje-header">
+                <ion-text class="mensaje-autor">
+                  {{ mensaje.emisor_tipo === 'cliente' ? 'Tú' : 'Mozo' }}
+                </ion-text>
+              </div>
+              <div class="mensaje-texto">
+                {{ mensaje.mensaje }}
+              </div>
+              <div class="mensaje-hora">
+                {{ formatearFecha(mensaje.fecha_creacion) }}
+              </div>
+            </div>
+          </div>
+        }
+      }
+    </div>
+  }
+</ion-content>
+
+<ion-footer>
+  <div class="input-container">
+    <ion-input
+      [(ngModel)]="nuevoMensaje"
+      placeholder="Escribe tu consulta..."
+      [disabled]="enviando"
+      (keyup.enter)="enviarMensaje()"
+      class="mensaje-input"
+    ></ion-input>
+    <ion-button
+      (click)="enviarMensaje()"
+      [disabled]="!nuevoMensaje.trim() || enviando"
+      color="primary"
+      class="enviar-button"
+    >
+      @if (enviando) {
+        <ion-icon name="hourglass-outline"></ion-icon>
+      } @else {
+        <ion-icon name="send"></ion-icon>
+      }
+    </ion-button>
+  </div>
+</ion-footer>

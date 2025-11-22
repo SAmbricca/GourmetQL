@@ -1,0 +1,218 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()">
+        <img src="assets/volver-icono.png" alt="Volver" class="volver-icon">
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">
+      Consultas de Clientes
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="cargarChats($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  @if (cargando) {
+    <div class="loading-container">
+      <ion-text>
+        <h3>Cargando consultas...</h3>
+      </ion-text>
+    </div>
+  } @else {
+    @if (chats.length === 0) {
+      <div class="empty-state">
+        <ion-icon name="chatbubbles-outline"></ion-icon>
+        <ion-text>
+          <h3>Sin consultas activas</h3>
+          <p>No hay chats activos en este momento</p>
+        </ion-text>
+      </div>
+    } @else {
+      <div class="consultas-container">
+        
+        <!-- SECCIÓN PENDIENTES (Último msj del Cliente) -->
+        @if (filtrarConsultas('pendiente').length > 0) {
+          <div class="seccion-header">
+            <ion-text color="danger">
+            </ion-text>
+          </div>
+
+          @for (chat of filtrarConsultas('pendiente'); track chat.pedido_id) {
+            <ion-card class="consulta-card pendiente">
+              <ion-card-header (click)="toggleChat(chat)">
+                <div class="consulta-header">
+                  <div class="info-principal">
+                    <ion-text class="mesa-info">
+                      <ion-icon name="restaurant"></ion-icon>
+                      Mesa {{ chat.mesa_numero }}
+                    </ion-text>
+                    <ion-text class="cliente-nombre">
+                      {{ chat.cliente_nombre }}
+                    </ion-text>
+                  </div>
+                  <div class="info-secundaria">
+                    <ion-badge color="warning">
+                      <ion-icon name="time"></ion-icon>
+                      Acción Requerida
+                    </ion-badge>
+                    <ion-text class="fecha">
+                      {{ formatearFecha(chat.ultimo_mensaje?.fecha_creacion) }}
+                    </ion-text>
+                  </div>
+                </div>
+              </ion-card-header>
+
+              <ion-card-content>
+                <!-- Preview Último Mensaje -->
+                <div class="mensaje-preview">
+                  <ion-icon name="chatbubble-ellipses"></ion-icon>
+                  <p><strong>Último mensaje -> Cliente:</strong> {{ chat.ultimo_mensaje?.mensaje }}</p>
+                </div>
+
+                <!-- CHAT EXPANDIDO -->
+                @if (chat.mostrarChat) {
+                  <div class="chat-expandido">
+                    <div class="chat-mensajes">
+                      @for (mensaje of chat.mensajes; track mensaje.id) {
+                        <div [class]="mensaje.emisor_tipo === 'cliente' ? 'mensaje mensaje-cliente' : 'mensaje mensaje-mozo'">
+                          <div class="mensaje-contenido">
+                            <div class="mensaje-autor">
+                              {{ mensaje.emisor_tipo === 'cliente' ? 'Cliente' : 'Yo' }}
+                            </div>
+                            <div class="mensaje-texto">
+                              {{ mensaje.mensaje }}
+                            </div>
+                            <div class="mensaje-hora">
+                              {{ formatearFecha(mensaje.fecha_creacion) }}
+                            </div>
+                          </div>
+                        </div>
+                      }
+                    </div>
+
+                    <div class="respuesta-form">
+                      <ion-input
+                        [(ngModel)]="respuestaMozo"
+                        placeholder="Escribe tu respuesta..."
+                        [disabled]="enviando"
+                        class="respuesta-input"
+                        (keyup.enter)="responderConsulta(chat)"
+                      ></ion-input>
+                      <ion-button
+                        (click)="responderConsulta(chat)"
+                        [disabled]="!respuestaMozo.trim() || enviando"
+                        expand="block"
+                        color="success"
+                      >
+                        @if (enviando) {
+                          <ion-icon name="hourglass" slot="start"></ion-icon>
+                        } @else {
+                          <ion-icon name="send" slot="start"></ion-icon>
+                        }
+                      </ion-button>
+                    </div>
+                  </div>
+                } @else {
+                  <ion-button (click)="toggleChat(chat)" expand="block" fill="outline" color="primary">
+                    <ion-icon name="chatbubbles" slot="start"></ion-icon>
+                    Abrir Chat
+                  </ion-button>
+                }
+              </ion-card-content>
+            </ion-card>
+          }
+        }
+
+        <!-- SECCIÓN RESPONDIDAS (Último msj del Mozo) -->
+        @if (filtrarConsultas('respondida').length > 0) {
+          <div class="seccion-header">
+          </div>
+
+          @for (chat of filtrarConsultas('respondida'); track chat.pedido_id) {
+            <ion-card class="consulta-card respondida">
+              <ion-card-header (click)="toggleChat(chat)">
+                <div class="consulta-header">
+                  <div class="info-principal">
+                    <ion-text class="mesa-info">
+                      <ion-icon name="restaurant"></ion-icon>
+                      Mesa {{ chat.mesa_numero }}
+                    </ion-text>
+                    <ion-text class="cliente-nombre">
+                      {{ chat.cliente_nombre }}
+                    </ion-text>
+                  </div>
+                  <div class="info-secundaria">
+                    <ion-badge color="success">
+                      <ion-icon name="checkmark-done"></ion-icon>
+                      Respondido
+                    </ion-badge>
+                    <ion-text class="fecha">
+                      {{ formatearFecha(chat.ultimo_mensaje?.fecha_creacion) }}
+                    </ion-text>
+                  </div>
+                </div>
+              </ion-card-header>
+
+              <ion-card-content>
+                <div class="mensaje-preview">
+                  <ion-icon name="return-up-back-outline"></ion-icon>
+                  <p><strong>Último mensaje -> Yo:</strong> {{ chat.ultimo_mensaje?.mensaje }}</p>
+                </div>
+
+                @if (chat.mostrarChat) {
+                  <div class="chat-expandido">
+                    <div class="chat-mensajes">
+                      @for (mensaje of chat.mensajes; track mensaje.id) {
+                        <div [class]="mensaje.emisor_tipo === 'cliente' ? 'mensaje mensaje-cliente' : 'mensaje mensaje-mozo'">
+                          <div class="mensaje-contenido">
+                            <div class="mensaje-autor">
+                              {{ mensaje.emisor_tipo === 'cliente' ? 'Cliente' : 'Yo' }}
+                            </div>
+                            <div class="mensaje-texto">
+                                {{ mensaje.mensaje }}
+                            </div>
+                            <div class="mensaje-hora">
+                              {{ formatearFecha(mensaje.fecha_creacion) }}
+                            </div>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                     <!-- Formulario también aquí para continuar charla -->
+                     <div class="respuesta-form">
+                        <ion-input
+                          [(ngModel)]="respuestaMozo"
+                          placeholder="Escribe..."
+                          [disabled]="enviando"
+                          class="respuesta-input"
+                          (keyup.enter)="responderConsulta(chat)"
+                        ></ion-input>
+                        <ion-button
+                          (click)="responderConsulta(chat)"
+                          [disabled]="!respuestaMozo.trim() || enviando"
+                          expand="block"
+                          color="success"
+                        >
+                           <ion-icon name="send"></ion-icon>
+                        </ion-button>
+                      </div>
+                  </div>
+                } @else {
+                   <ion-button (click)="toggleChat(chat)" expand="block" fill="outline" color="medium">
+                    <ion-icon name="eye" slot="start"></ion-icon>
+                    Ver Chat
+                  </ion-button>
+                }
+              </ion-card-content>
+            </ion-card>
+          }
+        }
+
+      </div>
+    }
+  }
+</ion-content>

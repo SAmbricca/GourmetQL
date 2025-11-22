@@ -1,0 +1,91 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="end">
+      <ion-button (click)="irAlHome()">
+        <ion-icon name="home-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Resultados</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  @if (cargando) {
+    <div class="loading-container">
+      <ion-spinner name="crescent" color="light"></ion-spinner>
+    </div>
+  } @else {
+    <div class="resultados-container">
+      
+      <!-- Resumen KPI -->
+      <ion-card class="kpi-card">
+        <ion-card-content>
+          <div class="kpi-number">{{ promedioGeneral }}</div>
+          <div class="kpi-stars">
+            <ion-icon name="star" *ngFor="let s of [1,2,3,4,5]" [class.filled]="s <= promedioGeneral"></ion-icon>
+          </div>
+          <div class="kpi-text">Promedio General de {{ totalEncuestas }} opiniones</div>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Selector de Gráfico -->
+      <div class="chart-selector">
+        <ion-segment [(ngModel)]="tipoGrafico" mode="ios">
+          <ion-segment-button value="barras">
+            <ion-icon name="bar-chart-outline"></ion-icon>
+            <ion-label>Barras</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="torta">
+            <ion-icon name="pie-chart-outline"></ion-icon>
+            <ion-label>Torta</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+      </div>
+
+      <!-- Gráfico de Barras -->
+      @if (tipoGrafico === 'barras') {
+        <ion-card class="chart-card">
+          <ion-card-content>
+            <h3>Distribución de Calificaciones</h3>
+            <div class="bar-chart-container">
+              @for (porc of porcentajes; track $index) {
+                <div class="bar-row">
+                  <span class="label">{{ $index + 1 }} <ion-icon name="star"></ion-icon></span>
+                  <div class="bar-track">
+                    <div class="bar-fill" 
+                         [style.width.%]="porc"
+                         [class.high]="$index >= 3"
+                         [class.mid]="$index === 2"
+                         [class.low]="$index < 2">
+                    </div>
+                  </div>
+                  <span class="value">{{ porc }}%</span>
+                </div>
+              }
+            </div>
+          </ion-card-content>
+        </ion-card>
+      }
+
+      <!-- Gráfico de Torta (Pie Chart) -->
+      @if (tipoGrafico === 'torta') {
+        <ion-card class="chart-card">
+          <ion-card-content>
+            <h3>Porcentaje de Satisfacción</h3>
+            <div class="pie-chart-wrapper">
+              <div class="pie-chart" [ngStyle]="pieChartStyle">
+                <div class="pie-center"></div>
+              </div>
+            </div>
+            <div class="leyenda">
+              <div class="item"><span class="dot green"></span>4-5 Estrellas</div>
+              <div class="item"><span class="dot yellow"></span>3 Estrellas</div>
+              <div class="item"><span class="dot red"></span>1-2 Estrellas</div>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      }
+
+    </div>
+  }
+</ion-content>

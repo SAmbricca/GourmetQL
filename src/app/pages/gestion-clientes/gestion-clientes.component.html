@@ -1,0 +1,39 @@
+<ion-content [fullscreen]="true" class="gestion-content">
+  <div class="gestion-container">
+    <div class="logo-container">
+      <img src="./assets/logo.png" class="logo">
+      <h1 class="app-title">Gourmet QL</h1>
+    </div>
+
+    <ion-card class="gestion-card">
+      <!-- Título fijo -->
+      <ion-header class="card-header">
+        <ion-toolbar class="title">
+          <ion-title>Solicitud de ingreso</ion-title>
+        </ion-toolbar>
+      </ion-header>
+
+      <!-- Lista que scrollea -->
+      <div class="list-scroll">
+        <ion-list>
+          @for(cliente of clientesPendientes; track cliente){
+            <ion-item>
+              <ion-label>
+                <h2>{{ cliente.nombre }} {{ cliente.apellido }}</h2>
+                <p>Email: {{ cliente.email }}</p>
+              </ion-label>
+              <ion-button color="success" (click)="aprobar(cliente)">Aceptar</ion-button>
+              <ion-button color="danger" (click)="rechazar(cliente)">Rechazar</ion-button>
+            </ion-item>
+          }
+        </ion-list>
+
+        @if(clientesPendientes.length === 0){
+          <ion-item>
+            <ion-label>No hay clientes pendientes</ion-label>
+          </ion-item>
+        }
+      </div>
+    </ion-card>
+  </div>
+</ion-content>

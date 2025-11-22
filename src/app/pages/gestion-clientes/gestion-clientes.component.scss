@@ -1,0 +1,110 @@
+.gestion-content {
+  --background: linear-gradient(135deg, #f09850 0%,  #cc480b 100%);
+}
+
+.gestion-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 20px;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.app-title {
+  color: white;
+  font-size: 2.2rem;
+  font-weight: bold;
+  margin: 10px 0 5px 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  font-family:'Times New Roman', Times, serif;
+}
+
+.logo-container {
+  text-align: center;
+  margin-bottom: 30px;
+
+  .logo {
+    width: 120px;
+    height: 120px;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    margin-bottom: 20px;
+  }
+}
+
+.title {
+  --background: linear-gradient(135deg, #da8e63 0%, #d86c07 100%);
+  color: white;
+  text-align: center;
+  padding: 12px;
+  font-family:'Times New Roman', Times, serif;
+}
+
+.notifications-container {
+  --padding-start: 15px;
+  --padding-end: 15px;
+  max-height: 60vh;   // altura máxima visible
+  overflow-y: auto;   // scroll solo si hay muchas
+  border-radius: 25px;                // si querés también redondear el contenedor
+  background: rgba(255, 255, 255, 0.05); // un fondo sutil transparente
+  padding: 10px;
+
+
+  .gestion-card {
+    border-radius: 25px;
+    background: #1c1c1c;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    color: #fff;
+    overflow: hidden;
+    max-width: 500px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }  
+
+}
+.card-header {
+  position: sticky;   /* siempre visible */
+  top: 0;
+  z-index: 10;
+ 
+  
+}
+.list-scroll {
+  border-radius: 25px;  
+  max-height: 60vh;   /* hasta 60% de pantalla */
+  overflow-y: auto;   /* acá se activa el scroll */
+  border-radius: 25px;  
+  width: 400px;
+}
+
+
+.notifications-container {
+  width: 100%;
+  max-width: 500px;   // más ancho que los 400px originales
+  max-height: 70vh;   // ocupa hasta el 70% de la pantalla
+  overflow-y: auto;   // aparece scroll solo si hay muchas
+  margin-bottom: 20px;
+  padding: 15px;
+    border-radius: 25px;  
+
+}
+@media (max-width: 768px){
+    .gestion-container{
+        padding: 15px;
+    }
+
+    .logo-container{
+        .logo{
+            width: 100px;
+            height: 100px;
+        }
+
+        .app-title{
+            font-size: 1.8rem;
+        }
+    }
+
+
+}

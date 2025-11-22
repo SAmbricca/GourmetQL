@@ -1,0 +1,90 @@
+ion-content {
+  --background: linear-gradient(135deg, #f09850 0%, #cc480b 100%);
+  ion-title{
+    padding-top: 20px;
+  }
+}
+
+
+.volver-icon {
+  width: 36px;
+  height: 36px;
+  padding-top: 20px;
+}
+.header-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+
+  h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #333;
+  }
+}
+
+.producto-info {
+  text-align: center;
+  padding: 10px 0;
+
+  h1 {
+    font-size: 1.8rem; // Texto gigante para lectura rápida
+    font-weight: bold;
+    color: #222;
+    margin: 10px 0;
+  }
+}
+
+.acciones {
+  margin-top: 15px;
+  ion-button {
+    font-weight: bold;
+    height: 50px; // Botones grandes para dedos ocupados
+  }
+}
+
+// Estados de la tarjeta
+ion-card {
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-left: 8px solid #e0e0e0; // Estado pendiente por defecto
+
+  &.en-preparacion {
+    border-left: 8px solid #ffc409; // Amarillo alerta
+    background-color: #fffdf5;
+  }
+}
+
+// Animación para items en preparación (Llamar la atención)
+.blink {
+  color: #d32f2f; // Rojo
+  font-weight: 900;
+  font-size: 1.1rem;
+  animation: blinker 1.5s linear infinite;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.empty-msg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 80%;
+  color: #999;
+  
+  h3 {
+    font-size: 1.5rem;
+    margin-top: 20px;
+  }
+}

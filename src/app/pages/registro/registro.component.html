@@ -1,0 +1,174 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Registro de Usuario</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="registro-container">
+    
+    <form [formGroup]="registroForm" (ngSubmit)="registrarUsuario()">
+      
+      <div class="section-title">Foto de Perfil</div>
+      <div class="foto-container">
+        <ion-avatar 
+          class="avatar-grande" 
+          [class.avatar-vacio]="!fotoUrl"
+          (click)="tomarFoto()">
+          <img [src]="fotoUrl || 'assets/placeholder/persona_placeholder.jpeg'" alt="Foto de perfil" />
+          @if (!fotoUrl) {
+            <ion-icon name="camera" class="camera-overlay"></ion-icon>
+          }
+        </ion-avatar>
+        <ion-button 
+          fill="outline" 
+          size="small" 
+          (click)="tomarFoto()"
+          class="btn-foto">
+          <ion-icon name="camera" slot="start"></ion-icon>
+          {{ fotoUrl ? 'Cambiar Foto' : 'Tomar Foto' }}
+        </ion-button>
+        @if (fotoError) {
+          <ion-text color="danger">
+            <p class="error-text">{{ fotoError }}</p>
+          </ion-text>
+        }
+      </div>
+
+      <ion-button 
+        expand="block" 
+        fill="outline" 
+        color="secondary"
+        (click)="escanearCodigoBarras()"
+        class="qr-button">
+        <ion-icon name="qr-code" slot="start"></ion-icon>
+        Escanear DNI con QR
+      </ion-button>
+
+      <div class="section-title">
+        <p>Datos Personales</p>
+      </div>
+      
+      <div class="input-container">
+        <ion-input
+          formControlName="nombre"
+          placeholder="Nombre"
+          fill="outline"
+          [class.ion-invalid]="nombreError"
+          [class.ion-touched]="registroForm.get('nombre')?.touched">
+        </ion-input>
+        @if (nombreError) {
+          <ion-text color="danger">
+            <p class="error-text">{{ nombreError }}</p>
+          </ion-text>
+        }
+      </div>
+
+      <div class="input-container">
+        <ion-input
+          formControlName="apellido"
+          placeholder="Apellido"
+          fill="outline"
+          [class.ion-invalid]="apellidoError"
+          [class.ion-touched]="registroForm.get('apellido')?.touched">
+        </ion-input>
+        @if (apellidoError) {
+          <ion-text color="danger">
+            <p class="error-text">{{ apellidoError }}</p>
+          </ion-text>
+        }
+      </div>
+
+      <div class="input-container">
+        <ion-input
+          formControlName="email"
+          type="email"
+          placeholder="Correo electrónico"
+          fill="outline"
+          [class.ion-invalid]="emailError"
+          [class.ion-touched]="registroForm.get('email')?.touched">
+        </ion-input>
+        @if (emailError) {
+          <ion-text color="danger">
+            <p class="error-text">{{ emailError }}</p>
+          </ion-text>
+        }
+      </div>
+
+      <div class="input-container">
+        <ion-input
+          formControlName="dni"
+          type="number"
+          placeholder="DNI"
+          fill="outline"
+          [class.ion-invalid]="dniError"
+          [class.ion-touched]="registroForm.get('dni')?.touched">
+        </ion-input>
+        @if (dniError) {
+          <ion-text color="danger">
+            <p class="error-text">{{ dniError }}</p>
+          </ion-text>
+        }
+      </div>
+
+      <div class="input-container">
+        <ion-input
+          formControlName="cuil"
+          placeholder="CUIL (20-12345678-9)"
+          fill="outline"
+          [class.ion-invalid]="cuilError"
+          [class.ion-touched]="registroForm.get('cuil')?.touched">
+        </ion-input>
+        @if (cuilError) {
+          <ion-text color="danger">
+            <p class="error-text">{{ cuilError }}</p>
+          </ion-text>
+        }
+      </div>
+
+      <div class="input-container">
+        <ion-input
+          formControlName="contrasenia"
+          type="password"
+          placeholder="Contraseña"
+          fill="outline"
+          [class.ion-invalid]="contraseniaError"
+          [class.ion-touched]="registroForm.get('contrasenia')?.touched">
+        </ion-input>
+        @if (contraseniaError) {
+          <ion-text color="danger">
+            <p class="error-text">{{ contraseniaError }}</p>
+          </ion-text>
+        }
+      </div>
+
+      <div class="section-title">Perfil de Usuario</div>
+      
+      <div class="input-container">
+        <ion-select 
+          formControlName="perfil" 
+          placeholder="Seleccione un perfil"
+          fill="outline"
+          interface="action-sheet">
+          @for (perfil of perfilesDisponibles; track perfil) {
+            <ion-select-option [value]="perfil">
+              {{ perfil | titlecase }}
+            </ion-select-option>
+          }
+        </ion-select>
+      </div>
+
+      <div class="button-container">
+        <ion-button 
+          expand="block" 
+          type="submit"
+          [disabled]="!registroForm.valid"
+          class="register-button">
+          <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+          Registrar
+        </ion-button>
+      </div>
+    </form>
+    
+  </div>
+</ion-content>

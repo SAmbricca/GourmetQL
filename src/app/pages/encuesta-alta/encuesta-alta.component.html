@@ -1,0 +1,100 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Tu Opinión Importa</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="encuesta-container">
+    
+    <!-- Header Visual -->
+    <div class="header-text">
+      <h2>¡Esperamos que hayas disfrutado!</h2>
+      <p>Ayúdanos a mejorar calificando tu experiencia.</p>
+    </div>
+
+    <!-- Card Comida -->
+    <ion-card class="rating-card">
+      <ion-card-content>
+        <div class="rating-label">
+          <ion-icon name="restaurant-outline" style="display:none"></ion-icon> 
+          <h3>Comida</h3>
+          <span class="score">{{ calificacionComida }}/5</span>
+        </div>
+        <div class="stars-container">
+          <ion-icon 
+            *ngFor="let i of [1,2,3,4,5]" 
+            [name]="i <= calificacionComida ? 'star' : 'star-outline'"
+            [class.active]="i <= calificacionComida"
+            (click)="calificacionComida = i">
+          </ion-icon>
+        </div>
+        <ion-range min="1" max="5" step="1" snaps="true" [(ngModel)]="calificacionComida"></ion-range>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Card Servicio -->
+    <ion-card class="rating-card">
+      <ion-card-content>
+        <div class="rating-label">
+          <h3>Atención / Servicio</h3>
+          <span class="score">{{ calificacionServicio }}/5</span>
+        </div>
+        <div class="stars-container">
+          <ion-icon 
+            *ngFor="let i of [1,2,3,4,5]" 
+            [name]="i <= calificacionServicio ? 'star' : 'star-outline'"
+            [class.active]="i <= calificacionServicio"
+            (click)="calificacionServicio = i">
+          </ion-icon>
+        </div>
+        <ion-range min="1" max="5" step="1" snaps="true" [(ngModel)]="calificacionServicio"></ion-range>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Card Ambiente -->
+    <ion-card class="rating-card">
+      <ion-card-content>
+        <div class="rating-label">
+          <h3>Ambiente</h3>
+          <span class="score">{{ calificacionAmbiente }}/5</span>
+        </div>
+        <div class="stars-container">
+          <ion-icon 
+            *ngFor="let i of [1,2,3,4,5]" 
+            [name]="i <= calificacionAmbiente ? 'star' : 'star-outline'"
+            [class.active]="i <= calificacionAmbiente"
+            (click)="calificacionAmbiente = i">
+          </ion-icon>
+        </div>
+        <ion-range min="1" max="5" step="1" snaps="true" [(ngModel)]="calificacionAmbiente"></ion-range>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Comentarios -->
+    <ion-card class="input-card">
+      <ion-card-content>
+        <ion-label>¿Algo más que agregar?</ion-label>
+        <ion-textarea 
+          [(ngModel)]="comentariosTexto" 
+          placeholder="Escribe aquí tus sugerencias o felicitaciones..."
+          rows="4">
+        </ion-textarea>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Botón Final -->
+    <div class="submit-section">
+      <ion-button expand="block" size="large" color="light" class="btn-enviar" (click)="enviarEncuesta()" [disabled]="cargando">
+        <ion-icon slot="start" name="send-outline"></ion-icon>
+        {{ cargando ? 'Enviando...' : 'Enviar Opinión' }}
+      </ion-button>
+    </div>
+
+  </div>
+</ion-content>

@@ -1,0 +1,74 @@
+<ion-header>
+  <ion-toolbar color="tertiary"> 
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()">
+        <img src="assets/volver-icono.png">
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Bar - Bebidas Pendientes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div *ngIf="pendientes.length === 0" class="empty-msg">
+    <h3>¡Barra despejada!</h3>
+    <p>Esperando nuevos pedidos...</p>
+  </div>
+
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let item of pendientes">
+        
+        <ion-card [class.en-preparacion]="item.estado === 'preparacion'">
+          <ion-card-content>
+            
+            <div class="header-ticket">
+              <div class="mesa-badge">
+                Mesa {{ item.pedido?.mesa?.numero }}
+              </div>
+              <ion-text color="medium">
+                <small>{{ item.pedido?.fecha_creacion | date:'HH:mm' }}</small>
+              </ion-text>
+            </div>
+
+            <div class="producto-body">
+              <div class="cantidad-badge">{{ item.cantidad }}</div>
+              <div class="nombre-producto">
+                {{ item.menu.nombre }}
+              </div>
+            </div>
+
+            <div *ngIf="item.estado === 'preparacion'" class="estado-preparando">
+              <ion-icon name="hourglass-outline"></ion-icon> PREPARANDO...
+            </div>
+
+            <div class="acciones">
+              <ion-button 
+                *ngIf="item.estado === 'pendiente'" 
+                expand="block" 
+                fill="outline" 
+                color="tertiary" 
+                (click)="preparar(item)">
+                Comenzar
+              </ion-button>
+
+              <ion-button 
+                *ngIf="item.estado === 'preparacion'" 
+                expand="block" 
+                color="success" 
+                (click)="terminar(item)">
+                ¡Listo para servir!
+              </ion-button>
+            </div>
+
+          </ion-card-content>
+        </ion-card>
+
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

@@ -1,0 +1,7 @@
+{
+  "name": "GourmetQL",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

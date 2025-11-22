@@ -1,0 +1,46 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title class="ion-text-center panel-title">
+      Panel Principal
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrarSesion()">
+        <img src="assets/salir-icono.jpeg" alt="Salir" class="salir-icon">
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="user-info-container">
+    <ion-card>
+      <ion-card-header>
+        <div class="user-details">
+          <ion-card-title>{{ nombreCompleto }}</ion-card-title>
+        </div>
+      </ion-card-header>
+    </ion-card>
+  </div>
+
+  <div class="opciones-container">
+    <ion-text class="ion-text-center" color="medium">
+      <h2>Acciones:</h2>
+    </ion-text>
+
+    <ion-grid>
+      <ion-row>
+        @for (opcion of opcionesDisponibles; track opcion.ruta) {
+          <ion-col size="12" size-md="6">
+            <ion-card button (click)="navegarA(opcion.ruta)">
+              <ion-card-header>
+                <div class="opcion-header">
+                  <ion-card-title>{{ opcion.titulo }}</ion-card-title>
+                </div>
+              </ion-card-header>
+            </ion-card>
+          </ion-col>
+        }
+      </ion-row>
+    </ion-grid>
+  </div>
+</ion-content>

@@ -1,0 +1,224 @@
+.gestion-content {
+  --background: linear-gradient(135deg, #f09850 0%, #cc480b 100%);
+  display: flex;
+  flex-direction: column;
+}
+
+.volver-icon {
+  width: 36px;
+  height: 36px;
+  padding-top: 20px;
+}
+
+ion-header {
+  ion-toolbar {
+    --background: #fff;
+    --border-style: none;
+  }
+}
+
+.consulta-title {
+  font-weight: 600;
+  color: #333;
+  padding-top: 16px;
+}
+
+.volver-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  padding-top: 16px;
+}
+
+.info-toolbar {
+  --background: #fff;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  --min-height: 40px;
+
+  .mesa-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    color: #666;
+    padding: 8px 0;
+    font-weight: 500;
+
+    ion-icon {
+      font-size: 1.1rem;
+      color: #f09850;
+    }
+  }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  
+  h3 {
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 500;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  padding-bottom: 80px; // Espacio para que el último mensaje no quede tapado por el footer
+  gap: 12px;
+  min-height: 100%;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 80vh; // Ajustado para centrar verticalmente
+  padding: 20px;
+  text-align: center;
+
+  ion-icon {
+    font-size: 80px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    color: #fff;
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    max-width: 80%;
+    margin: 0 auto;
+  }
+}
+
+/* Mensajes */
+.mensaje {
+  display: flex;
+  margin-bottom: 4px;
+  animation: fadeIn 0.3s ease-in;
+  width: 100%;
+
+  /* CLIENTE (Yo) -> Derecha / Azul */
+  &.mensaje-cliente {
+    justify-content: flex-end;
+
+    .mensaje-contenido {
+      background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+      color: white;
+      border-radius: 18px 18px 4px 18px;
+      box-shadow: 0 2px 8px rgba(53, 122, 189, 0.3);
+      
+      .mensaje-autor { color: rgba(255, 255, 255, 0.9); }
+      .mensaje-hora { color: rgba(255, 255, 255, 0.8); }
+    }
+  }
+
+  /* MOZO (Otro) -> Izquierda / Blanco */
+  &.mensaje-mozo {
+    justify-content: flex-start;
+
+    .mensaje-contenido {
+      background: white;
+      color: #333;
+      border-radius: 18px 18px 18px 4px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+      .mensaje-autor { color: #f09850; font-weight: bold; }
+      .mensaje-hora { color: #999; }
+    }
+  }
+}
+
+.mensaje-contenido {
+  max-width: 80%;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+}
+
+.mensaje-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.mensaje-autor {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.mensaje-texto {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.mensaje-hora {
+  font-size: 0.65rem;
+  text-align: right;
+  margin-top: 2px;
+  align-self: flex-end;
+}
+
+/* Footer Input */
+ion-footer {
+  background: white;
+  box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.05);
+  padding-bottom: var(--ion-safe-area-bottom, 0);
+}
+
+.input-container {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  gap: 10px;
+  background: #fff;
+
+  .mensaje-input {
+    flex: 1;
+    --background: #f5f5f5;
+    --padding-start: 16px;
+    --padding-end: 16px;
+    --placeholder-color: #999;
+    border-radius: 24px;
+    font-size: 1rem;
+    min-height: 44px;
+  }
+
+  .enviar-button {
+    --border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    margin: 0;
+    --padding-start: 0;
+    --padding-end: 0;
+    
+    ion-icon {
+      font-size: 1.2rem;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Fondo naranja -->
+    <item android:drawable="@color/fucsia_background" />
+    
+    <!-- Icono centrado usando drawable personalizado -->
+    <item android:drawable="@drawable/splash_icon" />
+</layer-list>

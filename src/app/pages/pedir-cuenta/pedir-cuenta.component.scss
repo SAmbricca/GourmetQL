@@ -1,0 +1,245 @@
+ion-content {
+  // Mismo gradiente que mesa-opciones para consistencia
+  --background: linear-gradient(135deg, #f09850 0%, #cc480b 100%);
+}
+
+ion-toolbar {
+  --background: transparent;
+  --color: white;
+  ion-title {
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding-top: 20px;
+    color: #333; // Contraste sobre el header transparente si se superpone, o blanco
+  }
+  // Forzamos título blanco si está sobre el gradiente
+  --color: black; 
+  ion-icon{
+    padding-top: 20px;
+  }
+}
+
+.bill-container {
+  padding: 10px 20px 40px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.loading-container {
+  height: 60vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  p { margin-top: 15px; font-weight: 500; }
+}
+
+.bill-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  margin: 0;
+  overflow: visible;
+
+  ion-card-header {
+    text-align: center;
+    padding-bottom: 0;
+    
+    .icon-header {
+      width: 50px;
+      height: 50px;
+      background: #e3f2fd; // Azul clarito
+      color: #1976d2;
+      border-radius: 50%;
+      margin: 0 auto 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+
+    ion-card-title {
+      color: #333;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+  }
+
+  ion-list {
+    background: transparent;
+    padding: 0;
+  }
+
+  ion-item {
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    --min-height: 40px;
+    font-size: 0.9rem;
+    color: #555;
+
+    h3 {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 2px;
+    }
+    
+    .price-text {
+      font-weight: 600;
+      color: #333;
+    }
+  }
+}
+
+.divider {
+  height: 1px;
+  background: #eee;
+  margin: 15px 0;
+  border-bottom: 1px dashed #ccc; // Efecto ticket
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+  color: #666;
+
+  &.discount {
+    color: #ef5350; // Rojo descuento
+    font-weight: 600;
+    ion-icon { vertical-align: middle; margin-right: 4px; }
+  }
+
+  &.tip {
+    color: #2e7d32; // Verde dinero
+    align-items: center;
+    
+    .tip-amount { font-weight: 700; }
+  }
+}
+
+.tip-control-card {
+  background: white;
+  border-radius: 16px;
+  margin: 10px 0;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+
+  ion-card-header {
+    padding-bottom: 0;
+    ion-card-subtitle {
+      text-align: center;
+      font-weight: 600;
+      color: #666;
+    }
+  }
+
+  .satisfaction-range {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+
+    ion-icon { font-size: 24px; }
+    ion-range { padding-top: 0; }
+  }
+
+  .quick-chips {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0;
+    
+    ion-chip {
+      font-size: 0.8rem;
+    }
+  }
+
+  .manual-tip-input {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f5f5f5;
+    border-radius: 8px;
+    padding: 5px 15px;
+    margin-top: 10px;
+
+    ion-label {
+      color: #666;
+      font-weight: 500;
+      margin-right: 10px;
+    }
+
+    ion-input {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #333;
+      --padding-top: 5px;
+      --padding-bottom: 5px;
+      max-width: 100px;
+      text-align: right;
+    }
+  }
+}
+
+.qr-action-container {
+  // Estilo tipo Glassmorphism sobre el fondo naranja
+  text-align: center;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 15px;
+  padding: 20px;
+  backdrop-filter: blur(5px);
+  margin: 15px 0;
+
+  p {
+    color: white;
+    margin: 0 0 15px;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  }
+
+  .qr-btn {
+    --border-radius: 12px;
+    font-weight: 700;
+    --box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  }
+}
+
+.total-container {
+  background: white;
+  border-radius: 16px;
+  padding: 25px 20px; // Más padding vertical
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15); // Más sombra
+  margin-top: 15px;
+  border: 1px solid #eee;
+
+  .total-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: #999;
+    letter-spacing: 2px;
+    font-weight: 700;
+    margin-bottom: 5px;
+  }
+
+  .total-amount {
+    font-size: 3rem; // Texto grande
+    font-weight: 900;
+    line-height: 1;
+    color: #333;
+    // El gradiente que te gusta
+    background: linear-gradient(45deg, #333 30%, #cc480b 100%);
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+// Animación simple de entrada
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate__fadeIn {
+  animation: fadeIn 0.4s ease-out;
+}

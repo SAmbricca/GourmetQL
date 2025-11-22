@@ -1,0 +1,82 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Detalle del Pedido</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  @if (cargando) {
+    <div class="ion-text-center ion-padding top-50">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando tu pedido...</p>
+    </div>
+  } @else {
+    <div class="content-wrapper">
+      
+      <ion-card class="summary-card">
+        <ion-card-content>
+          <div class="header-row">
+            <h1>Mesa {{ numeroMesa }}</h1>
+            <ion-badge [color]="pedido?.estado === 'pendiente' ? 'medium' : 'primary'" mode="ios">
+              {{ pedido?.estado | uppercase }}
+            </ion-badge>
+          </div>
+          
+          @if (pedido?.tiempo_estimado > 0) {
+            <div class="time-row ion-margin-bottom">
+              <ion-icon name="time-outline" color="medium"></ion-icon>
+              <ion-text color="medium">
+                <small>Tiempo estimado: {{ pedido?.tiempo_estimado }} min</small>
+              </ion-text>
+            </div>
+          }
+
+          <div class="total-row">
+            <span>Total Acumulado</span>
+            <ion-text color="dark">
+              <h2 class="price">${{ total | number:'1.0-0' }}</h2>
+            </ion-text>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <div class="section-title">
+        <h3>Tus Productos</h3>
+      </div>
+
+      <div class="products-list">
+        @for (detalle of pedido?.detalles_pedido; track detalle.id) {
+          <ion-card class="product-card">
+            <div class="product-img">
+              <img [src]="getImagenProducto(detalle)" alt="{{ detalle.menu.nombre }}" />
+            </div>
+            
+            <div class="product-info">
+              <div class="info-top">
+                <h4>{{ detalle.menu.nombre }}</h4>
+                <span class="qty">x{{ detalle.cantidad }}</span>
+              </div>
+              
+              <div class="info-price">
+                ${{ detalle.precio_unitario * detalle.cantidad | number:'1.0-0' }}
+              </div>
+
+              <div class="product-status">
+                <ion-chip [color]="getColorEstadoProducto(detalle.estado)" outline="true">
+                  <ion-icon [name]="getIconoEstadoProducto(detalle.estado)"></ion-icon>
+                  <ion-label>{{ detalle.estado | titlecase }}</ion-label>
+                </ion-chip>
+              </div>
+            </div>
+          </ion-card>
+        }
+      </div>
+
+    </div>
+  }
+</ion-content>

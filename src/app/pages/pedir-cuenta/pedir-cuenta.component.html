@@ -1,0 +1,110 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()" color="dark">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">Cuenta Mesa</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="bill-container">
+    
+    @if (loading) {
+      <div class="loading-container">
+        <ion-spinner name="crescent" color="light"></ion-spinner>
+        <p>Cargando...</p>
+      </div>
+    } @else {
+
+      <ion-card class="bill-card">
+        <ion-card-header>
+          <div class="icon-header"><ion-icon name="receipt-outline"></ion-icon></div>
+          <ion-card-title>Resumen de Consumo</ion-card-title>
+        </ion-card-header>
+
+        <ion-card-content>
+          <ion-list lines="none">
+            @for (item of listaItems; track item.nombre) {
+              <ion-item>
+                <ion-label>
+                  <h3>{{ item.nombre }}</h3>
+                  <p>x{{ item.cantidad }}</p>
+                </ion-label>
+                <div slot="end" class="price-text">${{ item.importe | number:'1.0-0' }}</div>
+              </ion-item>
+            }
+          </ion-list>
+          <div class="divider"></div>
+          
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span>${{ subtotal | number:'1.0-0' }}</span>
+          </div>
+          
+          @if (descuentoJuego > 0) {
+            <div class="summary-row discount">
+              <span><ion-icon name="game-controller-outline"></ion-icon> Descuento</span>
+              <span>- ${{ descuentoJuego | number:'1.0-0' }}</span>
+            </div>
+          }
+        </ion-card-content>
+      </ion-card>
+
+      @if (!propinaHabilitada) {
+        <div class="qr-action-container">
+          <p>Escanea el QR para dejar propina</p>
+          <ion-button expand="block" color="tertiary" class="qr-btn" (click)="escanearQRPropina()">
+            <ion-icon name="qr-code-outline" slot="start"></ion-icon>
+            Escanear QR
+          </ion-button>
+        </div>
+      } @else {
+        <ion-card class="tip-control-card animate__animated animate__fadeIn">
+          <ion-card-header>
+            <ion-card-subtitle>Nivel de Satisfacción</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            
+            <div class="satisfaction-range">
+              <ion-icon name="sad-outline" color="medium"></ion-icon>
+              <ion-range [min]="0" [max]="20" [step]="5" [pin]="true" 
+                         [(ngModel)]="propinaPorcentaje" (ionChange)="alCambiarSlider($event)"
+                         color="success">
+                <ion-label slot="start">0%</ion-label>
+                <ion-label slot="end">20%</ion-label>
+              </ion-range>
+              <ion-icon name="happy-outline" color="success"></ion-icon>
+            </div>
+
+            <div class="quick-chips">
+              <ion-chip (click)="cambiarPorcentajePropina(0)" [outline]="propinaPorcentaje !== 0">Nada</ion-chip>
+              <ion-chip (click)="cambiarPorcentajePropina(10)" [outline]="propinaPorcentaje !== 10" color="success">Bien (10%)</ion-chip>
+              <ion-chip (click)="cambiarPorcentajePropina(15)" [outline]="propinaPorcentaje !== 15" color="success">Genial (15%)</ion-chip>
+            </div>
+
+            <div class="manual-tip-input">
+              <ion-label>Monto propina: $</ion-label>
+              <ion-input type="number" [(ngModel)]="propina" (ionChange)="alCambiarMontoManual()"></ion-input>
+            </div>
+
+          </ion-card-content>
+        </ion-card>
+      }
+
+      <div class="total-container">
+        <div class="total-label">TOTAL A PAGAR</div>
+        <div class="total-amount">${{ totalPedido | number:'1.0-0' }}</div>
+      </div>
+
+      <div class="pay-action">
+        <ion-button expand="block" class="pay-btn" (click)="realizarPago()" [disabled]="procesandoPago">
+          @if (procesandoPago) { <ion-spinner name="dots"></ion-spinner> } 
+          @else { <ion-icon name="wallet-outline" slot="start"></ion-icon> Pagar }
+        </ion-button>
+      </div>
+    }
+  </div>
+</ion-content>

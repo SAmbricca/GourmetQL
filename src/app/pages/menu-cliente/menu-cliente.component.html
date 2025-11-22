@@ -1,0 +1,116 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()">
+        <img src="assets/volver-icono.png" alt="Volver" class="volver-icon">
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center menu-title">
+      Menú
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  @if (cargando) {
+    <div class="loading-container">
+      <ion-text>
+        <h3>Cargando menú...</h3>
+      </ion-text>
+    </div>
+  } @else {
+    <div class="categorias-container">
+      @for (categoria of menuPorTipo; track categoria.tipo) {
+        <div class="categoria-seccion">
+          <h2 class="categoria-titulo">{{ categoria.tipo }}</h2>
+          
+          <div class="menu-horizontal-scroll">
+            @for (item of categoria.items; track item.id) {
+              <ion-card class="menu-card">
+                <!-- Carrusel de imágenes -->
+                <div class="imagenes-container">
+                  <div class="imagenes-scroll">
+                    @for (foto of item.foto_url; track $index) {
+                      <img [src]="foto" [alt]="item.nombre" class="producto-imagen">
+                    }
+                  </div>
+                </div>
+
+                <ion-card-header>
+                  <ion-card-title>{{ item.nombre }}</ion-card-title>
+                </ion-card-header>
+
+                <ion-card-content>
+                  <p class="descripcion">{{ item.descripcion }}</p>
+                  
+                  <div class="info-container">
+                    <div class="info-item">
+                      <ion-icon name="time-outline"></ion-icon>
+                      <span>Tiempo est: {{ item.tiempo_elaboracion }} min</span>
+                    </div>
+                    <div class="info-item precio">
+                      <ion-icon name="cash-outline"></ion-icon>
+                      <span>${{ item.precio.toFixed(2) }}</span>
+                    </div>
+                  </div>
+
+                  <div class="acciones-container">
+                    @if (getCantidadItem(item) === 0) {
+                      <ion-button expand="block" (click)="agregarItem(item)">
+                        Agregar al pedido
+                      </ion-button>
+                    } @else {
+                      <div class="cantidad-controls">
+                        <ion-button (click)="quitarItem(item)" fill="solid" color="danger" class="btn-control">
+                          <ion-icon slot="icon-only" name="remove"></ion-icon>
+                        </ion-button>
+                        <span class="cantidad">{{ getCantidadItem(item) }}</span>
+                        <ion-button (click)="agregarItem(item)" fill="solid" color="success" class="btn-control">
+                          <ion-icon slot="icon-only" name="add"></ion-icon>
+                        </ion-button>
+                      </div>
+                    }
+                  </div>
+                </ion-card-content>
+              </ion-card>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</ion-content>
+
+<ion-footer class="pedido-footer">
+  <div class="pedido-resumen">
+    <div class="resumen-info">
+      <div class="total-container">
+        <ion-text color="light">
+          <h2>Total: ${{ totalPedido.toFixed(2) }}</h2>
+        </ion-text>
+        @if (cantidadTotalItems > 0) {
+          <ion-badge color="warning">{{ cantidadTotalItems }} items</ion-badge>
+        }
+      </div>
+      @if (tiempoTotal > 0) {
+        <ion-text color="light">
+          <p class="tiempo-estimado">
+            <ion-icon name="timer-outline"></ion-icon>
+            Tiempo estimado: {{ tiempoTotal }} min
+          </p>
+        </ion-text>
+      }
+    </div>
+    
+    <div class="acciones-footer">
+      <ion-button 
+        expand="block" 
+        [disabled]="cantidadTotalItems === 0"
+        (click)="confirmarPedido()"
+        size="large"
+        color="success">
+        Realizar Pedido
+      </ion-button>
+    </div>
+  </div>
+</ion-footer>

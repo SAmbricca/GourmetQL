@@ -1,0 +1,164 @@
+ion-content {
+  --background: linear-gradient(135deg, #f09850 0%, #cc480b 100%);
+}
+
+ion-toolbar {
+  --background: transparent;
+  --color: white;
+  ion-title {
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: black;
+    padding-top: 20px;
+  }
+}
+
+.dashboard-container {
+  padding: 10px 20px 40px 20px;
+}
+
+.welcome-header {
+  margin-bottom: 20px;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  
+  h2 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin: 0;
+    text-align: center;
+  }
+  p {
+    margin: 5px 0 0;
+    opacity: 0.9;
+    font-size: 0.95rem;
+  }
+}
+
+.status-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  margin-bottom: 25px;
+  overflow: visible;
+
+  ion-card-content {
+    padding: 20px;
+  }
+
+  .status-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+
+    .status-badge {
+      padding: 8px 16px;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      align-items: center;
+    }
+
+    .time-info {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #666;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+  }
+
+  .progress-container {
+    ion-progress-bar {
+      height: 8px;
+      border-radius: 4px;
+      --background: #eee;
+    }
+  }
+}
+
+.section-title {
+  h3 {
+    color: white;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    padding-left: 5px;
+    font-weight: 600;
+    opacity: 0.9;
+    text-align: center;
+  }
+}
+
+.action-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin: 5px;
+  height: 110px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: transform 0.2s ease;
+
+  &:active {
+    transform: scale(0.96);
+  }
+
+  .icon-wrapper {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+
+    &.primary { background: #e3f2fd; color: #2196f3; }
+    &.secondary { background: #f3e5f5; color: #ab47bc; }
+    &.tertiary { background: #e0f2f1; color: #26a69a; }
+    &.success { background: #e8f5e9; color: #66bb6a; }
+    &.warning { background: #fff3e0; color: #ffa726; }
+    &.danger { background: #ffebee; color: #ef5350; }
+  }
+
+  ion-label {
+    font-weight: 600;
+    color: #444;
+    font-size: 0.9rem;
+  }
+
+  // Estilo especial para tarjeta de juegos horizontal
+  &.featured {
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 0 20px;
+    height: 90px;
+
+    .card-content-row {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      gap: 15px;
+    }
+
+    .text-wrapper {
+      flex: 1;
+      text-align: left;
+      
+      ion-card-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #333;
+      }
+      p {
+        margin: 2px 0 0;
+        font-size: 0.8rem;
+        color: #666;
+      }
+    }
+  }
+}

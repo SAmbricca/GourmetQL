@@ -1,0 +1,45 @@
+<ion-header>
+  <ion-toolbar color="danger"> <ion-buttons slot="start">
+      <ion-button (click)="volver()"><img src="assets/volver-icono.png" style="width:30px"></ion-button>
+    </ion-buttons>
+    <ion-title>Cocina - Pendientes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div *ngIf="pendientes.length === 0" class="empty-msg">
+    <h3>¡Cocina al día!</h3>
+  </div>
+
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" size-md="6" *ngFor="let item of pendientes">
+        <ion-card [class.en-preparacion]="item.estado === 'preparacion'">
+          <ion-card-content>
+            <div class="header-item">
+              <h2>Mesa {{ item.pedido?.mesa?.numero }}</h2>
+              <ion-badge color="dark">{{ item.pedido?.fecha_creacion | date:'HH:mm:ss' }}</ion-badge>
+            </div>
+            
+            <div class="producto-info">
+              <h1>{{ item.cantidad }}x {{ item.menu.nombre }}</h1>
+            </div>
+
+            <div class="acciones">
+              <ion-button *ngIf="item.estado === 'pendiente'" expand="full" color="warning" (click)="empezarPreparacion(item)">
+                Cocinar
+              </ion-button>
+              <ion-button *ngIf="item.estado === 'preparacion'" expand="full" color="success" (click)="finalizarItem(item)">
+                Terminar
+              </ion-button>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

@@ -1,0 +1,48 @@
+ion-content {
+  --background: linear-gradient(135deg, #f09850 0%, #cc480b 100%);
+}
+
+.icon-small { width: 30px; height: 30px; }
+
+.card-pedido {
+  border-radius: 15px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  margin-bottom: 15px;
+
+  &.nuevo {
+    border-left: 6px solid #ffc409; // Amarillo para alerta
+  }
+
+  &.listo {
+    border-left: 6px solid #2dd36f; // Verde para listo
+    animation: pulse 2s infinite;
+  }
+
+  .texto-listo {
+    color: #2dd36f;
+    font-weight: bold;
+    font-size: 1.2rem;
+    text-align: center;
+  }
+
+  .acciones {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    ion-button { flex: 1; }
+  }
+}
+
+.empty-msg {
+  text-align: center;
+  color: white;
+  margin-top: 50px;
+  font-size: 1.5rem;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
