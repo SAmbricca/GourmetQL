@@ -1,0 +1,203 @@
+<ion-header class="ion-no-border header-transparente">
+  <ion-toolbar>
+    <!-- Espacio vacío para empujar contenido (Overlay visual) -->
+  </ion-toolbar>
+</ion-header>
+
+<!-- Header Funcional Gourmet -->
+<ion-header class="ion-no-border">
+  <ion-toolbar class="gourmet-toolbar">
+    <ion-buttons slot="start">
+      <ion-button (click)="volverAlHome()">
+        <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="gourmet-title ion-text-center">
+      Gestión de Reservas
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrarSesion()" color="danger">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="gourmet-content">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content pullingIcon="chevron-down-circle-outline"></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="main-container">
+
+    <!-- SECCIÓN: PENDIENTES DE APROBACIÓN -->
+    <div class="section-title">
+      <ion-text color="light">
+        <h2 class="title-pendiente">
+          Solicitudes Pendientes
+        </h2>
+      </ion-text>
+    </div>
+
+    @if (cargando) {
+      <div class="center-state">
+        <ion-spinner name="crescent" color="warning"></ion-spinner>
+        <p>Cargando reservas...</p>
+      </div>
+    } 
+    @else if (reservasPendientes.length === 0) {
+      <div class="center-state empty empty-pending">
+        <div class="icon-circle">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+        </div>
+        <p>No hay solicitudes pendientes</p>
+      </div>
+    } 
+    @else {
+      <ion-grid class="ion-no-padding">
+        <ion-row>
+          @for (reserva of reservasPendientes; track reserva.id) {
+            <ion-col size="12" size-md="6">
+              <ion-card class="reserva-card">
+                <div class="card-status-bar"></div>
+                
+                <ion-card-header>
+                  <div class="user-profile">
+                    <ion-avatar>
+                      <img [src]="reserva.cliente.foto_url || 'assets/avatar-default.png'" />
+                    </ion-avatar>
+                    <div class="user-info">
+                      <ion-card-title>{{ reserva.cliente.nombre }} {{ reserva.cliente.apellido }}</ion-card-title>
+                      <p class="email-text">{{ reserva.cliente.email }}</p>
+                    </div>
+                  </div>
+                </ion-card-header>
+
+                <ion-card-content>
+                  <!-- Detalles -->
+                  <div class="reserva-details">
+                    <div class="detail-item">
+                      <ion-icon name="calendar-outline"></ion-icon>
+                      <div class="text">
+                        <span class="label">FECHA</span>
+                        <span class="value">{{ reserva.fecha_hora | date:'dd/MM' }}</span>
+                      </div>
+                    </div>
+                    <div class="detail-item">
+                      <ion-icon name="time-outline"></ion-icon>
+                      <div class="text">
+                        <span class="label">HORA</span>
+                        <span class="value">{{ reserva.fecha_hora | date:'HH:mm' }}</span>
+                      </div>
+                    </div>
+                    <div class="detail-item pax">
+                      <ion-icon name="people-outline"></ion-icon>
+                      <div class="text">
+                        <span class="label">PAX</span>
+                        <span class="value">{{ reserva.cantidad_comensales }}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Área de Acciones Normales -->
+                  @if (reservaRechazarId !== reserva.id) {
+                    <div class="actions-container">
+                      <ion-button fill="outline" class="btn-action reject" (click)="iniciarRechazo(reserva.id)">
+                        RECHAZAR
+                      </ion-button>
+                      <ion-button fill="solid" class="btn-action confirm" (click)="aprobarReserva(reserva)">
+                        APROBAR
+                      </ion-button>
+                    </div>
+                  } 
+                  <!-- Área de Rechazo con Motivo -->
+                  @else {
+                    <div class="rejection-area">
+                      <p class="rejection-label">Motivo del rechazo:</p>
+                      <input 
+                        type="text" 
+                        class="rejection-input"
+                        [(ngModel)]="motivoRechazo" 
+                        placeholder="Ej: Sin disponibilidad..."
+                      >
+                      <div class="rejection-buttons">
+                        <ion-button size="small" color="medium" fill="clear" (click)="cancelarRechazo()" class="btn-cancel">
+                          Cancelar
+                        </ion-button>
+                        <ion-button size="small" color="danger" (click)="confirmarRechazo(reserva)" class="btn-confirm">
+                          Confirmar
+                        </ion-button>
+                      </div>
+                    </div>
+                  }
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+          }
+        </ion-row>
+      </ion-grid>
+    }
+
+    <!-- SECCIÓN: CONFIRMADAS (Futuras) -->
+    <div class="section-title section-confirmed">
+      <ion-text color="light">
+        <h2 class="title-confirmed">
+          Reservas Confirmadas
+        </h2>
+      </ion-text>
+    </div>
+
+    @if (!cargando && reservasConfirmadas.length > 0) {
+      <ion-grid class="ion-no-padding">
+        <ion-row>
+          @for (reserva of reservasConfirmadas; track reserva.id) {
+            <ion-col size="12" size-md="6">
+              <ion-card class="reserva-card card-confirmed">
+                <div class="card-status-bar status-confirmed"></div>
+                <ion-card-header>
+                  <div class="user-profile">
+                    <ion-avatar class="avatar-confirmed">
+                      <img [src]="reserva.cliente.foto_url || 'assets/avatar-default.png'" />
+                    </ion-avatar>
+                    <div class="user-info">
+                      <ion-card-title>{{ reserva.cliente.nombre }} {{ reserva.cliente.apellido }}</ion-card-title>
+                      <ion-badge color="success">CONFIRMADA</ion-badge>
+                    </div>
+                  </div>
+                </ion-card-header>
+                <ion-card-content>
+                   <div class="reserva-details">
+                    <div class="detail-item">
+                      <ion-icon name="calendar-outline" class="icon-confirmed"></ion-icon>
+                      <div class="text">
+                        <span class="label">FECHA</span>
+                        <span class="value">{{ reserva.fecha_hora | date:'dd/MM' }}</span>
+                      </div>
+                    </div>
+                    <div class="detail-item">
+                      <ion-icon name="time-outline" class="icon-confirmed"></ion-icon>
+                      <div class="text">
+                        <span class="label">HORA</span>
+                        <span class="value">{{ reserva.fecha_hora | date:'HH:mm' }}</span>
+                      </div>
+                    </div>
+                    <div class="detail-item pax">
+                      <ion-icon name="people-outline" class="icon-confirmed"></ion-icon>
+                      <div class="text">
+                        <span class="label">PAX</span>
+                        <span class="value">{{ reserva.cantidad_comensales }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+          }
+        </ion-row>
+      </ion-grid>
+    } @else if (!cargando) {
+      <p class="no-confirmed-msg">No hay reservas confirmadas próximas.</p>
+    }
+
+  </div>
+</ion-content>

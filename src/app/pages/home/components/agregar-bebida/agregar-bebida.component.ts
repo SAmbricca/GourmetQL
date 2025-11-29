@@ -19,9 +19,9 @@ interface FotoBebida {
   styleUrls: ['./agregar-bebida.component.scss'],
   standalone: true,
   imports: [
-    IonContent, IonCard, IonCardContent, IonItem, IonLabel, IonInput, IonTextarea, 
-    IonButton, IonIcon, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, 
-    IonGrid, IonRow, IonCol, IonSpinner, FormsModule, CommonModule
+    IonContent, IonItem, IonLabel, IonInput, IonTextarea, 
+    IonButton, IonIcon, IonHeader, IonToolbar, IonButtons, IonBackButton, 
+    IonGrid, IonRow, IonCol, FormsModule, CommonModule
   ]
 })
 export class AgregarBebidaComponent implements OnInit {

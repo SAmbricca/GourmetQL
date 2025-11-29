@@ -1,3 +1,7 @@
+<ion-header class="ion-no-border header-transparente">
+  <ion-toolbar></ion-toolbar>
+</ion-header>
+
 <ion-content [fullscreen]="true" class="login-content">
   <div class="login-container">
 
@@ -11,18 +15,12 @@
         <ion-card-content>
           <ion-item fill="outline" class="input-item">
             <ion-label position="floating">Correo Electrónico</ion-label>
-            <ion-input
-              type="email"
-              [(ngModel)]="email">
-            </ion-input>
+            <ion-input type="email" name="email" [(ngModel)]="email"></ion-input>
           </ion-item>
 
           <ion-item fill="outline" class="input-item">
             <ion-label position="floating">Contraseña</ion-label>
-            <ion-input
-              type="password"
-              [(ngModel)]="contrasenia">
-            </ion-input>
+            <ion-input type="password" name="password" [(ngModel)]="contrasenia"></ion-input>
           </ion-item>
 
           <ion-button
@@ -32,6 +30,15 @@
             (click)="iniciarSesion()">
             <ion-icon name="log-in" slot="start"></ion-icon>
             Iniciar Sesión
+          </ion-button>
+
+          <ion-button
+            expand="block"
+            size="large"
+            class="login-button btn-google"
+            (click)="loginGoogle()">
+            <ion-icon name="logo-google" slot="start"></ion-icon>
+            Google
           </ion-button>
 
           <ion-button
@@ -48,29 +55,18 @@
 
     <div class="separator">
       <hr class="separator-line">
-      <span class="separator-text">O inicia sesión como:</span>
+      <span class="separator-text">Accesos Directos</span>
       <hr class="separator-line">
     </div>
 
     <div class="quick-login">
       <ion-card class="quick-login-card">
-        <ion-card-header>
-          <ion-card-title class="quick-login-title">
-            Acceso Rápido
-          </ion-card-title>
-        </ion-card-header>
-
         <ion-card-content class="quick-buttons-container">
           @for (usuario of usuariosRapidos; track usuario) {
-            <ion-button
-              expand="block"
-              fill="outline"
-              size="large"
-              class="quick-login-btn"
+            <ion-button expand="block" fill="outline" class="quick-login-btn"
               [class]="'btn-' + usuario.perfil.replace('ñ', 'n')"
               (click)="loginRapido(usuario)">
               {{ usuario.perfil }}
-              <span class="username">{{ usuario.nombre }}</span>
             </ion-button>
           }
         </ion-card-content>
@@ -83,17 +79,16 @@
     <ng-template>
       <ion-content class="modal-anonimo-content">
         <div class="modal-anonimo-container">
-          <div class="modal-header">
-            <h2>Registro Cliente Anónimo</h2>
+           <div class="modal-header">
+            <h2>Registro Cliente</h2>
             <ion-button fill="clear" (click)="cerrarModalAnonimo()">
               <ion-icon name="close" slot="icon-only"></ion-icon>
             </ion-button>
           </div>
-
           <div class="modal-body">
             <div class="foto-container">
               @if (fotoAnonimo) {
-                <img [src]="fotoAnonimo" class="foto-preview" alt="Foto del cliente">
+                <img [src]="fotoAnonimo" class="foto-preview">
               } @else {
                 <div class="foto-placeholder">
                   <ion-icon name="camera" size="large"></ion-icon>
@@ -101,31 +96,18 @@
                 </div>
               }
             </div>
-
             <div class="botones-foto">
               <ion-button expand="block" (click)="tomarFoto()" [disabled]="procesandoRegistro">
-                <ion-icon name="camera" slot="start"></ion-icon>
-                Tomar Foto
+                <ion-icon name="camera" slot="start"></ion-icon> Tomar Foto
               </ion-button>
             </div>
-
             <ion-item fill="outline" class="input-nombre">
               <ion-label position="floating">Nombre</ion-label>
-              <ion-input
-                type="text"
-                [(ngModel)]="nombreAnonimo"
-                [disabled]="procesandoRegistro"
-                maxlength="50">
-              </ion-input>
+              <ion-input type="text" [(ngModel)]="nombreAnonimo" [disabled]="procesandoRegistro"></ion-input>
             </ion-item>
-
-            <ion-button
-              expand="block"
-              size="large"
-              class="btn-registrar"
-              (click)="registrarClienteAnonimo()"
+            <ion-button expand="block" size="large" class="btn-registrar" (click)="registrarClienteAnonimo()"
               [disabled]="procesandoRegistro || !nombreAnonimo || !fotoAnonimo">
-              {{ procesandoRegistro ? 'Registrando...' : 'Registrar' }}
+              {{ procesandoRegistro ? 'Registrando...' : 'Ingresar' }}
             </ion-button>
           </div>
         </div>

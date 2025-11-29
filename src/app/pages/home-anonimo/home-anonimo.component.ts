@@ -1,23 +1,31 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { SupabaseService } from '../../services/supabase';
+import { SupabaseService, Usuario } from '../../services/supabase';
 import { QrHandlerService } from '../../services/qr-handler';
 import { ToastService } from '../../services/toast';
 import { Router } from '@angular/router';
 import { NotificacionesService, NotificacionTiempoReal } from '../../services/notificaciones';
 import { Subscription } from 'rxjs';
-import { IonContent, IonButton, IonText, IonButtons, IonCol, IonGrid, IonRow, IonTitle, IonToolbar, IonHeader, IonCard, IonCardHeader, IonCardTitle, IonSpinner, IonBadge} from '@ionic/angular/standalone';
+import { 
+  LoadingController, 
+  IonContent, IonButton, IonCol, IonGrid, IonRow, 
+  IonHeader, IonToolbar, IonCard, IonCardHeader, 
+  IonCardTitle, IonSpinner, IonBadge, IonIcon 
+} from '@ionic/angular/standalone';
 import { Preferences } from '@capacitor/preferences';
 
-interface ClienteAnonimo {
+// --- Interfaces Unificadas ---
+type TipoCliente = 'registrado' | 'anonimo';
+
+interface DatosCliente {
   id: number;
   nombre: string;
-  foto_url: string;
-  fecha_creacion: string;
+  foto_url?: string;
+  tipo: TipoCliente;
+  perfil?: string; // Para el usuario registrado será 'cliente'
 }
 
 interface OpcionMenu {
   titulo: string;
-  descripcion?: string;
   icono?: string;
   accion: () => void;
   deshabilitado?: boolean;
@@ -27,19 +35,19 @@ interface OpcionMenu {
 type EstadoCliente = 'sin_registrar' | 'esperando_mesa' | 'mesa_asignada';
 
 @Component({
-  selector: 'app-home-anonimo',
+  selector: 'app-home-cliente', // Cambio sugerido de selector
   templateUrl: './home-anonimo.component.html',
   styleUrls: ['./home-anonimo.component.scss'],
-  imports: [IonContent, IonButton, IonText, IonTitle, IonButtons, IonCol, IonGrid, IonRow, IonHeader, IonToolbar, IonCard, IonCardHeader, IonCardTitle, IonSpinner, IonBadge],
+  imports: [IonContent, IonButton, IonCol, IonGrid, IonRow, IonHeader, IonToolbar, IonCard, IonCardHeader, IonCardTitle, IonSpinner, IonBadge, IonIcon],
   standalone: true
 })
 export class HomeAnonimoComponent implements OnInit, OnDestroy {
-  clienteActual: ClienteAnonimo | null = null;
+  clienteActual: DatosCliente | null = null;
   estadoActual: EstadoCliente = 'sin_registrar';
   verificandoEstado: boolean = true;
   notificacionesNoLeidas: number = 0;
   
-  private readonly CLIENTE_KEY = 'cliente_anonimo_actual';
+  private readonly CLIENTE_ANONIMO_KEY = 'cliente_anonimo_actual';
   private readonly ESTADO_KEY = 'estado_cliente';
   
   private notificacionesSubscription?: Subscription;
@@ -52,11 +60,12 @@ export class HomeAnonimoComponent implements OnInit, OnDestroy {
     private qrHandler: QrHandlerService,
     private toastService: ToastService,
     private router: Router,
-    private notificacionesService: NotificacionesService
+    private notificacionesService: NotificacionesService,
+    private loadingController: LoadingController
   ) {}
 
   async ngOnInit() {
-    await this.cargarCliente();
+    await this.cargarDatosCliente();
     await this.verificarEstadoCliente();
     this.configurarOpciones();
     await this.inicializarNotificaciones();
@@ -71,17 +80,52 @@ export class HomeAnonimoComponent implements OnInit, OnDestroy {
     }
   }
 
-  async cargarCliente(): Promise<void> {
+  // --- LOADING PERSONALIZADO GOURMET ---
+  async mostrarLoading() {
+    const loading = await this.loadingController.create({
+      cssClass: 'custom-loading-gourmet', 
+      message: undefined, 
+      spinner: null,
+      duration: 10000 
+    });
+    await loading.present();
+    return loading;
+  }
+
+  // Lógica unificada para cargar Registrado o Anónimo
+  async cargarDatosCliente(): Promise<void> {
     try {
-      const { value } = await Preferences.get({ key: this.CLIENTE_KEY });
-      if (value) {
-        this.clienteActual = JSON.parse(value);
-        console.log('Cliente cargado:', this.clienteActual);
+      // 1. Intentar obtener usuario registrado desde el servicio
+      const usuarioRegistrado = await this.supabaseService.obtenerUsuarioActual();
+
+      if (usuarioRegistrado && usuarioRegistrado.perfil === 'cliente') {
+        this.clienteActual = {
+          id: usuarioRegistrado.id,
+          nombre: usuarioRegistrado.nombre,
+          foto_url: usuarioRegistrado.foto_url,
+          tipo: 'registrado',
+          perfil: 'cliente'
+        };
       } else {
-        this.router.navigate(['/login']);
+        // 2. Si no hay registrado, buscar anónimo en storage
+        const { value } = await Preferences.get({ key: this.CLIENTE_ANONIMO_KEY });
+        
+        if (value) {
+          const anon = JSON.parse(value);
+          this.clienteActual = {
+            id: anon.id,
+            nombre: anon.nombre,
+            foto_url: anon.foto_url,
+            tipo: 'anonimo',
+            perfil: 'cliente_anonimo' // Helper para notificaciones
+          };
+        } else {
+          // Si no es ninguno, al login
+          this.router.navigate(['/login']);
+        }
       }
     } catch (error) {
-      console.error('Error al cargar cliente:', error);
+      console.error('Error al cargar datos del cliente:', error);
       this.router.navigate(['/login']);
     }
   }
@@ -95,10 +139,13 @@ export class HomeAnonimoComponent implements OnInit, OnDestroy {
         return;
       }
 
+      // Determinar qué columna consultar según el tipo
+      const columnaId = this.clienteActual.tipo === 'registrado' ? 'cliente_id' : 'cliente_anonimo_id';
+
       const { data: listaEspera, error: errorLista } = await this.supabaseService.supabase
         .from('lista_espera')
         .select('*')
-        .eq('cliente_anonimo_id', this.clienteActual.id)
+        .eq(columnaId, this.clienteActual.id) // Query dinámica
         .order('fecha_ingreso', { ascending: false })
         .limit(1)
         .single();
@@ -107,19 +154,14 @@ export class HomeAnonimoComponent implements OnInit, OnDestroy {
         console.error('Error al verificar lista de espera:', errorLista);
       }
 
-      console.log('Lista espera encontrada:', listaEspera);
-
       if (listaEspera) {
         if (listaEspera.estado === 'esperando') {
           this.estadoActual = 'esperando_mesa';
-          console.log('Estado: esperando_mesa');
         } else if (listaEspera.estado === 'atendido') {
           this.estadoActual = 'mesa_asignada';
-          console.log('Estado: mesa_asignada');
         }
       } else {
         this.estadoActual = 'sin_registrar';
-        console.log('Estado: sin_registrar');
       }
 
       await Preferences.set({
@@ -137,24 +179,20 @@ export class HomeAnonimoComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Verificación periódica cada 10 segundos
   private iniciarVerificacionPeriodica(): void {
     this.verificacionInterval = setInterval(async () => {
-      console.log('Verificación periódica del estado...');
       await this.verificarEstadoCliente();
-    }, 10000); // Cada 10 segundos
+    }, 10000); 
   }
 
   private async inicializarNotificaciones(): Promise<void> {
     if (!this.clienteActual) return;
 
     try {
-      console.log('Suscribiéndose a notificaciones para cliente:', this.clienteActual.id);
+      // Importante: Asegurarse de suscribirse al ID correcto
       await this.notificacionesService.suscribirNotificaciones(this.clienteActual.id.toString());
       await this.cargarNotificacionesNoLeidas();
       this.escucharNotificaciones();
-
-      console.log('✅ Sistema de notificaciones inicializado para cliente anónimo ID:', this.clienteActual.id);
     } catch (error) {
       console.error('Error al inicializar notificaciones:', error);
     }
@@ -164,7 +202,11 @@ export class HomeAnonimoComponent implements OnInit, OnDestroy {
     this.notificacionesSubscription = this.notificacionesService.notificaciones$
       .subscribe(async (notificacion: NotificacionTiempoReal | null) => {
         if (notificacion) {
-          console.log('🔔 Nueva notificación recibida:', notificacion);
+          // Filtrado extra de seguridad: verificar que la notificación sea para mi perfil
+          // (cliente vs cliente_anonimo) si el servicio no lo hace.
+          const perfilEsperado = this.clienteActual?.tipo === 'registrado' ? 'cliente' : 'cliente_anonimo'; // O 'anonimo' según tu lógica de inserción
+          
+          // Asumimos que si llega aquí es válida, o agregas un if(notificacion.destinatario_perfil === ...)
           this.notificacionesNoLeidas++;
           
           if (notificacion.tipo === 'mesa_asignada') {
@@ -182,19 +224,14 @@ export class HomeAnonimoComponent implements OnInit, OnDestroy {
       value: this.estadoActual
     });
     
-    // Reconfigurar opciones
     this.configurarOpciones();
-    
-    // Mostrar toast
     await this.toastService.mostrarToastExito('¡Le han asignado una mesa! Escanee el QR de su mesa');
     
-    // Marcar notificación como leída
     if (notificacion.id) {
       await this.notificacionesService.marcarComoLeida(notificacion.id);
       this.notificacionesNoLeidas = Math.max(0, this.notificacionesNoLeidas - 1);
     }
     
-    // Verificar estado completo
     await this.verificarEstadoCliente();
   }
 
@@ -206,7 +243,6 @@ export class HomeAnonimoComponent implements OnInit, OnDestroy {
         .obtenerNotificacionesNoLeidas(this.clienteActual.id.toString());
       
       this.notificacionesNoLeidas = notificaciones.length;
-      console.log(`Notificaciones no leídas: ${this.notificacionesNoLeidas}`);
     } catch (error) {
       console.error('Error al cargar notificaciones no leídas:', error);
     }
@@ -222,19 +258,33 @@ export class HomeAnonimoComponent implements OnInit, OnDestroy {
   configurarOpciones(): void {
     this.opcionesDisponibles = [];
 
+    // La lógica de opciones es idéntica, pero ahora aplica a ambos tipos de usuario
     switch (this.estadoActual) {
       case 'sin_registrar':
         this.opcionesDisponibles = [
           {
             titulo: 'Escanear QR de Ingreso',
-            descripcion: 'Únase a la lista de espera',
             accion: () => this.escanearQRIngreso(),
             deshabilitado: false
           },
           {
             titulo: 'Ver Encuestas Previas',
-            descripcion: 'Consulte opiniones de otros clientes',
             accion: () => this.verEncuestas(),
+            deshabilitado: false
+          },
+          {
+            titulo: 'Agendar una reserva',
+            accion: () => this.router.navigate(['/reservas']),
+            deshabilitado: false
+          },
+          {
+            titulo: 'Pedido Delivery',
+            accion: () => this.router.navigate(['/delivery']),
+            deshabilitado: false
+          },
+          {
+            titulo: 'Estado Delivery',
+            accion: () => this.router.navigate(['/estado-pedido']),
             deshabilitado: false
           }
         ];
@@ -244,13 +294,11 @@ export class HomeAnonimoComponent implements OnInit, OnDestroy {
         this.opcionesDisponibles = [
           {
             titulo: 'Estado en Lista de Espera',
-            descripcion: 'Esperando asignación de mesa',
             accion: () => {},
             deshabilitado: true
           },
           {
             titulo: 'Ver Encuestas Previas',
-            descripcion: 'Consulte opiniones de otros clientes',
             accion: () => this.verEncuestas(),
             deshabilitado: false
           }
@@ -261,13 +309,11 @@ export class HomeAnonimoComponent implements OnInit, OnDestroy {
         this.opcionesDisponibles = [
           {
             titulo: 'Escanear QR de Mesa',
-            descripcion: 'Acceda a su mesa y realice pedidos',
             accion: () => this.escanearQRMesa(),
             deshabilitado: false
           },
           {
             titulo: 'Ver Encuestas Previas',
-            descripcion: 'Consulte opiniones de otros clientes',
             accion: () => this.verEncuestas(),
             deshabilitado: false
           }
@@ -282,10 +328,14 @@ export class HomeAnonimoComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const loading = await this.mostrarLoading();
     const resultado = await this.qrHandler.escanearYProcesarQR();
+    await loading.dismiss();
 
     if (!resultado.exito) {
-      this.toastService.mostrarToastError(resultado.mensaje);
+      if (resultado.mensaje !== 'Escaneo cancelado') {
+        this.toastService.mostrarToastError(resultado.mensaje);
+      }
       return;
     }
 
@@ -293,49 +343,61 @@ export class HomeAnonimoComponent implements OnInit, OnDestroy {
       this.toastService.mostrarToastError('Debe escanear el QR de ingreso al local');
       return;
     }
-
-    const registrado = await this.qrHandler.registrarEnListaEspera(this.clienteActual!.id);
     
+    if (!this.clienteActual) return;
+
+    const registrado = await this.qrHandler.registrarEnListaEspera(
+        this.clienteActual.id, 
+        this.clienteActual.tipo
+    );
+      
     if (registrado) {
-      this.estadoActual = 'esperando_mesa';
-      await Preferences.set({
-        key: this.ESTADO_KEY,
-        value: this.estadoActual
-      });
-      this.configurarOpciones();
+        this.estadoActual = 'esperando_mesa';
+        await Preferences.set({
+          key: this.ESTADO_KEY,
+          value: this.estadoActual
+        });
+        this.configurarOpciones();
 
-      // -------------------------------------------------------------------------
-      // LOGICA DE NOTIFICACION A MAITRES
-      // -------------------------------------------------------------------------
-      try {
-        // 1. Obtener todos los maitres
-        const { data: maitres } = await this.supabaseService.supabase
-            .from('usuarios')
-            .select('id, perfil')
-            .eq('perfil', 'maitre');
+        await this.notificarMaitres();
+    }
+  }
 
-        // 2. Enviar notificación a cada uno
-        if (maitres && maitres.length > 0) {
-            for (const maitre of maitres) {
-                await this.notificacionesService.enviarNotificacion({
-                    // Usamos 'as any' para tipos nuevos no estrictos en la interfaz actual
-                    tipo: 'nuevo_cliente_espera' as any, 
-                    titulo: 'Nuevo Cliente en Espera',
-                    mensaje: `${this.clienteActual!.nombre} (Anónimo) ingresó a la lista de espera.`,
-                    destinatario_id: maitre.id,
-                    destinatario_perfil: maitre.perfil,
-                    datos: { 
-                        cliente_anonimo_id: this.clienteActual!.id,
-                        accion: 'revisar_lista'
-                    }
-                });
-            }
+  private async notificarMaitres() {
+    try {
+      const { data: maitres } = await this.supabaseService.supabase
+          .from('usuarios')
+          .select('id, perfil')
+          .eq('perfil', 'maitre');
+
+      if (maitres && maitres.length > 0) {
+        // Preparamos los datos dinámicos para la notificación
+        const datosNotificacion: any = {
+           accion: 'revisar_lista'
+        };
+        
+        // Asignamos la key correcta
+        if (this.clienteActual!.tipo === 'registrado') {
+          datosNotificacion.cliente_id = this.clienteActual!.id;
+        } else {
+          datosNotificacion.cliente_anonimo_id = this.clienteActual!.id;
         }
-      } catch (error) {
-        console.error('Error al notificar a los maitres:', error);
-        // No bloqueamos el flujo principal si falla la notificación
+
+        const etiqueta = this.clienteActual!.tipo === 'registrado' ? '(Registrado)' : '(Anónimo)';
+
+          for (const maitre of maitres) {
+              await this.notificacionesService.enviarNotificacion({
+                  tipo: 'nuevo_cliente_espera' as any, 
+                  titulo: 'Nuevo Cliente en Espera',
+                  mensaje: `${this.clienteActual!.nombre} ${etiqueta} ingresó a la lista de espera.`,
+                  destinatario_id: maitre.id.toString(), // Convertir a string si tu tabla usa texto
+                  destinatario_perfil: maitre.perfil,
+                  datos: datosNotificacion
+              });
+          }
       }
-      // -------------------------------------------------------------------------
+    } catch (error) {
+      console.error('Error al notificar maitres', error);
     }
   }
 
@@ -345,10 +407,14 @@ export class HomeAnonimoComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const loading = await this.mostrarLoading();
     const resultado = await this.qrHandler.escanearYProcesarQR();
+    await loading.dismiss();
 
     if (!resultado.exito) {
-      this.toastService.mostrarToastError(resultado.mensaje);
+      if (resultado.mensaje !== 'Escaneo cancelado') {
+        this.toastService.mostrarToastError(resultado.mensaje);
+      }
       return;
     }
 
@@ -357,9 +423,14 @@ export class HomeAnonimoComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const acceso = await this.qrHandler.verificarYAccederMesa(
-      this.clienteActual!.id,
-      resultado.datos!.numeroMesa!
+    if (!this.clienteActual) return;
+
+    // 2. Procesar acceso usando el SERVICIO actualizado
+    // El servicio maneja la navegación y validación de pedidos
+    await this.qrHandler.verificarYAccederMesa(
+        this.clienteActual.id,
+        this.clienteActual.tipo, // 'registrado' | 'anonimo'
+        resultado.datos!.numeroMesa!
     );
   }
 
@@ -368,12 +439,26 @@ export class HomeAnonimoComponent implements OnInit, OnDestroy {
   }
 
   async cerrarSesion(): Promise<void> {
-    this.desuscribirNotificaciones();
-    await this.notificacionesService.cancelarTodasLasNotificaciones();
+    const loading = await this.mostrarLoading();
     
-    await Preferences.remove({ key: this.CLIENTE_KEY });
-    await Preferences.remove({ key: this.ESTADO_KEY });
-    this.router.navigate(['/login']);
+    try {
+      this.desuscribirNotificaciones();
+      await this.notificacionesService.cancelarTodasLasNotificaciones();
+      
+      if (this.clienteActual?.tipo === 'registrado') {
+        await this.supabaseService.cerrarSesion();
+      } else {
+        await Preferences.remove({ key: this.CLIENTE_ANONIMO_KEY });
+      }
+      
+      await Preferences.remove({ key: this.ESTADO_KEY });
+      
+      await loading.dismiss();
+      this.router.navigate(['/login']);
+    } catch (error) {
+      await loading.dismiss();
+      this.router.navigate(['/login']);
+    }
   }
 
   get nombreCliente(): string {
@@ -384,29 +469,10 @@ export class HomeAnonimoComponent implements OnInit, OnDestroy {
     if (this.verificandoEstado) return 'Verificando...';
     
     switch (this.estadoActual) {
-      case 'sin_registrar':
-        return 'Sin registrar';
-      case 'esperando_mesa':
-        return 'En lista de espera';
-      case 'mesa_asignada':
-        return 'Mesa asignada';
-      default:
-        return 'Estado desconocido';
-    }
-  }
-
-  get estadoColor(): string {
-    if (this.verificandoEstado) return 'medium';
-    
-    switch (this.estadoActual) {
-      case 'sin_registrar':
-        return 'warning';
-      case 'esperando_mesa':
-        return 'primary';
-      case 'mesa_asignada':
-        return 'success';
-      default:
-        return 'medium';
+      case 'sin_registrar': return 'Sin registrar';
+      case 'esperando_mesa': return 'En lista de espera';
+      case 'mesa_asignada': return 'Mesa asignada';
+      default: return 'Estado desconocido';
     }
   }
 
@@ -414,14 +480,10 @@ export class HomeAnonimoComponent implements OnInit, OnDestroy {
     if (this.verificandoEstado) return '#9ca3af';
     
     switch (this.estadoActual) {
-      case 'sin_registrar':
-        return '#f59e0b';
-      case 'esperando_mesa':
-        return '#3b82f6';
-      case 'mesa_asignada':
-        return '#10b981';
-      default:
-        return '#9ca3af';
+      case 'sin_registrar': return '#f59e0b';
+      case 'esperando_mesa': return '#3b82f6';
+      case 'mesa_asignada': return '#10b981';
+      default: return '#9ca3af';
     }
   }
 }

@@ -1,164 +1,293 @@
+// ------------------------------------------------------------------
+// PALETA GOURMET & VARIABLES
+// ------------------------------------------------------------------
+$color-bg-gradient-start: #2c3e50;
+$color-bg-gradient-end: #000000;
+$color-card-surface: rgba(30, 30, 30, 0.75); // Más opaco para legibilidad
+$color-gold: #d4af37;
+$color-gold-glow: rgba(212, 175, 55, 0.3);
+$color-text-light: #f5f5dc; // Beige
+$color-text-dim: #a0a0a0;
+$color-success: #27ae60;
+$color-danger: #c0392b;
+$color-blue: #2980b9;
+$color-purple: #8e44ad;
+
+// ------------------------------------------------------------------
+// ESTRUCTURA PRINCIPAL
+// ------------------------------------------------------------------
 ion-content {
-  --background: linear-gradient(135deg, #f09850 0%, #cc480b 100%);
+  // Fondo completo, sin cortes
+  --background: radial-gradient(circle at top right, #{$color-bg-gradient-start} 0%, #{$color-bg-gradient-end} 100%);
 }
 
+// Toolbar transparente
 ion-toolbar {
-  --background: transparent;
-  --color: white;
+  --border-width: 0;
+  --background: white;
+  
   ion-title {
-    font-weight: bold;
-    letter-spacing: 1px;
-    color: black;
-    padding-top: 20px;
+    font-family: 'Playfair Display', serif; // Fuente elegante sugerida
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
   }
 }
 
-.dashboard-container {
-  padding: 10px 20px 40px 20px;
+.empty-toolbar {
+  --background: transparent;
+  --border-width: 0;
 }
 
-.welcome-header {
-  margin-bottom: 20px;
-  color: white;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  
-  h2 {
-    font-size: 1.8rem;
-    font-weight: 800;
+// Clase para el ion-content igual al home para mantener consistencia
+ion-content.gourmet-content {
+   // Asegura que el fondo cubra todo
+   --background: radial-gradient(circle at top right, #2c3e50 0%, #000000 100%);
+}
+
+.internal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; // Distribuye: Botón - Título - Espacio
+  padding: 10px 15px;
+  margin-bottom: 10px;
+
+  .back-btn {
+    --color: #d4af37; // $color-gold
+    margin: 0;
+    --padding-start: 0;
+    font-size: 1.2rem; // Tamaño del icono
+    
+    ion-icon {
+      font-size: 2rem;
+    }
+  }
+
+  .page-title {
+    font-family: 'Playfair Display', serif;
+    color: #f5f5dc; // $color-text-light
+    font-size: 2.3rem;
+    font-weight: 700;
     margin: 0;
     text-align: center;
-  }
-  p {
-    margin: 5px 0 0;
-    opacity: 0.9;
-    font-size: 0.95rem;
-  }
-}
-
-.status-card {
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-  margin-bottom: 25px;
-  overflow: visible;
-
-  ion-card-content {
-    padding: 20px;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
   }
 
-  .status-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-
-    .status-badge {
-      padding: 8px 16px;
-      border-radius: 12px;
-      font-size: 1.2rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      align-items: center;
-    }
-
-    .time-info {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      color: #666;
-      font-size: 0.9rem;
-      font-weight: 500;
-    }
-  }
-
-  .progress-container {
-    ion-progress-bar {
-      height: 8px;
-      border-radius: 4px;
-      --background: #eee;
-    }
+  // Truco para centrar el título perfectamente
+  .spacer-placeholder {
+    width: 48px; // Mismo ancho aproximado que el botón de back
   }
 }
 
-.section-title {
-  h3 {
-    color: white;
-    font-size: 1.5rem;
-    margin-bottom: 10px;
-    padding-left: 5px;
-    font-weight: 600;
-    opacity: 0.9;
-    text-align: center;
+ .custom-back-btn {
+    --color: #{$color-gold};
+    --icon-font-size: 24px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
   }
+
+// Ajuste para el contenedor dashboard
+.dashboard-container {
+  padding: 0 20px 40px 20px;
 }
 
-.action-card {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  margin: 5px;
-  height: 110px;
+// Contenedor Flex para ocupar todo el alto (No Empty Spaces)
+.dashboard-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  transition: transform 0.2s ease;
+  min-height: 100%; // Forza a ocupar todo el alto del scroll
+  padding: 0 20px 40px 20px;
+}
 
-  &:active {
-    transform: scale(0.96);
+// ------------------------------------------------------------------
+// HEADER DE BIENVENIDA
+// ------------------------------------------------------------------
+.welcome-header {
+  margin-top: 10px;
+  margin-bottom: 25px;
+  text-align: left;
+  position: relative;
+  padding-left: 15px;
+  border-left: 4px solid $color-gold; // Acento lateral
+
+  h2 {
+    color: $color-text-light;
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin: 0;
+    line-height: 1.2;
+    text-shadow: 0 4px 10px rgba(0,0,0,0.6);
+
+    span {
+      display: block;
+      font-size: 1rem;
+      color: $color-gold;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      font-weight: 400;
+      margin-bottom: 5px;
+    }
   }
+}
 
-  .icon-wrapper {
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
+// ------------------------------------------------------------------
+// SECCIÓN DE ACCIONES (GRID)
+// ------------------------------------------------------------------
+.actions-grid {
+  flex-grow: 1; // Ocupa el espacio sobrante
+  display: flex;
+  flex-direction: column;
+
+  .section-title {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 24px;
+    margin-bottom: 15px;
+    
+    h3 {
+      font-size: 1.4rem;
+      color: $color-text-dim;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin: 0;
+    }
 
-    &.primary { background: #e3f2fd; color: #2196f3; }
-    &.secondary { background: #f3e5f5; color: #ab47bc; }
-    &.tertiary { background: #e0f2f1; color: #26a69a; }
-    &.success { background: #e8f5e9; color: #66bb6a; }
-    &.warning { background: #fff3e0; color: #ffa726; }
-    &.danger { background: #ffebee; color: #ef5350; }
+    &::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, #444, transparent);
+      margin-left: 15px;
+    }
+  }
+}
+
+// ------------------------------------------------------------------
+// TARJETAS DE ACCIÓN (High Contrast & Texture)
+// ------------------------------------------------------------------
+.action-card {
+  margin: 0 0 16px 0;
+  width: 100%;
+  border-radius: 16px;
+  // Efecto Glassmorphism oscuro
+  --background: #{$color-card-surface};
+  background: $color-card-surface;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  border: 1px solid rgba(255, 255, 255, 0.05); // Borde sutil
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: visible; // Permite sombras fuera
+
+  &:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
   }
 
-  ion-label {
-    font-weight: 600;
-    color: #444;
-    font-size: 0.9rem;
-  }
+  // Estilo interno de la tarjeta
+  .card-content-row {
+    display: flex;
+    align-items: center;
+    padding: 18px;
+    position: relative;
+    z-index: 1;
 
-  // Estilo especial para tarjeta de juegos horizontal
-  &.featured {
-    flex-direction: row;
-    justify-content: flex-start;
-    padding: 0 20px;
-    height: 90px;
-
-    .card-content-row {
+    // ICONO CON FONDO CIRCULAR (CONTRASTE)
+    .icon-wrapper {
+      flex-shrink: 0;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
-      width: 100%;
-      gap: 15px;
+      justify-content: center;
+      margin-right: 18px;
+      background: rgba(255, 255, 255, 0.08);
+      
+      ion-icon {
+        font-size: 1.6rem;
+        color: white;
+      }
+
+      // Colores semánticos para los iconos
+      &.warning { 
+        background: linear-gradient(135deg, $color-gold); 
+        box-shadow: 0 0 10px $color-gold-glow;
+      }
+      &.secondary { background: linear-gradient(135deg, $color-blue); }
+      &.primary { background: linear-gradient(135deg, #3498db, #2980b9); }
+      &.danger { 
+        background: linear-gradient(135deg, $color-danger); 
+        animation: pulse-border 2s infinite; // Llamada a la acción para juegos
+      }
+      &.tertiary { background: linear-gradient(135deg, $color-purple); }
+      &.success { background: linear-gradient(135deg, $color-success); }
     }
 
     .text-wrapper {
-      flex: 1;
-      text-align: left;
-      
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
       ion-card-title {
-        font-size: 1.1rem;
+        color: $color-text-light;
+        font-size: 1.5rem;
         font-weight: 700;
-        color: #333;
+        margin-bottom: 4px;
+        letter-spacing: 0.5px;
       }
+
       p {
-        margin: 2px 0 0;
-        font-size: 0.8rem;
-        color: #666;
+        margin: 0;
+        color: $color-text-dim;
+        font-size: 1.1rem;
       }
     }
+
+    // Flecha derecha
+    ion-icon[name="chevron-forward-outline"] {
+      font-size: 1.4rem;
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    // Badge de Descuento
+    ion-badge {
+      --background: #{$color-danger};
+      --color: white;
+      font-weight: 800;
+      border-radius: 4px;
+      padding: 4px 8px;
+      box-shadow: 0 2px 5px rgba(192, 57, 43, 0.5);
+    }
+  }
+}
+
+// ------------------------------------------------------------------
+// ANIMACIONES
+// ------------------------------------------------------------------
+@keyframes pulse-border {
+  0% { box-shadow: 0 0 0 0 rgba($color-danger, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba($color-danger, 0); }
+  100% { box-shadow: 0 0 0 0 rgba($color-danger, 0); }
+}
+
+// Responsive adjustments
+@media (min-height: 800px) {
+  .dashboard-container {
+    justify-content: center; // Centrar verticalmente en pantallas muy altas
+  }
+  
+  .welcome-header {
+    margin-bottom: 40px;
+    h2 { font-size: 3rem; }
+  }
+
+  .action-card {
+    padding: 10px 0; // Tarjetas más gorditas
   }
 }

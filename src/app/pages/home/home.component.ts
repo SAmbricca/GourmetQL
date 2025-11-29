@@ -3,7 +3,11 @@ import { SupabaseService, Usuario } from '../../services/supabase';
 import { Router } from '@angular/router';
 import { NotificacionesService, NotificacionTiempoReal } from '../../services/notificaciones';
 import { Subscription } from 'rxjs';
-import { IonContent, IonButton, IonText, IonButtons, IonCol, IonGrid, IonRow, IonTitle, IonToolbar, IonHeader, IonCard, IonCardHeader, IonCardTitle, IonBadge } from '@ionic/angular/standalone';
+import { 
+  IonContent, IonButton, IonCardSubtitle, IonIcon, IonCol, 
+  IonGrid, IonRow, IonToolbar, IonHeader, 
+  IonCard, IonCardHeader, IonCardTitle, LoadingController 
+} from '@ionic/angular/standalone';
 
 interface OpcionMenu {
   titulo: string;
@@ -15,7 +19,8 @@ interface OpcionMenu {
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
-  imports: [IonContent, IonButton, IonText, IonTitle, IonButtons, IonCol, IonGrid, IonRow, IonHeader, IonToolbar, IonCard, IonCardHeader, IonCardTitle]
+  imports: [IonContent, IonButton, IonCol, IonIcon, IonGrid, IonRow, IonHeader, IonToolbar, IonCard, IonCardHeader, IonCardTitle],
+  standalone: true
 })
 export class HomeComponent implements OnInit, OnDestroy {
   usuarioActual: Usuario | null = null;
@@ -38,6 +43,16 @@ export class HomeComponent implements OnInit, OnDestroy {
     {
       titulo: 'Gestión Clientes',
       ruta: '/gestion-clientes',
+      perfiles: ['dueño', 'supervisor'],
+    },
+    {
+      titulo: 'Gestión Reservas',
+      ruta: '/lista-reservas',
+      perfiles: ['dueño', 'supervisor'],
+    },
+    {
+      titulo: 'Gestión Delivery',
+      ruta: '/pedidos-mozo',
       perfiles: ['dueño', 'supervisor'],
     },
     {
@@ -85,7 +100,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(
     private supabaseService: SupabaseService,
     private router: Router,
-    private notificacionesService: NotificacionesService
+    private notificacionesService: NotificacionesService,
+    private loadingController: LoadingController
   ) {}
 
   async ngOnInit() {
@@ -96,6 +112,18 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.desuscribirNotificaciones();
+  }
+
+  // --- LOADING PERSONALIZADO GOURMET ---
+  async mostrarLoading() {
+    const loading = await this.loadingController.create({
+      cssClass: 'custom-loading-gourmet', 
+      message: undefined, 
+      spinner: null, 
+      duration: 10000 
+    });
+    await loading.present();
+    return loading;
   }
 
   async cargarUsuario(): Promise<void> {
@@ -133,8 +161,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.notificacionesSubscription = this.notificacionesService.notificaciones$
       .subscribe((notificacion: NotificacionTiempoReal | null) => {
         if (notificacion) {
-          console.log('Nueva notificación:', notificacion);
-          
           this.notificacionesNoLeidas++;
         }
       });
@@ -165,10 +191,20 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   async cerrarSesion(): Promise<void> {
-    this.desuscribirNotificaciones();
-    await this.notificacionesService.cancelarTodasLasNotificaciones();
-    
-    this.supabaseService.cerrarSesion();
+    const loading = await this.mostrarLoading();
+
+    try {
+      this.desuscribirNotificaciones();
+      await this.notificacionesService.cancelarTodasLasNotificaciones();
+      
+      await this.supabaseService.cerrarSesion();
+      
+      await loading.dismiss();
+      this.router.navigate(['/login']);
+    } catch (error) {
+      await loading.dismiss();
+      this.router.navigate(['/login']);
+    }
   }
 
   get nombreCompleto(): string {

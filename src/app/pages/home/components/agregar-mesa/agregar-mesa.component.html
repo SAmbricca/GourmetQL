@@ -1,119 +1,72 @@
-<ion-header>
+<!-- Header vacío/transparente -->
+<ion-header class="ion-no-border header-transparente">
   <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/home"></ion-back-button>
-    </ion-buttons>
-    <ion-title>Agregar Nueva Mesa</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <!-- Overlay de loading -->
-  @if (isLoading) {
-    <div class="loading-overlay">
-      <div class="loading-content">
-        <ion-spinner name="crescent" color="primary"></ion-spinner>
-        <p>{{ loadingMessage }}</p>
-      </div>
-    </div>
-  }
-
-  <div class="agregar-mesa-container">
+<ion-content class="gourmet-content">
+  <div class="form-container">
     
-    <ion-card>
-      <ion-card-content>
-        
-        <ion-item fill="outline">
-          <ion-label position="floating">Número de Mesa</ion-label>
-          <ion-input 
-            type="number"
-            [(ngModel)]="numero"
-            [disabled]="isLoading"
-            min="1"
-            max="999">
-          </ion-input>
-        </ion-item>
+    <!-- Header Interno -->
+    <div class="inner-header">
+      <ion-buttons>
+        <ion-back-button defaultHref="/home" mode="md" class="custom-back-btn"></ion-back-button>
+      </ion-buttons>
+      <h1 class="inner-title">Agregar Mesa</h1>
+    </div>
+    
+    <!-- INFO MESA CARD -->
+    <div class="gourmet-card">
+      <h3 class="section-title">Información General</h3>
+      
+      <ion-item class="gourmet-input">
+        <ion-label position="floating">Número de Mesa</ion-label>
+        <ion-input type="number" [(ngModel)]="numero" min="1" max="999"></ion-input>
+      </ion-item>
 
-        <ion-item fill="outline">
-          <ion-label position="floating">Cantidad de Comensales</ion-label>
-          <ion-input 
-            type="number"
-            [(ngModel)]="cantidadComensales"
-            [disabled]="isLoading"
-            min="1"
-            max="20">
-          </ion-input>
-        </ion-item>
+      <ion-item class="gourmet-input">
+        <ion-label position="floating">Comensales</ion-label>
+        <ion-input type="number" [(ngModel)]="cantidadComensales" min="1" max="20"></ion-input>
+      </ion-item>
 
-        <ion-item fill="outline">
-          <ion-label position="floating">Tipo de Mesa</ion-label>
-          <ion-select 
-            [(ngModel)]="tipo"
-            [disabled]="isLoading"
-            interface="popover">
-            <ion-select-option value="estandar">Estándar</ion-select-option>
-            <ion-select-option value="vip">VIP</ion-select-option>
-            <ion-select-option value="movilidad_reducida">Movilidad Reducida</ion-select-option>
-          </ion-select>
-        </ion-item>
+      <ion-item class="gourmet-input">
+        <ion-label position="floating">Tipo</ion-label>
+        <ion-select [(ngModel)]="tipo" interface="action-sheet" cancelText="Cancelar">
+          <ion-select-option value="estandar">Estándar</ion-select-option>
+          <ion-select-option value="vip">VIP</ion-select-option>
+          <ion-select-option value="movilidad_reducida">Movilidad Reducida</ion-select-option>
+        </ion-select>
+      </ion-item>
+    </div>
 
-      </ion-card-content>
-    </ion-card>
-
-    <ion-card>
-      <ion-card-content>
-        <h2>Foto de la Mesa</h2>
-        
-        @if (foto) {
-          <ion-grid>
-            <ion-row>
-              <ion-col size="12">
-                <div class="foto-preview">
-                  <img [src]="foto.url" alt="Foto de la mesa">
-                  <ion-button 
-                    size="small" 
-                    color="danger" 
-                    fill="clear"
-                    [disabled]="isLoading"
-                    (click)="eliminarFoto()">
-                    <ion-icon name="close-circle"></ion-icon>
-                  </ion-button>
-                </div>
-              </ion-col>
-            </ion-row>
-          </ion-grid>
-        }
-
-        @if (!foto) {
-          <div class="foto-buttons">
-            <ion-button 
-              expand="block"
-              fill="outline"
-              [disabled]="isLoading"
-              (click)="agregarFoto('camera')">
-              <ion-icon name="camera" slot="start"></ion-icon>
-              Tomar Foto
-            </ion-button>
-
-            <ion-button 
-              expand="block"
-              fill="outline"
-              [disabled]="isLoading"
-              (click)="agregarFoto('gallery')">
-              <ion-icon name="images" slot="start"></ion-icon>
-              Seleccionar de Galería
+    <!-- FOTO CARD -->
+    <div class="gourmet-card">
+      <h3 class="section-title">Fotografía</h3>
+      
+      @if (foto) {
+        <div class="foto-preview-container">
+          <img [src]="foto.url" class="mesa-img" alt="Foto Mesa">
+          <div class="overlay-actions">
+            <ion-button color="danger" (click)="eliminarFoto()">
+              <ion-icon name="close-circle" slot="start"></ion-icon>
+              Eliminar
             </ion-button>
           </div>
-        }
-      </ion-card-content>
-    </ion-card>
+        </div>
+      } @else {
+        <div class="foto-buttons-grid">
+          <ion-button expand="block" fill="outline" class="btn-secondary" (click)="agregarFoto('camera')">
+            <ion-icon name="camera" slot="start"></ion-icon>
+            Cámara
+          </ion-button>
+        </div>
+      }
+    </div>
 
     <div class="action-buttons">
       <ion-button 
-        expand="block"
-        size="large"
-        color="primary"
-        [disabled]="isLoading"
+        expand="block" 
+        class="btn-gourmet-primary" 
         (click)="guardarMesa()">
         <ion-icon name="save" slot="start"></ion-icon>
         Agregar Mesa

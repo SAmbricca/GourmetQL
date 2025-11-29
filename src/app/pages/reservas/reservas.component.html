@@ -1,0 +1,122 @@
+<!-- Header transparente para respetar el Safe Area (Batería, Hora) -->
+<ion-header class="ion-no-border header-transparente">
+  <ion-toolbar>
+    <!-- Espacio vacío, solo para empujar el contenido hacia abajo -->
+  </ion-toolbar>
+</ion-header>
+<ion-content [fullscreen]="true" class="gourmet-content">
+  
+  <!-- Header Interno -->
+  <div class="internal-header">
+    <ion-button (click)="volver()" fill="clear" class="back-btn">
+      <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
+    </ion-button>
+    <h1 class="gourmet-title">Mis Reservas</h1>
+    <div style="width: 48px;"></div>
+  </div>
+
+  <div class="reservas-container">
+    
+    <!-- Estado de carga -->
+    @if (cargando) {
+      <div class="loading-container">
+        <ion-spinner name="crescent" color="warning"></ion-spinner>
+        <p>Buscando reservas...</p>
+      </div>
+    }
+
+    <!-- Lista vacía -->
+    @if (!cargando && reservas.length === 0) {
+      <div class="empty-state">
+        <ion-icon name="calendar-outline"></ion-icon>
+        <h3>Sin reservas activas</h3>
+        <p>Agenda una mesa para disfrutar de nuestra experiencia gourmet.</p>
+      </div>
+    }
+
+    <!-- Lista de Reservas -->
+    <ion-grid>
+      <ion-row>
+        @for (reserva of reservas; track reserva.id) {
+          <ion-col size="12"> <!-- Full width en móvil para que se vean enormes -->
+            <ion-card class="menu-card reservation-card">
+              <ion-card-header>
+                <div class="card-top">
+                  <ion-badge [color]="getBadgeColor(reserva.estado)" class="status-badge">
+                    {{ reserva.estado | uppercase }}
+                  </ion-badge>
+                  <div class="comensales">
+                    <ion-icon name="people-outline"></ion-icon>
+                    <span>{{ reserva.cantidad_comensales }}</span>
+                  </div>
+                </div>
+                <ion-card-title>
+                  {{ reserva.fecha_hora | date:'EEEE d MMMM' : '' : 'es-AR' }}
+                </ion-card-title>
+                <div class="hora-container">
+                  <ion-icon name="time-outline"></ion-icon>
+                  <span class="hora-text">{{ reserva.fecha_hora | date:'HH:mm' }} hs</span>
+                </div>
+              </ion-card-header>
+            </ion-card>
+          </ion-col>
+        }
+      </ion-row>
+    </ion-grid>
+
+    <!-- NUEVO BOTÓN "REALIZAR RESERVA" (Debajo de la lista) -->
+    <div class="bottom-action-container">
+      <ion-button expand="block" class="main-action-btn" (click)="setOpen(true)">
+        REALIZAR RESERVA
+      </ion-button>
+    </div>
+
+  </div>
+
+  <!-- Modal de Nueva Reserva (Mismo contenido, lógica corregida en TS si usaste opción 2) -->
+  <ion-modal [isOpen]="modalAbierto" (didDismiss)="setOpen(false)" class="gourmet-modal">
+    <ng-template>
+      <ion-header class="ion-no-border">
+        <ion-toolbar class="modal-toolbar">
+          <ion-title>Nueva Reserva</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="setOpen(false)">Cancelar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="modal-content">
+        <div class="form-container">
+          
+          <div class="input-group">
+            <label>FECHA Y HORA</label>
+            <ion-datetime 
+              [(ngModel)]="fechaSeleccionada"
+              presentation="date-time"
+              [preferWheel]="true"
+              locale="es-AR"
+              minuteValues="0,15,30,45"
+              class="gourmet-datetime">
+            </ion-datetime>
+          </div>
+
+          <div class="input-group">
+            <label>COMENSALES</label>
+            <!-- Asegúrate de usar los métodos del TS aquí -->
+            <div class="range-wrapper">
+               <ion-button (click)="disminuirComensales()" fill="outline" shape="round">-</ion-button>
+               <span class="comensales-display">{{ comensales }}</span>
+               <ion-button (click)="aumentarComensales()" fill="outline" shape="round">+</ion-button>
+            </div>
+          </div>
+
+          <ion-button expand="block" class="action-btn" (click)="crearReserva()">
+            CONFIRMAR MESA
+          </ion-button>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+</ion-content>
+

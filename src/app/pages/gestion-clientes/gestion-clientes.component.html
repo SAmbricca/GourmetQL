@@ -22,8 +22,14 @@
                 <h2>{{ cliente.nombre }} {{ cliente.apellido }}</h2>
                 <p>Email: {{ cliente.email }}</p>
               </ion-label>
-              <ion-button color="success" (click)="aprobar(cliente)">Aceptar</ion-button>
-              <ion-button color="danger" (click)="rechazar(cliente)">Rechazar</ion-button>
+              <ion-button (click)="aprobar(cliente)" [disabled]="loading" color="success">
+                <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+                <span *ngIf="!loading">Aprobar</span>
+              </ion-button>
+              <ion-button (click)="rechazar(cliente)" [disabled]="loading" color="danger">
+                <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+                <span *ngIf="!loading">Rechazar</span>
+              </ion-button>
             </ion-item>
           }
         </ion-list>

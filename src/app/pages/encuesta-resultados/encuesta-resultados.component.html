@@ -1,22 +1,33 @@
-<ion-header class="ion-no-border">
+<!-- Header vacío con fondo blanco según requerimiento -->
+<ion-header class="ion-no-border header-blanco">
   <ion-toolbar>
-    <ion-buttons slot="end">
-      <ion-button (click)="irAlHome()">
-        <ion-icon name="home-outline"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-    <ion-title>Resultados</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  @if (cargando) {
-    <div class="loading-container">
-      <ion-spinner name="crescent" color="light"></ion-spinner>
-    </div>
-  } @else {
-    <div class="resultados-container">
+<ion-content class="gourmet-content">
+  
+  <div class="resultados-container">
+    
+    <!-- NUEVO HEADER INTERNO -->
+    <div class="inner-header-centered">
+      <!-- Botón Home a la Izquierda -->
+      <ion-button class="btn-home-gourmet" (click)="irAlHome()" fill="clear">
+        <ion-icon name="home-outline"></ion-icon>
+      </ion-button>
       
+      <!-- Título Centrado y Grande -->
+      <h1 class="titulo-resultados">Encuestas</h1>
+      
+      <!-- Espaciador invisible para balancear el centrado flex -->
+      <div class="spacer-balance"></div>
+    </div>
+
+    @if (cargando) {
+      <div class="loading-container">
+        <!-- Spinner personalizado para coherencia -->
+        <div class="spinner-gold-ring"></div>
+      </div>
+    } @else {
       <!-- Resumen KPI -->
       <ion-card class="kpi-card">
         <ion-card-content>
@@ -85,7 +96,7 @@
           </ion-card-content>
         </ion-card>
       }
+    }
 
-    </div>
-  }
+  </div>
 </ion-content>

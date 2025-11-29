@@ -1,48 +1,372 @@
+// ------------------------------------------------------------------
+// PALETA DE COLORES GOURMET (Sincronizada con Login)
+// ------------------------------------------------------------------
+$color-dark-bg: #121212;
+$color-card-bg: #1e1e1e;
+$color-card-highlight: #252525;
+$color-gold: #d4af37;
+$color-gold-dim: #aa8c2c;
+$color-red-fire: #c0392b;
+$color-green-gourmet: #27ae60;
+$color-text-light: #f5f5dc; // Beige/Hueso
+$color-text-dim: #bdbdbd;
+
+// ------------------------------------------------------------------
+// FONDO Y CONTENEDOR PRINCIPAL
+// ------------------------------------------------------------------
 ion-content {
-  --background: linear-gradient(135deg, #f09850 0%, #cc480b 100%);
+  // Fondo: Mezcla de gradiente oscuro y patrón sutil (Efecto Piedra Pizarra)
+  --background: #000000;
+  --background-image: 
+    radial-gradient(circle at top right, rgba(44, 62, 80, 0.6) 0%, transparent 60%),
+    radial-gradient(circle at bottom left, rgba(192, 57, 43, 0.1) 0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23222222' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  
+  --color: #{$color-text-light};
 }
 
-.icon-small { width: 30px; height: 30px; }
+// ------------------------------------------------------------------
+// HEADER & TOOLBAR
+// ------------------------------------------------------------------
+ion-toolbar {
+  --background: rgba(30, 30, 30, 0.95);
+  --border-style: none;
+  --color: #{$color-gold};
+  border-bottom: 1px solid rgba($color-gold, 0.3);
+
+  ion-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 1.5rem;
+    margin-top: 20px;
+    margin-left: 10px;
+  }
+
+  ion-button {
+    --color: #{$color-gold};
+    margin-top: 20px;
+  }
+}
+
+.icon-small {
+  width: 28px;
+  height: 28px;
+  filter: drop-shadow(0 0 2px rgba(212, 175, 55, 0.5));
+}
+
+// ------------------------------------------------------------------
+// SEGMENTOS (Tabs)
+// ------------------------------------------------------------------
+ion-segment {
+  background: transparent;
+  padding: 10px;
+  
+  ion-segment-button {
+    --color: #{$color-text-dim};
+    --color-checked: #{$color-gold}; // Texto dorado al estar activo
+    --indicator-color: #{$color-gold}; // Línea inferior dorada
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+}
+
+// ------------------------------------------------------------------
+// TARJETAS DE PEDIDO (Estilo Lujo)
+// ------------------------------------------------------------------
+.card-pedido {
+  background: $color-card-bg;
+  border-radius: 12px;
+  margin: 0 0 20px 0;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba($color-gold, 0.15); // Borde sutil dorado
+  position: relative;
+  overflow: hidden;
+
+  // Header de la tarjeta
+  ion-card-header {
+    background: linear-gradient(90deg, rgba(0,0,0,0.4) 0%, transparent 100%);
+    border-bottom: 1px dashed rgba($color-text-dim, 0.2);
+    padding-bottom: 12px;
+
+    ion-card-subtitle {
+      color: $color-gold;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    ion-card-title {
+      color: $color-text-light;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      margin-top: 5px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    }
+  }
+
+  ion-card-content {
+    padding-top: 15px;
+    color: $color-text-dim;
+
+    p {
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+
+    // Lista de items (Estilo Ticket)
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 10px 0 20px 0;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      padding: 10px;
+
+      li {
+        padding: 8px 0;
+        border-bottom: 1px solid rgba($color-text-dim, 0.1);
+        font-size: 1rem;
+        color: $color-text-light;
+        display: flex;
+        align-items: center;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &::before {
+          content: '•';
+          color: $color-gold;
+          margin-right: 10px;
+          font-size: 1.2rem;
+        }
+      }
+    }
+  }
+
+  // --- ESTADOS DE LA TARJETA ---
+
+  // 1. NUEVO (Borde Izquierdo Dorado Pulsante)
+  &.nuevo {
+    border-left: 4px solid $color-gold;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; bottom: 0; width: 4px;
+      background: $color-gold;
+      box-shadow: 0 0 10px $color-gold;
+      opacity: 0.6;
+    }
+  }
+
+  // 2. LISTO (Estilo Verde Elegante)
+  &.listo {
+    border-left: 4px solid $color-green-gourmet;
+    background: linear-gradient(to right, rgba(39, 174, 96, 0.05), $color-card-bg);
+    animation: glowGreen 3s infinite ease-in-out;
+  }
+}
+
+// ------------------------------------------------------------------
+// BADGES (Etiquetas de Estado)
+// ------------------------------------------------------------------
+ion-badge {
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+
+  &[color="warning"] { // En preparación
+    --background: #{$color-gold-dim};
+    --color: #000;
+  }
+
+  &[color="success"] { // Listo
+    --background: #{$color-green-gourmet};
+    --color: #fff;
+  }
+}
+
+// ------------------------------------------------------------------
+// BOTONES Y ACCIONES
+// ------------------------------------------------------------------
+.acciones {
+  display: flex;
+  gap: 12px;
+  margin-top: 15px;
+  
+  ion-button {
+    flex: 1;
+    margin: 0;
+    --border-radius: 6px;
+    font-weight: 700;
+    text-transform: uppercase;
+    height: 45px;
+  }
+}
+
+// Sobreescritura global de botones dentro de las cards para el look Gourmet
+ion-card ion-button {
+  --box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+
+  // Botón Confirmar / Entregar (Dorado/Verde oscuro elegante)
+  &[color="success"], &.ion-color-success {
+    --background: linear-gradient(45deg, #{$color-gold-dim}, #{$color-gold});
+    --color: #000;
+    --background-activated: #{$color-gold-dim};
+  }
+  
+  // Botón Entregar Específico (Azul Noche o Verde Bosque)
+  &[color="primary"], &.ion-color-primary {
+    --background: linear-gradient(45deg, #2c3e50, #34495e);
+    --border: 1px solid #{$color-gold};
+    --color: #{$color-text-light};
+  }
+
+  // Botón Rechazar (Rojo Fuego)
+  &[color="danger"], &.ion-color-danger {
+    --background: linear-gradient(45deg, #800000, #{$color-red-fire});
+    --color: #fff;
+  }
+
+  // Botón Cobrar (Especial)
+  &[color="tertiary"], &.ion-color-tertiary {
+    --background: linear-gradient(90deg, #141E30 0%, #243B55 100%);
+    --border: 1px solid #{$color-gold};
+    --color: #{$color-gold};
+    margin-top: 10px;
+    height: 50px;
+    font-size: 1rem;
+    
+    ion-icon {
+      color: #{$color-gold};
+      margin-right: 8px;
+    }
+  }
+}
+
+// --- ESTILOS PARA DELIVERY ---
 
 .card-pedido {
-  border-radius: 15px;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-  margin-bottom: 15px;
+  // ... existente ...
 
-  &.nuevo {
-    border-left: 6px solid #ffc409; // Amarillo para alerta
-  }
+  &.es-delivery {
+    // Un borde púrpura o naranja sutil para diferenciar del dorado de mesa
+    border-left: 4px solid #9b59b6; 
 
-  &.listo {
-    border-left: 6px solid #2dd36f; // Verde para listo
-    animation: pulse 2s infinite;
-  }
+    ion-card-header ion-card-subtitle .badge-delivery {
+      color: #9b59b6; // Púrpura elegante
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
 
-  .texto-listo {
-    color: #2dd36f;
-    font-weight: bold;
-    font-size: 1.2rem;
-    text-align: center;
-  }
-
-  .acciones {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-    ion-button { flex: 1; }
+    &.nuevo {
+      border-left: 4px solid #e67e22; // Naranja para nuevo delivery
+       &::after {
+        background: #e67e22;
+        box-shadow: 0 0 10px #e67e22;
+      }
+    }
   }
 }
 
-.empty-msg {
+.direccion-envio {
+  color: #fff;
+  font-size: 0.9rem;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  opacity: 0.9;
+  
+  ion-icon {
+    color: $color-gold;
+  }
+}
+
+.direccion-envio-small {
+  color: $color-text-dim;
+  font-size: 0.8rem;
+  margin: 5px 0 0 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.success-text {
+  color: var(--ion-color-success);
+  font-weight: bold;
+}
+
+// ------------------------------------------------------------------
+// TEXTOS Y MENSAJES
+// ------------------------------------------------------------------
+.texto-listo {
+  color: $color-green-gourmet;
+  font-weight: 700;
+  font-size: 1.1rem;
   text-align: center;
-  color: white;
-  margin-top: 50px;
-  font-size: 1.5rem;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+  margin: 15px 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &::before, &::after {
+    content: '★';
+    color: $color-gold;
+    margin: 0 10px;
+    font-size: 0.8rem;
+  }
 }
 
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-  100% { transform: scale(1); }
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  text-align: center;
+  color: $color-text-dim;
+  padding: 20px;
+
+  p {
+    font-size: 1.2rem;
+    font-style: italic;
+    border-top: 1px solid $color-gold-dim;
+    border-bottom: 1px solid $color-gold-dim;
+    padding: 20px 0;
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+// ------------------------------------------------------------------
+// ANIMACIONES
+// ------------------------------------------------------------------
+@keyframes glowGreen {
+  0% { box-shadow: 0 0 5px rgba(39, 174, 96, 0.2); }
+  50% { box-shadow: 0 0 15px rgba(39, 174, 96, 0.5); border-color: rgba(39, 174, 96, 0.8); }
+  100% { box-shadow: 0 0 5px rgba(39, 174, 96, 0.2); }
+}
+
+// Ajuste para el spinner dentro del botón de cobrar
+ion-spinner {
+  --color: #{$color-gold};
 }

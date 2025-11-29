@@ -1,0 +1,125 @@
+// Importamos variables
+$color-gold: #d4af37;
+
+.gourmet-toolbar {
+
+  ion-toolbar {
+    --border-width: 0;
+  }
+}
+
+// --- LAYOUT PRINCIPAL ---
+.gourmet-content {
+  // Aseguramos que el contenido ocupe todo
+  --background: #121212;
+}
+
+ion-title{
+    font-size: 2rem;
+    align-items: center;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.delivery-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+// --- MAPA (Fondo completo o mitad superior) ---
+#mapId {
+  width: 100%;
+  height: 100%; // Importante para que Leaflet calcule bien
+  position: absolute; // Lo mandamos al fondo
+  top: 0;
+  left: 0;
+  z-index: 1; // Capa base
+}
+
+// --- INSTRUCCIONES FLOTANTES ---
+.instructions-bubble {
+  position: absolute;
+  top: 70px; // Debajo del toolbar
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10; // Encima del mapa
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  padding: 10px 20px;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  
+  p {
+    margin: 0;
+    color: #fff;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+}
+
+// --- TARJETA DE FORMULARIO (Inferior) ---
+.form-card {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 20; // Encima del mapa
+  background: #1e1e1e;
+  border-top-left-radius: 25px;
+  border-top-right-radius: 25px;
+  padding: 25px 20px 20px 20px;
+  box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  
+  // Animación suave al subir
+  animation: slideUp 0.4s ease-out;
+
+  .location-btn {
+    --background: #333;
+    --color: #fff;
+    --border-radius: 12px;
+    height: 45px;
+    font-weight: 600;
+  }
+}
+
+.gourmet-input {
+  --background: transparent;
+  --color: #fff;
+  border: 1px solid #444;
+  border-radius: 12px;
+  margin-bottom: 5px;
+
+  ion-label {
+    color: $color-gold !important;
+  }
+}
+
+.gourmet-btn-gold {
+  --background: #{$color-gold};
+  --color: #000;
+  font-weight: 700;
+  --border-radius: 12px;
+  height: 50px;
+  font-size: 1.1rem;
+  margin-top: 10px;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+// Toolbar transparente
+.gourmet-toolbar {
+  --background: transparent;
+  --border-width: 0;
+  position: absolute;
+  top: 0;
+  z-index: 100;
+}

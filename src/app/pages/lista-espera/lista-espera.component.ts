@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
-import {IonContent,IonButton, IonText, IonButtons, IonCol, IonGrid, IonRow, IonTitle, IonToolbar, IonHeader, IonCard, IonCardHeader, 
+import {IonContent,IonButton, IonText, IonButtons, IonCol, IonIcon, IonGrid, IonRow, IonTitle, IonToolbar, IonHeader, IonCard, IonCardHeader, IonSpinner, IonBadge,
   IonCardTitle,IonCardContent,IonRefresher,IonRefresherContent} from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -15,8 +15,8 @@ import { NotificacionesService } from '../../services/notificaciones';
   templateUrl: './lista-espera.component.html',
   styleUrls: ['./lista-espera.component.scss'],
   standalone: true,
-  imports: [CommonModule,FormsModule,IonContent, IonButton, IonText, IonTitle, IonButtons, IonCol, IonGrid, IonRow, IonHeader, IonToolbar, 
-    IonCard, IonCardHeader, IonCardTitle,IonCardContent,IonRefresher,IonRefresherContent]})
+  imports: [CommonModule,FormsModule,IonContent, IonButton, IonIcon, IonTitle, IonButtons, IonCol, IonGrid, IonRow, IonHeader, IonToolbar, IonBadge, IonText,
+    IonCard, IonCardHeader, IonCardTitle,IonCardContent,IonRefresher,IonRefresherContent, IonSpinner ]})
 
 export class ListaEsperaComponent implements OnInit {
   @ViewChild('inputMesa') inputMesa!: ElementRef<HTMLInputElement>;
@@ -80,6 +80,7 @@ export class ListaEsperaComponent implements OnInit {
     this.numeroMesaInput = null;
   }
 
+  // CORRECCIÓN PRINCIPAL AQUÍ
   async confirmarAsignacion(listaEsperaId: number, esAnonimo: boolean): Promise<void> {
     if (!this.numeroMesaInput || this.numeroMesaInput <= 0) {
       await this.toastService.mostrarToastError('Ingrese un número de mesa válido');
@@ -96,10 +97,12 @@ export class ListaEsperaComponent implements OnInit {
         return;
       }
 
+      // Normalización de datos para evitar nulls
       const clienteId = listaItem.cliente_id;
       const clienteAnonimoId = listaItem.cliente_anonimo_id;
       const nombreCliente = this.obtenerNombreCliente(listaItem);
 
+      // Verificación de mesa asignada previa
       const mesaAsignada = await this.mesaService.obtenerMesaAsignadaCliente(
         clienteId || undefined, 
         clienteAnonimoId || undefined
@@ -114,10 +117,10 @@ export class ListaEsperaComponent implements OnInit {
         return;
       }
 
+      // Llamada corregida pasando el ID de la lista de espera para actualizarlo luego
       await this.asignarMesaPorNumero(
         this.numeroMesaInput,
-        clienteAnonimoId!,
-        clienteId || undefined,
+        listaItem, // Pasamos el objeto completo o los IDs saneados
         nombreCliente
       );
 
@@ -131,8 +134,7 @@ export class ListaEsperaComponent implements OnInit {
 
   private async asignarMesaPorNumero(
     numeroMesa: number, 
-    clienteAnonimoId: number,
-    clienteId: number | undefined,
+    listaItem: ListaEsperaConCliente,
     nombreCliente: string
   ): Promise<void> {
     try {
@@ -150,27 +152,28 @@ export class ListaEsperaComponent implements OnInit {
         return;
       }
 
-      const mesaYaAsignada = await this.mesaService.obtenerMesaAsignadaCliente(
-        clienteId, 
-        clienteAnonimoId
-      );
+      const clienteId = listaItem.cliente_id;
+      const clienteAnonimoId = listaItem.cliente_anonimo_id;
       
-      if (mesaYaAsignada) {
-        const numeroMesaAsignada = await this.mesaService.obtenerNumeroMesa(mesaYaAsignada);
-        await this.toastService.mostrarToastAdvertencia(
-          `${nombreCliente} ya tiene la mesa ${numeroMesaAsignada} asignada`
-        );
-        return;
+      if (clienteAnonimoId) {
+          await this.mesaService.asignarMesa(mesa.id, clienteAnonimoId, null);
+      } else if (clienteId) {
+          await this.mesaService.asignarMesa(mesa.id, null, clienteId); 
       }
 
-      await this.mesaService.asignarMesa(mesa.id, clienteAnonimoId);
-      
+      // 2. Determinar destinatario notificación
+      const destinatarioId = clienteAnonimoId ? clienteAnonimoId : clienteId;
+      const perfilDestinatario = clienteAnonimoId ? 'cliente_anonimo' : 'cliente';
+
+      if (!destinatarioId) throw new Error("No se pudo identificar al cliente");
+
+      // 3. Enviar Notificación
       await this.notificacionesService.enviarNotificacion({
         tipo: 'mesa_asignada',
         titulo: 'Mesa Asignada',
         mensaje: `${nombreCliente}, diríjase a la mesa ${numeroMesa}`,
-        destinatario_id: clienteAnonimoId,
-        destinatario_perfil: 'cliente_anonimo',
+        destinatario_id: destinatarioId, // Ahora es seguro, no es null
+        destinatario_perfil: perfilDestinatario, // Dinámico
         datos: {
           numero_mesa: numeroMesa,
           mesa_id: mesa.id,
@@ -178,20 +181,23 @@ export class ListaEsperaComponent implements OnInit {
         }
       });
 
+      // 4. CRUCIAL: Actualizar estado en Lista de Espera
+      // Esto faltaba y es lo que causaba que siguiera en "esperando"
+      await this.listaEsperaService.marcarComoAtendido(listaItem.id);
+
       await this.toastService.mostrarToastExito(
         `Mesa ${numeroMesa} asignada a ${nombreCliente}`
       );
 
-      await this.notificacionesService.notificarMesaAsignada(nombreCliente, numeroMesa);
+      // Notificación local (opcional si ya usas realtime)
+      // await this.notificacionesService.notificarMesaAsignada(nombreCliente, numeroMesa);
 
       this.cancelarAsignacion();
       await this.cargarListas();
 
     } catch (error: any) {
       console.error('Error al confirmar asignación:', error);
-      await this.toastService.mostrarToastError(
-        error.message || 'Error al asignar la mesa'
-      );
+      throw error; // Re-lanzar para que lo capture el método padre
     }
   }
 

@@ -1,0 +1,326 @@
+// ------------------------------------------------------------------
+// PALETA & VARIABLES
+// ------------------------------------------------------------------
+$color-bg-dark: #121212;
+$color-card: #1e1e1e;
+$color-gold: #d4af37;
+$color-text: #f5f5dc;
+$color-gray: #888;
+$color-red-fire: #c0392b;
+$color-green-success: #2ecc71;
+$color-red-danger: #e74c3c;
+
+// ------------------------------------------------------------------
+// HEADER & LAYOUT
+// ------------------------------------------------------------------
+.header-transparente {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+  background: transparent;
+  pointer-events: none;
+}
+
+.gourmet-toolbar {
+  --background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(18,18,18,0.95) 100%);
+  --border-style: none;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.gourmet-title {
+  font-family: 'Playfair Display', serif;
+  color: $color-gold;
+  font-size: 1.5rem;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+
+ion-content.gourmet-content {
+  --background: radial-gradient(circle at top, #2b2b2b 0%, #000000 100%);
+}
+
+.main-container {
+  padding: 20px;
+  padding-top: 10px;
+}
+
+// ------------------------------------------------------------------
+// TITULOS DE SECCIÓN
+// ------------------------------------------------------------------
+.section-title {
+  margin-bottom: 15px;
+
+  h2 {
+    font-family: 'Playfair Display', serif;
+    margin-left: 10px;
+    display: inline-block;
+    padding-bottom: 5px;
+    font-size: 1.4rem;
+  }
+
+  // Estilo específico Pendientes
+  .title-pendiente {
+    border-bottom: 1px solid $color-gold;
+  }
+
+  // Estilo específico Confirmadas
+  .title-confirmed {
+    border-bottom: 1px solid $color-green-success;
+  }
+  
+  &.section-confirmed {
+    margin-top: 30px;
+  }
+}
+
+// ------------------------------------------------------------------
+// ESTADOS (LOADING / EMPTY)
+// ------------------------------------------------------------------
+.center-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+  color: $color-gray;
+  
+  p {
+    margin-top: 10px;
+    font-size: 1rem;
+  }
+
+  &.empty {
+    .icon-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 2px solid $color-gray;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+      
+      ion-icon {
+        font-size: 2rem;
+        color: $color-gray;
+      }
+    }
+  }
+
+  &.empty-pending {
+    height: 20vh;
+    margin-bottom: 20px;
+  }
+}
+
+.no-confirmed-msg {
+  text-align: center;
+  color: #666;
+  margin-top: 20px;
+  font-style: italic;
+}
+
+// ------------------------------------------------------------------
+// TARJETAS DE RESERVA
+// ------------------------------------------------------------------
+.reserva-card {
+  --background: #{$color-card};
+  margin: 0 0 15px 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+  position: relative;
+  overflow: hidden;
+
+  // Barra de estado lateral
+  .card-status-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: $color-gold; // Default (pendiente)
+    
+    &.status-confirmed {
+      background: $color-green-success;
+    }
+  }
+
+  &.card-confirmed {
+    opacity: 0.9;
+  }
+
+  // Header de tarjeta (Perfil)
+  ion-card-header {
+    padding-bottom: 5px;
+  }
+
+  .user-profile {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    ion-avatar {
+      width: 50px;
+      height: 50px;
+      border: 2px solid $color-gold;
+      
+      &.avatar-confirmed {
+        border-color: $color-green-success;
+      }
+
+      img {
+        object-fit: cover;
+      }
+    }
+
+    .user-info {
+      ion-card-title {
+        color: $color-text;
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 2px;
+      }
+      .email-text {
+        margin: 0;
+        font-size: 0.85rem;
+        color: $color-gray;
+      }
+    }
+  }
+
+  // Contenido
+  ion-card-content {
+    padding-top: 10px;
+  }
+
+  // Detalles (Grid de info)
+  .reserva-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr 0.8fr;
+    gap: 10px;
+    margin-bottom: 20px;
+    background: rgba(0,0,0,0.2);
+    padding: 10px;
+    border-radius: 8px;
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 5px;
+
+      ion-icon {
+        font-size: 1.4rem;
+        color: $color-gold;
+        
+        &.icon-confirmed {
+          color: $color-green-success;
+        }
+      }
+
+      .text {
+        display: flex;
+        flex-direction: column;
+        
+        .label {
+          font-size: 0.65rem;
+          color: $color-gray;
+          letter-spacing: 1px;
+        }
+        .value {
+          font-size: 0.95rem;
+          color: $color-text;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}
+
+// ------------------------------------------------------------------
+// ACCIONES (BOTONES)
+// ------------------------------------------------------------------
+.actions-container {
+  display: flex;
+  gap: 10px;
+
+  .btn-action {
+    flex: 1;
+    height: 40px;
+    --border-radius: 20px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin: 0;
+
+    &.reject {
+      --color: #{$color-red-danger};
+      --border-color: #{$color-red-danger};
+      --background-hover: rgba(231, 76, 60, 0.1);
+    }
+
+    &.confirm {
+      --background: #{$color-green-success};
+      --color: white;
+      --box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3);
+    }
+  }
+}
+
+// ------------------------------------------------------------------
+// ÁREA DE RECHAZO
+// ------------------------------------------------------------------
+.rejection-area {
+  background: rgba(231, 76, 60, 0.1);
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid rgba(231, 76, 60, 0.5);
+  animation: fadeIn 0.3s ease-out;
+
+  .rejection-label {
+    color: $color-red-danger;
+    margin: 0 0 8px 0;
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+
+  .rejection-input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(0,0,0,0.3);
+    color: white;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+    
+    &:focus {
+      outline: none;
+      border-color: $color-red-danger;
+    }
+    
+    &::placeholder {
+      color: rgba(255,255,255,0.4);
+    }
+  }
+
+  .rejection-buttons {
+    display: flex;
+    gap: 10px;
+
+    .btn-cancel {
+      flex: 1;
+    }
+    .btn-confirm {
+      flex: 1;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}

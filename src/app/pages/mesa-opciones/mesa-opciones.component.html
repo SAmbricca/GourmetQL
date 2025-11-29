@@ -1,10 +1,18 @@
 <ion-header class="ion-no-border">
-  <ion-toolbar>
-    <ion-title class="ion-text-center">Mesa {{ numeroMesa }}</ion-title>
+  <ion-toolbar class="empty-toolbar">
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content [fullscreen]="true" class="gourmet-content">
+  
+  <div class="internal-header">
+    <ion-back-button defaultHref="/home-anonimo" mode="md" class="custom-back-btn"></ion-back-button>
+    
+    <h1 class="page-title">Mesa {{ numeroMesa }}</h1>
+    
+    <div class="spacer-placeholder"></div>
+  </div>
+
   <div class="dashboard-container">
     
     <div class="welcome-header">
@@ -18,7 +26,6 @@
 
       <ion-grid class="ion-no-padding">
         <ion-row>
-          
           <ion-col size="12">
              <ion-card class="action-card featured" button (click)="irAlMenu()">
                <div class="card-content-row">
@@ -42,7 +49,7 @@
                 </div>
                 <div class="text-wrapper">
                   <ion-card-title>Ver mi Pedido</ion-card-title>
-                  <p>Revisá el estado de tu pedido</p>
+                  <p>Revisá el estado</p>
                 </div>
                 <ion-icon name="chevron-forward-outline" color="medium"></ion-icon>
               </div>
@@ -56,7 +63,7 @@
                    <ion-icon name="chatbubbles-outline"></ion-icon>
                 </div>
                 <div class="text-wrapper">
-                  <ion-card-title>Chatear con un Mozo</ion-card-title>
+                  <ion-card-title>Contactar Mozo</ion-card-title>
                   <p>¿Necesitás ayuda?</p>
                 </div>
                 <ion-icon name="chevron-forward-outline" color="medium"></ion-icon>
@@ -74,7 +81,7 @@
                     <ion-card-title>Juegos</ion-card-title>
                     <p>¡Gana descuentos jugando!</p>
                   </div>
-                  <ion-badge color="danger" class="ion-margin-end">OFF%</ion-badge>
+                  <ion-badge color="danger">OFF%</ion-badge>
                   <ion-icon name="chevron-forward-outline" color="medium"></ion-icon>
                 </div>
               </ion-card>
@@ -114,6 +121,7 @@
               </ion-card>
             </ion-col>
           }
+
         </ion-row>
       </ion-grid>
     </div>

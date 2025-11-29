@@ -20,8 +20,8 @@ export interface ItemPedido {
 
 export interface Pedido {
   mesa_id: number;
-  cliente_id?: number;
-  cliente_anonimo_id?: number;
+  cliente_id?: number | null | undefined;
+  cliente_anonimo_id?: number | null | undefined;
   estado: string;
   total: number;
   descuento: number;
@@ -90,11 +90,14 @@ export class MenuService {
       let pedidoId: number;
 
       // 1. Buscar pedido pendiente existente
+      // FIX: Agregamos .order() y .limit(1) para evitar el error "multiple rows returned"
       const { data: pedidoExistente, error: buscarError } = await this.supabaseService.supabase
         .from('pedidos')
         .select('id')
         .eq('mesa_id', pedido.mesa_id)
         .eq('estado', 'pendiente')
+        .order('fecha_creacion', { ascending: false }) // Tomamos el más reciente si hay duplicados
+        .limit(1) // <--- ESTA ES LA SOLUCIÓN CLAVE
         .maybeSingle();
 
       if (buscarError) throw buscarError;

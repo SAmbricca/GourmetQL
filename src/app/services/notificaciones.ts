@@ -13,10 +13,10 @@ export interface NotificacionPerfil {
 
 export interface NotificacionTiempoReal {
   id?: number;
-  tipo: 'pedido_rechazado' | 'pedido_modificado' | 'pedido_aceptado' | 'consulta_mozo' | 'mesa_asignada';
+  tipo: 'pedido_rechazado' | 'pedido_modificado' | 'pedido_aceptado' | 'consulta_mozo' | 'pedido_listo' | 'mesa_asignada' | 'nuevo_pedido_delivery' | 'nueva_reserva' | 'mesa_liberada';
   titulo: string;
   mensaje: string;
-  destinatario_id?: number;
+  destinatario_id?: number | string;
   destinatario_perfil?: string;
   datos?: any;
   leido?: boolean;
@@ -97,25 +97,25 @@ export class NotificacionesService {
 
   async enviarNotificacion(notificacion: NotificacionTiempoReal): Promise<{ success: boolean; message?: string }> {
     try {
-      const { data, error } = await this.supabase
+      if (!notificacion.destinatario_id) throw new Error("Falta destinatario ID");
+
+      const { error } = await this.supabase
         .from('notificaciones')
         .insert([
           {
             tipo: notificacion.tipo,
             titulo: notificacion.titulo,
             mensaje: notificacion.mensaje,
-            destinatario_id: notificacion.destinatario_id,
+            // Convertimos a string para asegurar compatibilidad con base de datos (text)
+            destinatario_id: notificacion.destinatario_id.toString(), 
             destinatario_perfil: notificacion.destinatario_perfil,
             datos: notificacion.datos,
             leido: false,
             fecha_creacion: new Date().toISOString()
           }
-        ])
-        .select()
-        .single();
+        ]);
 
       if (error) throw error;
-
       return { success: true };
     } catch (error: any) {
       console.error('Error al enviar notificación:', error);
@@ -197,12 +197,16 @@ export class NotificacionesService {
     );
   }
 
-  async notificarMesaAsignada(nombreCliente: string, numeroMesa: number): Promise<void> {
-    await this.mostrarNotificacionCustom(
-      'Mesa Asignada!',
-      `${nombreCliente}, dirigite a la mesa ${numeroMesa}`,
-      500
-    );
+  async notificarMesaAsignada(nombreCliente: string, numeroMesa: number) {
+    // Implementación simple para llamar desde el componente si se desea
+    await LocalNotifications.schedule({
+        notifications: [{
+            title: 'Mesa Asignada',
+            body: `${nombreCliente}, tu mesa es la ${numeroMesa}`,
+            id: Math.floor(Math.random() * 1000),
+            schedule: { at: new Date(Date.now() + 100) }
+        }]
+    });
   }
 
   async cancelarTodasLasNotificaciones(): Promise<void> {

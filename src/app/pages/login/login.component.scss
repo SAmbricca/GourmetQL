@@ -1,377 +1,365 @@
-.login-content {
-  --background: linear-gradient(135deg, #f09850 0%,  #cc480b 100%);
+// ------------------------------------------------------------------
+// PALETA DE COLORES GOURMET
+// ------------------------------------------------------------------
+$color-dark-bg: #121212;
+$color-card-bg: #1e1e1e;
+$color-gold: #d4af37;
+$color-gold-dim: #aa8c2c;
+$color-red-fire: #c0392b;
+$color-text-light: #f5f5dc;
+$color-text-dim: #bdbdbd;
+$color-input-bg: rgba(0, 0, 0, 0.3);
+
+// ------------------------------------------------------------------
+// HEADER TRANSPARENTE (Login Principal)
+// ------------------------------------------------------------------
+.header-transparente {
+
+  ion-toolbar {
+    --border-width: 0;
+  }
+}
+
+// ------------------------------------------------------------------
+// CONFIGURACIÓN CONTENIDO
+// ------------------------------------------------------------------
+ion-content.login-content {
+  --background: radial-gradient(circle at center, #2c3e50 0%, #000000 100%);
 }
 
 .login-container {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
-  padding: 20px;
   justify-content: center;
   align-items: center;
+  min-height: 100%;
+  // Padding superior que respeta el safe area + header
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(3px);
 }
 
+// ------------------------------------------------------------------
+// LOGO & TÍTULO
+// ------------------------------------------------------------------
 .logo-container {
   text-align: center;
   margin-bottom: 20px;
-  
+  animation: fadeInDown 0.8s ease-out;
+
   .logo {
-    width: 120px;
-    height: 200px;
-    margin-bottom: 10px;
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    filter: drop-shadow(0px 0px 10px rgba(212, 175, 55, 0.5));
   }
 
   .app-title {
-    color: white;
-    font-size: 3rem;
-    font-weight: bold;
-    margin: 10px 0 5px 0;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    font-family:'Times New Roman', Times, serif;
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: $color-gold;
+    margin-top: 5px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    letter-spacing: 1px;
+    text-transform: uppercase;
   }
 }
 
+// ------------------------------------------------------------------
+// FORMULARIO
+// ------------------------------------------------------------------
 .login-form {
   width: 100%;
   max-width: 400px;
-  margin-bottom: 20px;
+  z-index: 10;
+}
 
-  .login-card {
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+.login-card {
+  --background: #{$color-card-bg};
+  background: $color-card-bg;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 16px;
+  margin: 0;
+}
 
-    .input-item {
-      margin-bottom: 20px;
-      --border-radius: 12px;
-      --border-color: #e0e0e0;
-      --border-width: 2px;
+ion-item.input-item {
+  --background: #{$color-input-bg};
+  --color: #{$color-text-light};
+  --border-color: #{$color-gold-dim};
+  --highlight-color-focused: #{$color-gold};
+  border-radius: 8px;
+  margin-bottom: 12px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
 
-      &.item-has-focus {
-        --border-color: #667eea;
-      }
-    }
+  ion-label {
+    color: $color-text-dim !important;
+    font-weight: 600;
+  }
+  
+  ion-input {
+    --color: #{$color-text-light};
+  }
+}
 
-    .login-button {
-      margin-top: 10px;
-      --border-radius: 12px;
-      height: 50px;
-      font-weight: bold;
-      font-size: 1.1rem;
-      --background: linear-gradient(45deg, #f09850, #cc480b);
+.login-button {
+  --background: linear-gradient(90deg, #{$color-gold-dim} 0%, #{$color-gold} 100%);
+  --background-activated: #{$color-gold-dim};
+  --color: #000;
+  --border-radius: 8px;
+  --box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3);
+  font-weight: 800;
+  margin-top: 15px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+
+  &.btn-google {
+    --background: #db4437; // Color oficial Google Red
+    --background-activated: #c53929;
+    --color: #fff;
+    --box-shadow: 0 4px 10px rgba(219, 68, 55, 0.3);
+    margin-top: 10px; // Un poco de espacio extra
+    
+    ion-icon {
+      color: #fff;
     }
   }
 }
 
-.register-button {
-  margin-top: 10px;
-  --border-radius: 12px;
-  height: 50px;
-  font-weight: bold;
-  font-size: 1.1rem;
-  --background: linear-gradient(45deg, #50f0a8, #0bcc62);
+.quick-login-btn.btn-anonimo {
+  --background: #34495e;
+  --color: #fff;
+  --border-radius: 8px;
+  --box-shadow: none;
+  font-weight: 600;
+  margin-top: 5px;
+  height: 45px;
 }
 
+// ------------------------------------------------------------------
+// ACCESO RÁPIDO Y SEPARADOR
+// ------------------------------------------------------------------
 .separator {
   display: flex;
   align-items: center;
   width: 100%;
   max-width: 400px;
-  margin: 20px 0;
+  margin: 15px 0;
 
   .separator-line {
-    flex: 1;
-    height: 1px;
-    background: rgba(255, 255, 255, 0.3);
+    flex-grow: 1;
     border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, $color-gold, transparent);
   }
 
   .separator-text {
-    color: white;
-    padding: 0 15px;
-    font-size: 0.9rem;
-    white-space: nowrap;
+    padding: 0 10px;
+    color: $color-text-dim;
+    font-size: 0.85rem;
+    font-style: italic;
   }
 }
 
 .quick-login {
   width: 100%;
   max-width: 400px;
+  padding-bottom: 10px;
+}
 
-  .quick-login-card {
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
+.quick-login-card {
+  --background: transparent;
+  border-radius: 16px;
+  box-shadow: none;
+  border: none;
+  margin: 0;
+}
 
-    .quick-login-title {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #333;
-      gap: 8px;
+.quick-buttons-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  padding: 0;
+}
 
-      .info-button {
-        margin-left: auto;
-      }
-    }
+.quick-login-btn {
+  --border-radius: 6px;
+  --border-width: 1px;
+  font-weight: bold;
+  height: 45px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
 
-    .quick-buttons-container {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      padding-top: 0;
+  // ESTILOS ESPECIFICOS POR ROL
+  &.btn-dueno, &.btn-supervisor {
+    --border-color: #{$color-gold};
+    --color: #{$color-gold};
+    --background-hover: rgba(212, 175, 55, 0.1);
+  }
 
-      .quick-login-btn {
-        height: 60px;
-        --border-radius: 15px;
-        font-weight: 600;
-        font-size: 1rem;
-        position: relative;
-        overflow: hidden;
-        transition: all 0.3s ease;
+  &.btn-cocinero {
+    --border-color: #{$color-red-fire};
+    --color: #{$color-red-fire};
+    --background-hover: rgba(192, 57, 43, 0.1);
+  }
 
-        .username {
-          font-size: 0.8rem;
-          opacity: 0.7;
-          margin-left: 8px;
-          font-family:'Times New Roman', Times, serif;
-        }
+  &.btn-bartender {
+    --border-color: #9b59b6;
+    --color: #9b59b6;
+    --background-hover: rgba(155, 89, 182, 0.1);
+  }
 
-        &.btn-dueno {
-          --color: #d4af37;
-          --border-color: #d4af37;
-          
-          &:hover {
-            --background: rgba(212, 175, 55, 0.1);
-          }
-        }
-
-        &.btn-supervisor {
-          --color: #ff6b6b;
-          --border-color: #ff6b6b;
-          
-          &:hover {
-            --background: rgba(255, 107, 107, 0.1);
-          }
-        }
-
-        &.btn-cocinero {
-          --color: #4ecdc4;
-          --border-color: #4ecdc4;
-          
-          &:hover {
-            --background: rgba(78, 205, 196, 0.1);
-          }
-        }
-
-        &.btn-bartender {
-          --color: #a8e6cf;
-          --border-color: #a8e6cf;
-          
-          &:hover {
-            --background: rgba(168, 230, 207, 0.1);
-          }
-        }
-
-        &.btn-mozo {
-          --color: #ffa07a;
-          --border-color: #ffa07a;
-          
-          &:hover {
-            --background: rgba(255, 160, 122, 0.1);
-          }
-        }
-
-        &.btn-maitre {
-          --color: #dda0dd;
-          --border-color: #dda0dd;
-          
-          &:hover {
-            --background: rgba(221, 160, 221, 0.1);
-          }
-        }
-
-        &.btn-anonimo {
-          --background: linear-gradient(45deg, #667eea, #764ba2);
-          --color: white;
-          margin-top: 10px;
-          border-top: 2px solid rgba(255, 255, 255, 0.3);
-          padding-top: 10px;
-
-          &:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-          }
-        }
-
-        &:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-      }
-    }
+  &.btn-mozo {
+    --border-color: #e67e22;
+    --color: #e67e22;
+    --background-hover: rgba(230, 126, 34, 0.1);
+  }
+  
+  &.btn-metre {
+    --border-color: #1abc9c;
+    --color: #1abc9c;
+    --background-hover: rgba(26, 188, 156, 0.1);
   }
 }
 
-// Estilos del modal de registro anónimo
+// ------------------------------------------------------------------
+// MODAL CLIENTE ANÓNIMO (CORREGIDO SAFE AREA)
+// ------------------------------------------------------------------
+ion-modal {
+  --background: radial-gradient(circle at center, #2c3e50 0%, #000000 100%);
+  --border-radius: 16px;
+}
+
 .modal-anonimo-content {
-  --background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --background: #181818;
 }
 
 .modal-anonimo-container {
-  padding: 20px;
-  min-height: 100%;
+  // Padding dinámico: 20px base + el espacio de la barra de estado
+  padding: calc(20px + var(--ion-safe-area-top)) 20px 20px 20px;
   display: flex;
   flex-direction: column;
+  height: 60%;
+}
 
-  .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 10px;
 
-    h2 {
-      color: white;
-      font-size: 1.5rem;
-      font-weight: bold;
-      margin: 0;
-    }
+  h2 {
+    color: $color-gold;
+    font-size: 2rem;
+    margin: 0;
+    font-family: 'Playfair Display', serif;
+  }
+}
 
-    ion-button {
-      --color: white;
-    }
+.modal-body {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.foto-container {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid $color-gold;
+  background-color: #000;
+  margin-bottom: 25px;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .foto-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
-  .modal-body {
-    flex: 1;
+  .foto-placeholder {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-
-    .foto-container {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
-
-      .foto-preview {
-        width: 200px;
-        height: 200px;
-        border-radius: 50%;
-        object-fit: cover;
-        border: 5px solid white;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-      }
-
-      .foto-placeholder {
-        width: 200px;
-        height: 200px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.2);
-        border: 3px dashed rgba(255, 255, 255, 0.5);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        color: white;
-
-        ion-icon {
-          font-size: 4rem;
-          margin-bottom: 10px;
-        }
-
-        p {
-          margin: 0;
-          font-size: 1rem;
-        }
-      }
-    }
-
-    .botones-foto {
-      display: flex;
-      gap: 10px;
-
-      ion-button {
-        flex: 1;
-        --border-radius: 12px;
-        height: 50px;
-        --background: white;
-        --color: #667eea;
-
-        &[fill="outline"] {
-          --border-color: white;
-          --color: white;
-        }
-      }
-    }
-
-    .input-nombre {
-      --border-radius: 12px;
-      --border-color: white;
-      --border-width: 2px;
-      --background: rgba(255, 255, 255, 0.9);
-      margin-top: 10px;
-
-      ion-label {
-        --color: #667eea;
-      }
-
-      ion-input {
-        --color: #333;
-      }
-    }
-
-    .btn-registrar {
-      margin-top: 20px;
-      --border-radius: 12px;
-      height: 55px;
-      font-weight: bold;
-      font-size: 1.1rem;
-      --background: white;
-      --color: #667eea;
-
-      &:disabled {
-        opacity: 0.5;
-      }
+    align-items: center;
+    color: $color-text-dim;
+    
+    ion-icon {
+      font-size: 2.5rem;
     }
   }
 }
 
-@media (max-width: 768px) {
-  .login-container {
-    padding: 15px;
-  }
+.input-nombre {
+  width: 100%;
+  --background: #252525;
+  --color: #fff;
+  --border-color: #555;
+  --highlight-color-focused: $color-gold;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+}
 
-  .logo-container {
-    .logo {
+.btn-registrar {
+  width: 100%;
+  --background: linear-gradient(45deg, #c0392b, #e74c3c);
+  --box-shadow: 0 4px 15px rgba(192, 57, 43, 0.4);
+  --border-radius: 8px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+// ------------------------------------------------------------------
+// LOADING PERSONALIZADO (FIX: CSS PURO)
+// ------------------------------------------------------------------
+::ng-deep .custom-loading-gourmet {
+  --background: rgba(0, 0, 0, 0.85); // Fondo semitransparente oscuro para toda la pantalla
+  --spinner-color: transparent; // Ocultar cualquier rastro de spinner nativo
+
+  .loading-wrapper {
+    background: transparent !important; // Quitar el cuadrado blanco nativo
+    box-shadow: none !important;
+    border: none !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    
+    // Inyectamos el logo via CSS
+    &::after {
+      content: '';
+      display: block;
       width: 100px;
       height: 100px;
-    }
-
-    .app-title {
-      font-size: 1.8rem;
-    }
-  }
-
-  .quick-login {
-    .quick-buttons-container {
-      .quick-login-btn {
-        height: 55px;
-        font-size: 0.9rem;
-      }
+      background-image: url('../../../assets/logo.png');
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: contain;
+      animation: pulsateAndSpin 2s infinite ease-in-out;
+      border-radius: 50%;
+      border: 2px solid #{$color-gold}; // Anillo dorado opcional
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.6); // Resplandor dorado
     }
   }
+}
 
-  .modal-anonimo-container {
-    .modal-body {
-      .foto-container {
-        .foto-preview,
-        .foto-placeholder {
-          width: 150px;
-          height: 150px;
-        }
-      }
-    }
-  }
+@keyframes pulsateAndSpin {
+  0% { transform: scale(1) rotate(0deg); opacity: 0.9; }
+  50% { transform: scale(1.1) rotate(180deg); opacity: 1; }
+  100% { transform: scale(1) rotate(360deg); opacity: 0.9; }
 }

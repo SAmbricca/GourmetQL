@@ -1,317 +1,374 @@
-ion-content {
-  --background: linear-gradient(135deg, #f09850 0%, #cc480b 100%);
+// ------------------------------------------------------------------
+// PALETA DE COLORES GOURMET
+// ------------------------------------------------------------------
+$color-bg-dark: #121212;
+$color-card-bg: #1e1e1e;
+$color-gold: #d4af37;
+$color-gold-dim: #aa8c2c;
+$color-red-fire: #c0392b;
+$color-green-gourmet: #27ae60;
+$color-text-light: #f5f5dc; // Hueso/Beige
+$color-text-dim: #bdbdbd;
+$color-bubble-client: #333333;
 
-  ion-title{
-    padding-top: 20px;
-  }
+// ------------------------------------------------------------------
+// FONDO Y CONTENEDOR
+// ------------------------------------------------------------------
+ion-content {
+  // Textura de piedra pizarra oscura (mismo patrón que pedidos-mozo)
+  --background: #000000;
+  --background-image: 
+    radial-gradient(circle at top left, rgba(44, 62, 80, 0.4) 0%, transparent 60%),
+    radial-gradient(circle at bottom right, rgba(170, 140, 44, 0.1) 0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23222222' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  
+  --color: #{$color-text-light};
 }
 
-.pendientes-badge {
-  margin-right: 8px;
-  font-size: 0.8rem;
-  padding: 6px 10px;
-  border-radius: 12px;
-  box-shadow: 0 2px 4px rgb(255, 0, 0);
+// ------------------------------------------------------------------
+// HEADER & TOOLBAR
+// ------------------------------------------------------------------
+ion-toolbar {
+  --background: rgba(30, 30, 30, 0.98);
+  --border-style: none;
+  border-bottom: 1px solid rgba($color-gold, 0.3);
+
+  ion-title {
+    font-family: 'Playfair Display', serif;
+    color: $color-gold;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 1.1rem;
+    padding-top: 4px;
+  }
 }
 
 .volver-icon {
-  width: 36px;
-  height: 36px;
-  padding-top: 20px;
+  width: 24px;
+  height: 24px;
+  filter: drop-shadow(0 0 2px rgba(212, 175, 55, 0.6));
 }
 
-.loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 80vh;
-  
-  h3 {
-    color: #666;
-    font-size: 1.1rem;
-    font-weight: 500;
-  }
-}
-
-.empty-state {
+// ------------------------------------------------------------------
+// ESTADOS DE CARGA Y VACÍO
+// ------------------------------------------------------------------
+.loading-container, .empty-state {
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  height: 80vh;
-  padding: 20px;
+  align-items: center;
+  height: 70vh;
   text-align: center;
-
-  ion-icon {
-    font-size: 64px;
-    color: #ccc;
-    margin-bottom: 16px;
-  }
+  background: rgba(0,0,0,0.3);
 
   h3 {
-    color: #444;
-    font-size: 1.2rem;
-    margin-bottom: 8px;
-    font-weight: 600;
+    color: $color-gold;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
   }
-
+  
   p {
-    color: #888;
-    font-size: 0.95rem;
+    color: $color-text-dim;
+    font-style: italic;
+  }
+  
+  ion-icon {
+    font-size: 4rem;
+    color: rgba($color-gold, 0.3);
+    margin-bottom: 20px;
   }
 }
 
+// ------------------------------------------------------------------
+// TARJETAS DE CONSULTA
+// ------------------------------------------------------------------
 .consultas-container {
-  padding: 12px;
-  padding-bottom: 40px;
+  padding: 15px;
 }
 
 .seccion-header {
-  margin: 15px 4px 10px;
-  
-  h2 {
+  margin: 10px 0;
+  border-bottom: 1px solid rgba($color-gold, 0.2);
+}
+
+.consulta-card {
+  background: $color-card-bg;
+  border-radius: 12px;
+  margin: 0 0 20px 0;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05); // Borde sutil
+  transition: transform 0.2s ease;
+
+  // Estado Pendiente (Rojo Fuego)
+  &.pendiente {
+    border-left: 4px solid $color-red-fire;
+    
+    // Efecto de brillo rojo sutil
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; bottom: 0; width: 40px;
+      background: linear-gradient(90deg, rgba($color-red-fire, 0.15) 0%, transparent 100%);
+      pointer-events: none;
+    }
+  }
+
+  // Estado Respondida (Verde/Oro)
+  &.respondida {
+    border-left: 4px solid $color-green-gourmet;
+  }
+}
+
+// Cabecera de la Tarjeta
+ion-card-header {
+  padding: 15px;
+  background: linear-gradient(to bottom, rgba(40,40,40,0.5), transparent);
+  border-bottom: 1px dashed rgba($color-text-dim, 0.2);
+
+  .consulta-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .mesa-info {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    color: $color-text-light;
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 1rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin: 0;
 
-    ion-icon {
-      font-size: 1.2rem;
+    ion-icon { color: $color-gold; }
+  }
+
+  .cliente-nombre {
+    display: block;
+    font-size: 0.9rem;
+    color: $color-text-dim;
+    margin-top: 4px;
+    margin-left: 28px; // Indentar bajo el icono
+  }
+
+  .info-secundaria {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+
+    .fecha {
+      font-size: 0.75rem;
+      color: rgba($color-text-dim, 0.6);
+      margin-top: 5px;
     }
   }
 }
 
-.consulta-card {
-  margin: 0 0 16px 0;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  background: #fff;
-  overflow: hidden;
-  transition: transform 0.2s ease;
-
-  &.pendiente {
-    border-left: 5px solid var(--ion-color-danger);
-  }
-
-  &.respondida {
-    border-left: 5px solid var(--ion-color-success);
-  }
+// Contenido de la Tarjeta
+ion-card-content {
+  padding: 0;
 }
 
-ion-card-header {
-  cursor: pointer;
-  padding: 16px;
-  background: #fff;
-  border-bottom: 1px solid #f0f0f0;
-  
-  &:active {
-    background: #fafafa;
-  }
-}
-
-.consulta-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.info-principal {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
-}
-
-.mesa-info {
+// Previsualización del mensaje (cerrado)
+.mensaje-preview {
+  padding: 15px;
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #333;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.2);
 
   ion-icon {
-    color: #f09850;
-  }
-}
-
-.cliente-nombre {
-  font-size: 0.9rem;
-  color: #666;
-  margin-left: 24px;
-}
-
-.info-secundaria {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 6px;
-
-  ion-badge {
-    font-size: 1rem;
-    padding: 4px 8px;
-    padding-right: 20px;
-    border-radius: 4px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-  }
-
-  .fecha {
-    font-size: 0.9rem;
-    color: #999;
-  }
-}
-
-ion-card-content {
-  padding: 0; // Padding handled by children
-}
-
-.mensaje-preview {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 8px;
-  background: #fff;
-  
-  ion-icon {
+    color: $color-gold-dim;
     font-size: 1.2rem;
-    color: #999;
-    margin-top: 2px;
-    min-width: 20px;
   }
 
   p {
     margin: 0;
-    color: #444;
+    color: $color-text-light;
     font-size: 0.95rem;
-    line-height: 1.5;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    line-height: 1.4;
+    font-style: italic;
+    
+    strong { color: $color-gold; }
+  }
+  
+  // Botón "Abrir Chat" integrado visualmente
+  ion-button {
+    margin: 10px 15px;
+    --border-color: #{$color-gold-dim};
+    --color: #{$color-gold};
   }
 }
 
-/* Chat Expandido */
+// ------------------------------------------------------------------
+// CHAT EXPANDIDO (INTERIOR)
+// ------------------------------------------------------------------
 .chat-expandido {
-  border-top: 1px solid #000000;
-  border-bottom: 1px solid #000000;
+  background: #151515; // Más oscuro que la card
+  border-top: 1px solid rgba($color-gold, 0.2);
   animation: slideDown 0.3s ease-out;
 }
 
 .chat-mensajes {
+  padding: 15px;
+  max-height: 400px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  max-height: 350px;
-  overflow-y: auto;
-  padding: 16px;
-  background: #f4f5f8;
+  gap: 12px;
+  // Sutil textura de fondo en el área de chat
+  background-image: radial-gradient(#222 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
-/* Burbujas de Chat en Admin */
+// BURBUJAS DE CHAT
 .mensaje {
   display: flex;
   width: 100%;
+  
+  .mensaje-contenido {
+    max-width: 85%;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+  }
 
-  /* CLIENTE (Ellos) -> Izquierda / Blanco */
+  // Estilo CLIENTE (Izquierda)
   &.mensaje-cliente {
     justify-content: flex-start;
 
     .mensaje-contenido {
-      background: white;
-      color: #333;
-      border-radius: 16px 16px 16px 2px;
-      border: 1px solid #e0e0e0;
-      
-      .mensaje-autor { color: #666; }
+      background: #2c2c2c; // Gris oscuro
+      border-radius: 12px 12px 12px 0;
+      border: 1px solid #444;
+      color: $color-text-light;
+
+      .mensaje-autor { color: $color-text-dim; }
     }
   }
 
-  /* MOZO (Yo) -> Derecha / Azul */
+  // Estilo MOZO (Derecha - PROTAGONISTA)
   &.mensaje-mozo {
     justify-content: flex-end;
 
     .mensaje-contenido {
-      background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
-      color: white;
-      border-radius: 16px 16px 2px 16px;
-      box-shadow: 0 2px 6px rgba(74, 144, 226, 0.2);
+      // Gradiente Dorado/Bronce elegante
+      background: linear-gradient(135deg, #aa8c2c 0%, #7d6608 100%); 
+      border-radius: 12px 12px 0 12px;
+      color: #fff;
+      border: 1px solid $color-gold;
+
+      .mensaje-autor { 
+        color: rgba(255,255,255,0.8); 
+        text-align: right; 
+      }
       
-      .mensaje-autor { color: rgba(255,255,255,0.9); text-align: right; }
-      .mensaje-hora { color: rgba(255,255,255,0.8); }
+      .mensaje-texto {
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      }
+
+      .mensaje-hora {
+         color: rgba(255,255,255,0.7);
+      }
     }
   }
 }
 
-.mensaje-contenido {
-  max-width: 80%;
-  padding: 10px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
 .mensaje-autor {
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
 }
 
 .mensaje-texto {
-  font-size: 0.95rem;
+  font-size: 1rem;
   line-height: 1.4;
 }
 
 .mensaje-hora {
   font-size: 0.65rem;
   text-align: right;
-  margin-top: 4px;
-  color: #999;
+  margin-top: 6px;
+  font-style: italic;
 }
 
-/* Formulario Respuesta */
+// ------------------------------------------------------------------
+// FORMULARIO DE RESPUESTA
+// ------------------------------------------------------------------
 .respuesta-form {
+  padding: 12px;
+  background: #1a1a1a;
+  border-top: 1px solid #333;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 16px 16px 16px;
-  background: #f9f9f9;
-  border-top: 1px solid #eee;
 
-  .respuesta-input {
-    flex: 1;
-    --background: white;
-    --padding-start: 14px;
-    --padding-end: 14px;
-    border-radius: 24px;
-    border: 1px solid #ddd;
-    min-height: 44px;
+  // Input oscuro
+  ion-input.respuesta-input {
+    --background: #000;
+    --color: #fff;
+    --placeholder-color: #666;
+    --padding-start: 15px;
+    border: 1px solid #444;
+    border-radius: 25px;
+    height: 48px;
     font-size: 0.95rem;
+
+    &.has-focus {
+      border-color: $color-gold;
+    }
   }
 
+  // Botón Enviar
   ion-button {
     margin: 0;
     --border-radius: 50%;
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
     --padding-start: 0;
     --padding-end: 0;
+    --background: linear-gradient(45deg, #{$color-gold-dim}, #{$color-gold});
+    --color: #000;
+    --box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
 
     ion-icon {
-      font-size: 1.2rem;
+      font-size: 1.4rem;
+    }
+    
+    // Deshabilitado
+    &[disabled] {
+      opacity: 0.5;
+      --background: #444;
     }
   }
 }
 
+// ------------------------------------------------------------------
+// BADGES PERSONALIZADOS
+// ------------------------------------------------------------------
+ion-badge {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 5px 8px;
+  
+  &[color="warning"] { // Pendiente
+    --background: rgba(192, 57, 43, 0.2); // Fondo rojo transparente
+    --color: #ff6b6b; // Texto rojo claro
+    border: 1px solid #ff6b6b;
+  }
+
+  &[color="success"] { // Respondido
+    --background: rgba(39, 174, 96, 0.2);
+    --color: #2ecc71;
+    border: 1px solid #2ecc71;
+  }
+}
+
 @keyframes slideDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; max-height: 0; }
+  to { opacity: 1; max-height: 600px; }
 }

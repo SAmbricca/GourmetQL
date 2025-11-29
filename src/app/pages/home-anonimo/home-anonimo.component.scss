@@ -1,253 +1,212 @@
-ion-content {
-  --background: linear-gradient(135deg, #f09850 0%, #cc480b 100%);
+// ------------------------------------------------------------------
+// PALETA & VARIABLES
+// ------------------------------------------------------------------
+$color-bg-dark: #121212;
+$color-card: #1e1e1e;
+$color-gold: #d4af37;
+$color-text: #f5f5dc;
+$color-gray: #888;
+$color-red-fire: #c0392b;
+
+// ------------------------------------------------------------------
+// HEADER VACÍO
+// ------------------------------------------------------------------
+.empty-toolbar {
+  --border-width: 0;
 }
 
-.bienvenido-title{
-  padding-top: 16px;
-}
-.salir-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  padding-top: 16px;
+// ------------------------------------------------------------------
+// CONTENIDO & HEADER INTERNO
+// ------------------------------------------------------------------
+ion-content.gourmet-content {
+  --background: radial-gradient(circle at top, #2b2b2b 0%, #000000 100%);
 }
 
-.user-info-container {
-  padding: 20px 20px 0 20px;
+.internal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, transparent 100%);
 
-  ion-card {
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    background: white;
-
-    .user-details {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 15px;
-
-      .avatar-container {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        overflow: hidden;
-        border: 4px solid #f09850;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-
-        .user-avatar {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-      }
-
-      ion-card-title {
-        text-align: center;
-        font-size: 1.7rem;
-        font-weight: bold;
-        color: #333;
-        font-family: 'Times New Roman', Times, serif;
-        margin: 0;
-      }
-
-      .estado-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 8px;
-        width: 100%;
-
-        ion-spinner {
-          width: 24px;
-          height: 24px;
-        }
-
-        .estado-text {
-          margin: 0;
-          font-size: 0.95rem;
-          color: #666;
-        }
-
-        .estado-badge {
-          padding: 10px 24px;
-          border-radius: 25px;
-          color: white;
-          font-weight: 600;
-          font-size: 1rem;
-          text-align: center;
-          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-          transition: all 0.3s ease;
-
-          span {
-            display: block;
-          }
-        }
-      }
-    }
-  }
-}
-
-.opciones-container {
-  padding: 20px;
-
-  h2 {
-    margin-bottom: 20px;
-    color: white;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    font-size: 1.5rem;
-    font-weight: bold;
-  }
-
-  ion-card {
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
-    cursor: pointer;
-    background: white;
-    min-height: 120px;
-
-    &:not(.card-disabled):hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
-    }
-
-    &.card-disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      background: #f5f5f5;
-
-      &:hover {
-        transform: none;
-      }
-    }
-
-    .opcion-header {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-
-      .titulo-container {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-
-        ion-card-title {
-          font-size: 1.3rem;
-          font-weight: bold;
-          color: #333;
-          margin: 0;
-          flex: 1;
-        }
-
-        .notification-badge {
-          font-size: 0.75rem;
-          padding: 4px 8px;
-          border-radius: 12px;
-          min-width: 24px;
-          height: 24px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-      }
-
-      .opcion-descripcion {
-        font-size: 0.9rem;
-        color: #666;
-        margin: 0;
-        line-height: 1.4;
-
-        &.deshabilitada {
-          color: #999;
-        }
-      }
-
-      .opcion-deshabilitada {
-        font-size: 0.85rem;
-        color: #999;
-        margin: 0;
-        font-style: italic;
-      }
-    }
-  }
-}
-
-.flujo-info {
-  padding: 0 20px 20px 20px;
-  
-  .flujo-texto {
-    text-align: center;
-    font-size: 0.95rem;
-    color: white;
-    background: rgba(0, 0, 0, 0.2);
-    padding: 15px;
-    border-radius: 15px;
+  .gourmet-title {
+    font-family: 'Playfair Display', serif;
+    color: $color-gold;
+    font-size: 2.4rem;
+    letter-spacing: 1px;
     margin: 0;
-    line-height: 1.5;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    font-weight: 700;
+    text-align: center;
+    margin-left: 60px;
+  }
 
-    span {
-      display: block;
+  .logout-btn {
+    --color: #{$color-red-fire};
+    margin: 0;
+    --padding-start: 0;
+    --padding-end: 0;
+    ion-icon { font-size: 1.8rem; }
+    z-index: 100;
+  }
+}
+
+// ------------------------------------------------------------------
+// INFO USUARIO
+// ------------------------------------------------------------------
+.user-info-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 20px 20px 20px;
+  // Quitamos el background de aquí porque ahora el header interno lo cubre visualmente
+}
+
+.avatar-wrapper {
+  margin-bottom: 15px;
+  
+  .avatar-ring {
+    padding: 4px;
+    border: 2px solid $color-gold;
+    border-radius: 50%;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+  }
+
+  .user-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    background-color: #333;
+  }
+}
+
+.welcome-text {
+  text-align: center;
+  
+  h2 {
+    color: $color-text;
+    margin: 0 0 10px 0;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+  }
+}
+
+// Pill de estado
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(5px);
+  gap: 8px;
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    box-shadow: 0 0 5px currentColor;
+  }
+
+  span {
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  
+  &.loading {
+    border-color: $color-gold;
+    span { color: $color-gold; }
+  }
+}
+
+// ------------------------------------------------------------------
+// ACCIONES Y MENU
+// ------------------------------------------------------------------
+.opciones-container {
+  padding: 10px 15px 40px 15px;
+}
+
+.section-divider {
+  display: flex;
+  align-items: center;
+  margin: 15px 0 20px 0;
+  
+  span {
+    color: $color-gray;
+    text-transform: uppercase;
+    font-size: 1.3rem;
+    letter-spacing: 2px;
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    line-height: 0.1em;
+    margin: 10px 0 20px; 
+  }
+  span:after { 
+    background: #121212; 
+    padding: 0 10px; 
+  }
+}
+
+.menu-card {
+  --background: #{$color-card};
+  margin: 8px 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  position: relative;
+  overflow: hidden;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, $color-gold, transparent);
+  }
+
+  .titulo-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+
+    ion-card-title {
+      color: $color-text;
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+  }
+
+  &.card-disabled {
+    opacity: 0.6;
+    --background: #1a1a1a;
+
+    .lock-overlay {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: #555;
+      font-size: 1.2rem;
+    }
+    
+    .opcion-header {
+      padding-right: 20px;
     }
   }
 }
 
-@media (max-width: 768px) {
-  .user-info-container {
-    padding: 15px 15px 0 15px;
-
-    ion-card {
-      .user-details {
-        gap: 12px;
-
-        .avatar-container {
-          width: 80px;
-          height: 80px;
-        }
-
-        ion-card-title {
-          font-size: 1.5rem;
-        }
-
-        .estado-container {
-          .estado-badge {
-            font-size: 0.9rem;
-            padding: 8px 20px;
-          }
-        }
-      }
-    }
-  }
-
-  .opciones-container {
-    padding: 15px;
-
-    h2 {
-      font-size: 1.3rem;
-    }
-
-    ion-card {
-      min-height: 100px;
-
-      .opcion-header {
-        .titulo-container {
-          ion-card-title {
-            font-size: 1.15rem;
-          }
-        }
-
-        .opcion-descripcion {
-          font-size: 0.85rem;
-        }
-      }
-    }
-  }
-
-  .flujo-info {
-    .flujo-texto {
-      font-size: 0.9rem;
-      padding: 12px;
-    }
-  }
+.notification-badge {
+  --padding-start: 6px;
+  --padding-end: 6px;
+  border-radius: 50%;
+  font-size: 0.8rem;
 }

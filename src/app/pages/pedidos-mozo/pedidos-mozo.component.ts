@@ -12,10 +12,11 @@ import { ToastService } from '../../services/toast';
 import { Router } from '@angular/router';
 import { NotificacionesService, NotificacionTiempoReal } from '../../services/notificaciones';
 import { FacturaService } from '../../services/factura';
-// 1. Importar SupabaseService para buscar a los dueños/supervisores
 import { SupabaseService } from '../../services/supabase';
 import { addIcons } from 'ionicons';
-import { checkmarkDoneOutline, cashOutline, mailOutline, documentTextOutline } from 'ionicons/icons';
+// Agregamos iconos para delivery: bicycle, location, home
+import { checkmarkDoneOutline, cashOutline, mailOutline, documentTextOutline, bicycleOutline, locationOutline, restaurantOutline } from 'ionicons/icons';
+import { Email } from '../../services/email';
 
 @Component({
   selector: 'app-pedidos-mozo',
@@ -44,10 +45,11 @@ export class PedidosMozoComponent implements OnInit {
     private router: Router,
     private notificacionesService: NotificacionesService,
     private facturaService: FacturaService,
-    // 2. Inyectar SupabaseService
-    private supabaseService: SupabaseService
+    private supabaseService: SupabaseService,
+    private emailService: Email
   ) {
-    addIcons({ checkmarkDoneOutline, cashOutline, mailOutline, documentTextOutline });
+    // Registramos los nuevos iconos
+    addIcons({ checkmarkDoneOutline, cashOutline, mailOutline, documentTextOutline, bicycleOutline, locationOutline, restaurantOutline });
   }
 
   async ngOnInit() {
@@ -72,7 +74,25 @@ export class PedidosMozoComponent implements OnInit {
     }
   }
 
-  // Método Helper para notificar a Cliente/Anónimo
+  // --- HELPERS VISUALES ---
+  esDelivery(pedido: any): boolean {
+    return pedido.tipo_servicio === 'delivery';
+  }
+
+  getIdentificadorPedido(pedido: any): string {
+    if (this.esDelivery(pedido)) {
+      return 'Delivery';
+    }
+    return `Mesa ${pedido.mesa?.numero || '?'}`;
+  }
+
+  getDetalleUbicacion(pedido: any): string {
+    if (this.esDelivery(pedido)) {
+      return pedido.direccion_envio || 'Dirección no especificada';
+    }
+    return 'Salón Principal';
+  }
+
   private async notificarCambioEstado(pedido: any, tipo: NotificacionTiempoReal['tipo'], titulo: string, mensaje: string, datosExtra: any = {}) {
       let destinatarioId: number | null = null;
       let perfilDestino: 'cliente' | 'cliente_anonimo' = 'cliente';
@@ -100,7 +120,8 @@ export class PedidosMozoComponent implements OnInit {
   async confirmarPedido(pedido: any) {
     try {
       await this.pedidosService.cambiarEstadoPedido(pedido.id, 'confirmado');
-      this.toastService.mostrarToastExito(`Mesa ${pedido.mesa.numero}: Pedido confirmado`);
+      const textoIdentificador = this.getIdentificadorPedido(pedido);
+      this.toastService.mostrarToastExito(`${textoIdentificador}: Pedido confirmado`);
       
       await this.notificarCambioEstado(
           pedido, 
@@ -125,7 +146,7 @@ export class PedidosMozoComponent implements OnInit {
           pedido, 
           'pedido_rechazado', 
           'Pedido Observado', 
-          'El mozo ha devuelto tu pedido. Por favor revisalo o consulta al mozo.'
+          'El mozo ha devuelto tu pedido. Por favor revisalo o consulta al local.'
       );
 
       this.cargarPedidos();
@@ -136,14 +157,18 @@ export class PedidosMozoComponent implements OnInit {
 
   async entregarPedido(pedido: any) {
     try {
-      await this.pedidosService.cambiarEstadoPedido(pedido.id, 'entregado');
-      this.toastService.mostrarToastExito('Pedido entregado');
+      // Si es delivery, "entregar" significa que sale para envio o se entrega al delivery
+      const nuevoEstado = 'entregado'; 
+      await this.pedidosService.cambiarEstadoPedido(pedido.id, nuevoEstado);
+      
+      const mensajeExito = this.esDelivery(pedido) ? 'Pedido enviado a domicilio' : 'Pedido entregado en mesa';
+      this.toastService.mostrarToastExito(mensajeExito);
       
       await this.notificarCambioEstado(
           pedido, 
           'pedido_aceptado', 
-          '¡A comer!', 
-          'Tu pedido ha sido entregado a la mesa.'
+          this.esDelivery(pedido) ? '¡En camino!' : '¡A comer!', 
+          this.esDelivery(pedido) ? 'Tu pedido ha salido hacia tu domicilio.' : 'Tu pedido ha sido entregado a la mesa.'
       );
 
       this.cargarPedidos();
@@ -152,17 +177,38 @@ export class PedidosMozoComponent implements OnInit {
     }
   }
 
- async cobrarYLiberar(pedido: any) {
+  async cobrarYLiberar(pedido: any) {
     if (this.procesandoPagoId === pedido.id) return;
     this.procesandoPagoId = pedido.id;
 
     try {
-      // 1. Generar Factura (Obtener el BLOB real, no abrir visualmente para evitar crash)
-      this.toastService.mostrarToastExito('Procesando Factura...');
+      this.toastService.mostrarToastExito('Generando factura y procesando cobro...');
       
-      // CORRECCIÓN: Obtenemos el Blob primero
+      // 1. Generar el BLOB del PDF
       const pdfBlob = await this.facturaService.generarPDFBlob(pedido);
 
+      // 2. Lógica para Cliente Registrado (Envío de Email)
+      if (pedido.cliente && pedido.cliente.email) {
+        
+        // A. Subir PDF a Supabase Storage
+        const urlFactura = await this.facturaService.subirFacturaStorage(pdfBlob, pedido.id);
+        
+        if (urlFactura) {
+            // B. Enviar Email con el link
+            const enviado = await this.emailService.enviarFactura(
+                pedido.cliente, 
+                urlFactura, 
+                pedido.total
+            );
+            
+            if (enviado) {
+                this.toastService.mostrarToastExito(`Factura enviada a ${pedido.cliente.email}`);
+            } else {
+                this.toastService.mostrarToastAdvertencia('No se pudo enviar el email de la factura');
+            }
+        }
+      }
+      // Notificar Admin
       const { data: administradores } = await this.supabaseService.supabase
         .from('usuarios')
         .select('id, perfil')
@@ -171,39 +217,44 @@ export class PedidosMozoComponent implements OnInit {
 
       if (administradores && administradores.length > 0) {
           const totalCobrado = pedido.total || 0;
+          const identificador = this.getIdentificadorPedido(pedido);
+          
           const promesasAdmins = administradores.map((admin: any) => 
               this.notificacionesService.enviarNotificacion({
-                  tipo: 'mesa_liberada' as any, 
-                  titulo: `Mesa ${pedido.mesa.numero} Liberada`,
-                  mensaje: `El mozo ha cobrado $${totalCobrado} y liberado la mesa.`,
+                  tipo: 'mesa_liberada', // Reutilizamos el tipo 'mesa_liberada' aunque sea delivery para que llegue al admin
+                  titulo: `${identificador} Cobrado`,
+                  mensaje: `Se cobraron $${totalCobrado} del ${identificador}.`,
                   destinatario_id: admin.id,
                   destinatario_perfil: admin.perfil,
-                  datos: { pedido_id: pedido.id, mesa_id: pedido.mesa_id }
+                  datos: { pedido_id: pedido.id }
               })
           );
           await Promise.all(promesasAdmins);
       }
 
-      // 4. Notificar a Cliente Anónimo (si aplica)
+      // Notificar Cliente Anónimo
       if (pedido.cliente_anonimo_id) {
           await this.notificacionesService.enviarNotificacion({
               tipo: 'factura_disponible' as any, 
-              titulo: '¡Gracias por su visita!',
+              titulo: '¡Gracias por su compra!',
               mensaje: 'Presiona la notificación para descargar su factura.',
               destinatario_id: pedido.cliente_anonimo_id,
               destinatario_perfil: 'cliente_anonimo',
-              datos: { 
-                  pedido_id: pedido.id, 
-                  accion: 'descargar_pdf',
-                  // url_descarga: ... aquí podrías subir el blob a Supabase Storage y poner la URL pública
-              }
+              datos: { pedido_id: pedido.id, accion: 'descargar_pdf' }
           });
       }
  
-      // 5. Liberar Mesa
-      await this.pedidosService.confirmarPagoYLibearMesa(pedido.id, pedido.mesa_id);
+      // LOGICA CRÍTICA: MESA VS DELIVERY
+      if (this.esDelivery(pedido)) {
+          // Delivery: Solo marcamos como pagado, no intentamos liberar mesa (porque mesa_id es null)
+          await this.pedidosService.cambiarEstadoPedido(pedido.id, 'pagado');
+          this.toastService.mostrarToastExito(`Delivery finalizado y cobrado.`);
+      } else {
+          // Mesa: Usamos el método existente que libera la mesa
+          await this.pedidosService.confirmarPagoYLibearMesa(pedido.id, pedido.mesa_id);
+          this.toastService.mostrarToastExito(`Mesa ${pedido.mesa.numero} liberada y facturada.`);
+      }
       
-      this.toastService.mostrarToastExito(`Mesa ${pedido.mesa.numero} liberada y facturada.`);
       await this.cargarPedidos();
 
     } catch (error) {

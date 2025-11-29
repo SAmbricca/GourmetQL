@@ -38,7 +38,7 @@ export class UsuariosService {
       const { data, error } = await this.supabaseClient.supabase
         .from('usuarios')
         .select('*')
-        .eq('perfil', 'maitre')
+        .eq('perfil', 'cliente') // cambie perfil === maitre a perfil === cliente
         .eq('estado', 'pendiente');
 
       if (error) {
@@ -53,17 +53,25 @@ export class UsuariosService {
     }
   }
 
-  async aprobarCliente(cliente: Usuario): Promise<boolean> {
+  async aprobarCliente(cliente: Usuario){
     try {
-      const { error } = await this.supabaseClient.supabase
+
+      console.log("Cliente recibido:", cliente);
+
+      const { data, error } = await this.supabaseClient.supabase
         .from('usuarios')
         .update({ estado: 'habilitado' })
-        .eq('id', cliente.id);
+        .eq('id', cliente.id)   
+        .select()
+        .single();
 
       if (error) {
+        console.error("Error Supabase:", error);
         this.toastService.mostrarToastError('Error al aprobar cliente');
         return false;
       }
+
+      console.log("Cliente aprobado:", data);
 
       this.toastService.mostrarToastAprobacionExitosa(cliente);
       await this.emailService.enviarAprobacion(cliente);
@@ -76,27 +84,35 @@ export class UsuariosService {
     }
   }
 
-  async rechazarCliente(cliente: Usuario): Promise<boolean> {
+  async rechazarCliente(cliente: Usuario){
     try {
-      const { error } = await this.supabaseClient.supabase
+
+      console.log("Cliente recibido:", cliente);
+      const { data, error } = await this.supabaseClient.supabase
         .from('usuarios')
         .update({ estado: 'deshabilitado' })
-        .eq('id', cliente.id);
+        .eq('id', cliente.id)
+        .select()
+        .single();
 
       if (error) {
         this.toastService.mostrarToastError('Error al rechazar cliente');
         return false;
       }
 
+      console.log("Cliente rechazado exitosamente:", data);
+
       this.toastService.mostrarToastRechazoExitoso(cliente);
       await this.emailService.enviarRechazo(cliente);
       return true;
+
     } catch (error) {
       console.error('Error al rechazar cliente:', error);
       this.toastService.mostrarToastError('Error al conectar con el servidor');
       return false;
     }
   }
+
 
   async crearUsuario(usuario: Omit<Usuario, 'id'>): Promise<{ success: boolean; message: string }> {
     try {

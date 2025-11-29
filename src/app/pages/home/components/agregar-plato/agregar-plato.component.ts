@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonContent, IonCard, IonCardContent, IonItem, IonLabel, IonInput, IonTextarea, IonButton, 
-  IonIcon, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, 
-  IonGrid, IonRow, IonCol, IonSpinner } from '@ionic/angular/standalone';
+import { IonContent, IonItem, IonLabel, IonInput, IonTextarea, IonButton, 
+  IonIcon, IonHeader, IonToolbar, IonButtons, IonBackButton, 
+  IonGrid, IonRow, IonCol } from '@ionic/angular/standalone';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { SupabaseService } from '../../../../services/supabase';
@@ -20,9 +20,9 @@ interface FotoPlato {
   styleUrls: ['./agregar-plato.component.scss'],
   standalone: true,
   imports: [
-    IonContent, IonCard, IonCardContent, IonItem, IonLabel, IonInput, IonTextarea, IonButton, 
-    IonIcon, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, 
-    IonGrid, IonRow, IonCol, IonSpinner, FormsModule, CommonModule
+    IonContent, IonItem, IonLabel, IonInput, IonTextarea, IonButton, 
+    IonIcon, IonHeader, IonToolbar,  IonButtons, IonBackButton, 
+    IonGrid, IonRow, IonCol, FormsModule, CommonModule
   ]
 })
 export class AgregarPlatoComponent implements OnInit {

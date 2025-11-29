@@ -1,133 +1,139 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/home"></ion-back-button>
-    </ion-buttons>
-    <ion-title>Agregar Nuevo Plato</ion-title>
-  </ion-toolbar>
+<ion-header class="ion-no-border header-transparente">
+  <ion-toolbar></ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <!-- Overlay de loading -->
-  @if (isLoading) {
-    <div class="loading-overlay">
-      <div class="loading-content">
-        <ion-spinner name="crescent" color="primary"></ion-spinner>
-        <p>{{ loadingMessage }}</p>
-      </div>
-    </div>
-  }
-
-  <div class="agregar-plato-container">
+<ion-content class="gourmet-content">
+  
+  <div class="form-container">
     
-    <ion-card>
-      <ion-card-content>
-        
-        <ion-item fill="outline">
-          <ion-label position="floating">Nombre del Plato</ion-label>
-          <ion-input 
-            type="text"
-            [(ngModel)]="nombre"
-            [disabled]="isLoading"
-            maxlength="100">
-          </ion-input>
-        </ion-item>
+    <!-- Header Interno -->
+    <div class="inner-header">
+      <ion-buttons>
+        <ion-back-button defaultHref="/home" mode="md" class="custom-back-btn"></ion-back-button>
+      </ion-buttons>
+      <h1 class="inner-title">Agregar Plato</h1>
+    </div>
 
-        <ion-item fill="outline">
-          <ion-label position="floating">Descripción</ion-label>
-          <ion-textarea
-            [(ngModel)]="descripcion"
-            [disabled]="isLoading"
-            rows="4"
-            maxlength="500"
-            autoGrow="true">
-          </ion-textarea>
-        </ion-item>
+    <!-- DATOS DEL PLATO -->
+    <div class="gourmet-card">
+      <h3 class="section-title">Información</h3>
+      
+      <ion-item class="gourmet-input">
+        <ion-label position="floating">Nombre del Plato</ion-label>
+        <ion-input 
+          type="text"
+          [(ngModel)]="nombre"
+          maxlength="100"
+          [disabled]="isLoading">
+        </ion-input>
+      </ion-item>
 
-        <ion-item fill="outline">
-          <ion-label position="floating">Tiempo de Elaboración (minutos)</ion-label>
-          <ion-input 
-            type="number"
-            [(ngModel)]="tiempoElaboracion"
-            [disabled]="isLoading"
-            min="1"
-            max="1440">
-          </ion-input>
-        </ion-item>
+      <ion-item class="gourmet-input">
+        <ion-label position="floating">Descripción</ion-label>
+        <ion-textarea
+          [(ngModel)]="descripcion"
+          rows="3"
+          maxlength="500"
+          autoGrow="true"
+          [disabled]="isLoading">
+        </ion-textarea>
+      </ion-item>
 
-        <ion-item fill="outline">
-          <ion-label position="floating">Precio</ion-label>
-          <ion-input 
-            type="number"
-            [(ngModel)]="precio"
-            [disabled]="isLoading"
-            min="0.01"
-            step="0.01">
-          </ion-input>
-        </ion-item>
+      <ion-grid class="ion-no-padding">
+        <ion-row>
+          <ion-col size="6">
+            <ion-item class="gourmet-input">
+              <ion-label position="floating">Minutos</ion-label>
+              <ion-input 
+                type="number"
+                [(ngModel)]="tiempoElaboracion"
+                min="1"
+                max="1440"
+                [disabled]="isLoading">
+              </ion-input>
+            </ion-item>
+          </ion-col>
+          <ion-col size="6">
+            <ion-item class="gourmet-input">
+              <ion-label position="floating">Precio</ion-label>
+              <ion-input 
+                type="number"
+                [(ngModel)]="precio"
+                min="0.01"
+                step="0.01"
+                [disabled]="isLoading">
+              </ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </div>
 
-      </ion-card-content>
-    </ion-card>
-
-    <ion-card>
-      <ion-card-content>
-        <h2>Fotos del Plato</h2>
-        
-        <ion-grid>
-          <ion-row>
-            @for (foto of fotos; track $index) {
-              <ion-col size="4">
-                <div class="foto-preview">
-                  <img [src]="foto.url" alt="Foto del plato">
-                  <ion-button 
-                    size="small" 
-                    color="danger" 
-                    fill="clear"
-                    [disabled]="isLoading"
-                    (click)="eliminarFoto($index)">
-                    <ion-icon name="close-circle"></ion-icon>
-                  </ion-button>
+    <!-- FOTOGRAFÍA -->
+    <div class="gourmet-card">
+      <h3 class="section-title">Fotos ({{fotos.length}}/3)</h3>
+      
+      <ion-grid class="photos-grid">
+        <ion-row>
+          @for (foto of fotos; track $index) {
+            <ion-col size="4">
+              <div class="foto-thumb-container">
+                <img [src]="foto.url" alt="Plato">
+                <div class="delete-overlay" (click)="eliminarFoto($index)">
+                  <ion-icon name="close-circle"></ion-icon>
                 </div>
-              </ion-col>
-            }
-          </ion-row>
-        </ion-grid>
+              </div>
+            </ion-col>
+          }
+        </ion-row>
+      </ion-grid>
 
-        @if (fotos.length < 3) {
-          <div class="foto-buttons">
-            <ion-button 
-              expand="block"
-              fill="outline"
-              [disabled]="isLoading"
-              (click)="agregarFoto('camera')">
-              <ion-icon name="camera" slot="start"></ion-icon>
-              Tomar Foto
-            </ion-button>
+      @if (fotos.length < 3) {
+        <div class="foto-buttons-row">
+          <ion-button 
+            expand="block"
+            fill="outline"
+            class="btn-secondary"
+            (click)="agregarFoto('camera')"
+            [disabled]="isLoading">
+            <ion-icon name="camera" slot="start"></ion-icon>
+            Cámara
+          </ion-button>
 
-            <ion-button 
-              expand="block"
-              fill="outline"
-              [disabled]="isLoading"
-              (click)="agregarFoto('gallery')">
-              <ion-icon name="images" slot="start"></ion-icon>
-              Galería
-            </ion-button>
-          </div>
-        }
-      </ion-card-content>
-    </ion-card>
+          <ion-button 
+            expand="block"
+            fill="outline"
+            class="btn-secondary"
+            (click)="agregarFoto('gallery')"
+            [disabled]="isLoading">
+            <ion-icon name="images" slot="start"></ion-icon>
+            Galería
+          </ion-button>
+        </div>
+      }
+    </div>
 
     <div class="action-buttons">
       <ion-button 
         expand="block"
-        size="large"
-        color="primary"
-        [disabled]="isLoading"
-        (click)="guardarPlato()">
+        class="btn-gourmet-primary"
+        (click)="guardarPlato()"
+        [disabled]="isLoading">
         <ion-icon name="save" slot="start"></ion-icon>
-        Agregar Plato
+        {{ isLoading ? 'COCINANDO...' : 'AGREGAR AL MENÚ' }}
       </ion-button>
     </div>
 
   </div>
+
+  <!-- OVERLAY LOADING -->
+  @if (isLoading) {
+    <div class="loading-overlay-gourmet">
+      <div class="loading-content">
+        <div class="spinner-gold-ring"></div>
+        <h2 class="loading-title">Chef en Proceso</h2>
+        <p class="loading-text">{{ loadingMessage }}</p>
+      </div>
+    </div>
+  }
 </ion-content>

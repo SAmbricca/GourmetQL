@@ -1,131 +1,144 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/home"></ion-back-button>
-    </ion-buttons>
-    <ion-title>Agregar Nueva Bebida</ion-title>
-  </ion-toolbar>
+<!-- Header "fantasma" para mantener el espacio si es necesario por el sistema, pero invisible -->
+<ion-header class="ion-no-border header-transparente">
+  <ion-toolbar></ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <div class="agregar-bebida-container">
+<ion-content class="gourmet-content">
+  
+  <div class="form-container">
     
-    <ion-card>
-      <ion-card-content>
-        
-        <ion-item fill="outline">
-          <ion-label position="floating">Nombre de la Bebida</ion-label>
-          <ion-input 
-            type="text"
-            [(ngModel)]="nombre"
-            maxlength="100"
-            [disabled]="isLoading">
-          </ion-input>
-        </ion-item>
+    <!-- Header Interno con estilo Gourmet -->
+    <div class="inner-header">
+      <ion-buttons>
+        <ion-back-button defaultHref="/home" mode="md" class="custom-back-btn"></ion-back-button>
+      </ion-buttons>
+      <h1 class="inner-title">Agregar Bebida</h1>
+    </div>
 
-        <ion-item fill="outline">
-          <ion-label position="floating">Descripción</ion-label>
-          <ion-textarea
-            [(ngModel)]="descripcion"
-            rows="4"
-            maxlength="500"
-            autoGrow="true"
-            [disabled]="isLoading">
-          </ion-textarea>
-        </ion-item>
+    <!-- TARJETA DE INFORMACIÓN -->
+    <div class="gourmet-card">
+      <h3 class="section-title">Información</h3>
+      
+      <ion-item class="gourmet-input">
+        <ion-label position="floating">Nombre de la Bebida</ion-label>
+        <ion-input 
+          type="text"
+          [(ngModel)]="nombre"
+          maxlength="100"
+          [disabled]="isLoading">
+        </ion-input>
+      </ion-item>
 
-        <ion-item fill="outline">
-          <ion-label position="floating">Tiempo de Elaboración (minutos)</ion-label>
-          <ion-input 
-            type="number"
-            [(ngModel)]="tiempoElaboracion"
-            min="1"
-            max="1440"
-            [disabled]="isLoading">
-          </ion-input>
-        </ion-item>
+      <ion-item class="gourmet-input">
+        <ion-label position="floating">Descripción</ion-label>
+        <ion-textarea
+          [(ngModel)]="descripcion"
+          rows="3"
+          maxlength="500"
+          autoGrow="true"
+          [disabled]="isLoading">
+        </ion-textarea>
+      </ion-item>
 
-        <ion-item fill="outline">
-          <ion-label position="floating">Precio</ion-label>
-          <ion-input 
-            type="number"
-            [(ngModel)]="precio"
-            min="0.01"
-            step="0.01"
-            [disabled]="isLoading">
-          </ion-input>
-        </ion-item>
+      <ion-grid class="ion-no-padding">
+        <ion-row>
+          <ion-col size="6">
+            <ion-item class="gourmet-input">
+              <ion-label position="floating">Minutos</ion-label>
+              <ion-input 
+                type="number"
+                [(ngModel)]="tiempoElaboracion"
+                min="1"
+                max="1440"
+                [disabled]="isLoading">
+              </ion-input>
+            </ion-item>
+          </ion-col>
+          <ion-col size="6">
+            <ion-item class="gourmet-input">
+              <ion-label position="floating">Precio</ion-label>
+              <ion-input 
+                type="number"
+                [(ngModel)]="precio"
+                min="0.01"
+                step="0.01"
+                [disabled]="isLoading">
+              </ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </div>
 
-      </ion-card-content>
-    </ion-card>
-
-    <ion-card>
-      <ion-card-content>
-        <h2>Fotos de la Bebida</h2>
-        
-        <ion-grid>
-          <ion-row>
-            @for (foto of fotos; track $index) {
-              <ion-col size="4">
-                <div class="foto-preview">
-                  <img [src]="foto.url" alt="Foto de la bebida">
-                  <ion-button 
-                    size="small" 
-                    color="danger" 
-                    fill="clear"
-                    (click)="eliminarFoto($index)"
-                    [disabled]="isLoading">
-                    <ion-icon name="close-circle"></ion-icon>
-                  </ion-button>
+    <!-- TARJETA DE FOTOS -->
+    <div class="gourmet-card">
+      <h3 class="section-title">Fotos ({{fotos.length}}/3)</h3>
+      
+      <!-- Grid de fotos existentes -->
+      <ion-grid class="photos-grid">
+        <ion-row>
+          @for (foto of fotos; track $index) {
+            <ion-col size="4">
+              <div class="foto-thumb-container">
+                <img [src]="foto.url" alt="Bebida">
+                <div class="delete-overlay" (click)="eliminarFoto($index)">
+                  <ion-icon name="close-circle"></ion-icon>
                 </div>
-              </ion-col>
-            }
-          </ion-row>
-        </ion-grid>
+              </div>
+            </ion-col>
+          }
+        </ion-row>
+      </ion-grid>
 
-        @if (fotos.length < 3) {
-          <div class="foto-buttons">
-            <ion-button 
-              expand="block"
-              fill="outline"
-              (click)="agregarFoto('camera')"
-              [disabled]="isLoading">
-              <ion-icon name="camera" slot="start"></ion-icon>
-              Tomar Foto
-            </ion-button>
+      <!-- Botones de acción para agregar fotos -->
+      @if (fotos.length < 3) {
+        <div class="foto-buttons-row">
+          <ion-button 
+            expand="block"
+            fill="outline"
+            class="btn-secondary"
+            (click)="agregarFoto('camera')"
+            [disabled]="isLoading">
+            <ion-icon name="camera" slot="start"></ion-icon>
+            Cámara
+          </ion-button>
 
-            <ion-button 
-              expand="block"
-              fill="outline"
-              (click)="agregarFoto('gallery')"
-              [disabled]="isLoading">
-              <ion-icon name="images" slot="start"></ion-icon>
-              Galería
-            </ion-button>
-          </div>
-        }
-      </ion-card-content>
-    </ion-card>
+          <ion-button 
+            expand="block"
+            fill="outline"
+            class="btn-secondary"
+            (click)="agregarFoto('gallery')"
+            [disabled]="isLoading">
+            <ion-icon name="images" slot="start"></ion-icon>
+            Galería
+          </ion-button>
+        </div>
+      }
+    </div>
 
+    <!-- BOTÓN GUARDAR -->
     <div class="action-buttons">
       <ion-button 
         expand="block"
-        size="large"
-        color="primary"
+        class="btn-gourmet-primary"
         (click)="guardarBebida()"
         [disabled]="isLoading">
         <ion-icon name="save" slot="start"></ion-icon>
-        {{ isLoading ? 'Guardando...' : 'Agregar Bebida' }}
+        {{ isLoading ? 'PROCESANDO...' : 'AGREGAR BEBIDA' }}
       </ion-button>
     </div>
 
   </div>
 
-  <!-- Overlay de Loading -->
-  <div *ngIf="isLoading" class="loading-overlay">
-    <div class="loading-content">
-      <ion-spinner name="crescent" color="light"></ion-spinner>
-      <p>{{ loadingMessage }}</p>
+  <!-- OVERLAY DE LOADING GOURMET -->
+  @if (isLoading) {
+    <div class="loading-overlay-gourmet">
+      <div class="loading-content">
+        <!-- Puedes reemplazar este icono por tu logo girando -->
+        <div class="spinner-gold-ring"></div> 
+        <h2 class="loading-title">Gourmet App</h2>
+        <p class="loading-text">{{ loadingMessage }}</p>
+      </div>
     </div>
-  </div>
+  }
 </ion-content>

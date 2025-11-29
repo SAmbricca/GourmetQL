@@ -25,11 +25,27 @@
   </ion-refresher>
 
   <div *ngIf="segmentoActual === 'nuevos'">
-    <ion-card *ngFor="let pedido of pedidosNuevos" class="card-pedido nuevo">
+    <ion-card *ngFor="let pedido of pedidosNuevos" 
+              class="card-pedido nuevo" 
+              [class.es-delivery]="esDelivery(pedido)">
+      
       <ion-card-header>
-        <ion-card-subtitle>Mesa {{ pedido.mesa.numero }}</ion-card-subtitle>
-        <ion-card-title>Total: ${{ pedido.total }}</ion-card-title>
+        <div class="header-flex">
+          <ion-card-subtitle>
+            <span *ngIf="!esDelivery(pedido)">
+              <ion-icon name="restaurant-outline"></ion-icon> MESA {{ pedido.mesa?.numero }}
+            </span>
+            <span *ngIf="esDelivery(pedido)" class="badge-delivery">
+              <ion-icon name="bicycle-outline"></ion-icon> DELIVERY
+            </span>
+          </ion-card-subtitle>
+          <ion-card-title>Total: ${{ pedido.total }}</ion-card-title>
+        </div>
+        <p *ngIf="esDelivery(pedido)" class="direccion-envio">
+          <ion-icon name="location-outline"></ion-icon> {{ pedido.direccion_envio }}
+        </p>
       </ion-card-header>
+
       <ion-card-content>
         <p><strong>Items:</strong></p>
         <ul>
@@ -50,41 +66,53 @@
   </div>
 
   <div *ngIf="segmentoActual === 'curso'">
-    <ion-card *ngFor="let pedido of pedidosEnCurso" [class.listo]="pedido.estado === 'listo'">
+    <ion-card *ngFor="let pedido of pedidosEnCurso" 
+              [class.listo]="pedido.estado === 'listo'"
+              [class.es-delivery]="esDelivery(pedido)">
+      
       <ion-card-header>
-        <div style="display: flex; justify-content: space-between;">
-          <ion-card-title>Mesa {{ pedido.mesa.numero }}</ion-card-title>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <ion-card-title style="font-size: 1.4rem;">
+             <span *ngIf="!esDelivery(pedido)">Mesa {{ pedido.mesa?.numero }}</span>
+             <span *ngIf="esDelivery(pedido)"><ion-icon name="bicycle-outline"></ion-icon> Envío</span>
+          </ion-card-title>
+          
           <ion-badge [color]="pedido.estado === 'listo' ? 'success' : 'warning'">
             {{ pedido.estado | uppercase }}
           </ion-badge>
         </div>
+         <p *ngIf="esDelivery(pedido)" class="direccion-envio-small">
+          <ion-icon name="location-outline"></ion-icon> {{ pedido.direccion_envio }}
+        </p>
       </ion-card-header>
+
       <ion-card-content>
         <div *ngIf="pedido.estado === 'confirmado'">
           <p>Esperando elaboración en Cocina/Bar...</p>
         </div>
 
         <div *ngIf="pedido.estado === 'listo'">
-          <p class="texto-listo">¡Pedido completo para entregar!</p>
+          <p class="texto-listo">¡Pedido completo!</p>
           <ion-button expand="block" color="primary" (click)="entregarPedido(pedido)">
-            Entregar Pedido
+            {{ esDelivery(pedido) ? 'Despachar Delivery' : 'Entregar a Mesa' }}
           </ion-button>
         </div>
 
         <div *ngIf="pedido.estado === 'entregado' || pedido.estado === 'pagado'">
           
           <p *ngIf="pedido.estado === 'entregado'" class="ion-text-center ion-margin-bottom">
-            Cliente consumiendo...
+            {{ esDelivery(pedido) ? 'Repartidor en camino...' : 'Cliente consumiendo...' }}
           </p>
-          <p *ngIf="pedido.estado === 'pagado'" class="ion-text-center ion-margin-bottom" style="color: var(--ion-color-success); font-weight: bold;">
-            <ion-icon name="cash-outline"></ion-icon> ¡Cliente ya pagó! Confirmar salida.
+
+          <p *ngIf="pedido.estado === 'pagado'" class="ion-text-center ion-margin-bottom success-text">
+            <ion-icon name="cash-outline"></ion-icon> ¡Pagado! Confirmar finalización.
           </p>
 
           <ion-button expand="block" color="tertiary" (click)="cobrarYLiberar(pedido)" [disabled]="procesandoPagoId === pedido.id">
             <ion-spinner name="crescent" *ngIf="procesandoPagoId === pedido.id"></ion-spinner>
             <span *ngIf="procesandoPagoId !== pedido.id">
               <ion-icon name="document-text-outline" slot="start"></ion-icon>
-              Facturar y Liberar Mesa
+              {{ esDelivery(pedido) ? 'Finalizar Delivery' : 'Facturar y Liberar Mesa' }}
             </span>
           </ion-button>
         </div>

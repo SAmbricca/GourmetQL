@@ -1,179 +1,109 @@
-<ion-header [translucent]="true">
+<!-- Header vacío/transparente solo para Safe Area -->
+<ion-header class="ion-no-border header-transparente">
   <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/home"></ion-back-button>
-    </ion-buttons>
-    <ion-title>Agregar Empleado | Cliente</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <div class="empleado-container">
+<ion-content class="gourmet-content">
+  <div class="form-container">
     
+    <!-- Header Interno (Dentro del contenedor) -->
+    <div class="inner-header">
+      <ion-buttons>
+        <ion-back-button defaultHref="/home" mode="md" class="custom-back-btn"></ion-back-button>
+      </ion-buttons>
+      <h1 class="inner-title">Alta Usuario</h1>
+    </div>
+
+    <!-- FOTO SECTION -->
+    <div class="foto-section">
+      <div class="avatar-wrapper" [class.has-error]="fotoError">
+        @if (foto?.url) {
+          <img [src]="foto?.url" class="avatar-img" alt="Foto perfil">
+          <ion-button class="btn-delete-photo" color="danger" shape="round" (click)="eliminarFoto()">
+            <ion-icon name="trash" slot="icon-only"></ion-icon>
+          </ion-button>
+        } @else {
+          <div class="avatar-placeholder" (click)="tomarFoto()">
+            <ion-icon name="camera"></ion-icon>
+            <span>Foto</span>
+          </div>
+        }
+      </div>
+      @if (fotoError) {
+        <ion-text color="danger" class="error-text-center">
+          <small>{{ fotoError }}</small>
+        </ion-text>
+      }
+    </div>
+
     <form [formGroup]="empleadoForm" (ngSubmit)="agregarEmpleado()">
       
-      <div class="section-title center">Foto de Perfil</div>
-      <div class="foto-container">
-        <ion-avatar 
-          class="avatar-grande" 
-          [class.avatar-vacio]="!foto"
-          (click)="tomarFoto()">
-          @if (!foto) {
-            <ion-icon name="camera" class="camera-overlay"></ion-icon>
-          }
-        </ion-avatar>
-        <ion-button 
-          fill="outline" 
-          size="small" 
-          (click)="tomarFoto()"
-          class="btn-foto">
-          <ion-icon name="camera" slot="start"></ion-icon>
-          {{ foto ? 'Cambiar Foto' : 'Tomar Foto' }}
-        </ion-button>
-        @if (fotoError) {
-          <ion-text color="danger">
-            <p class="error-text">{{ fotoError }}</p>
-          </ion-text>
-        }
-      </div>
-
-      <ion-button 
-        expand="block" 
-        fill="outline" 
-        color="secondary"
-        (click)="escanearDNI()"
-        class="qr-button">
-        <ion-icon name="qr-code-outline" slot="start"></ion-icon>
-        Escanear código QR del DNI
+      <!-- SCANNER BUTTON -->
+      <ion-button expand="block" class="btn-scan mb-4" (click)="escanearDNI()">
+        <ion-icon name="scan" slot="start"></ion-icon>
+        Escanear DNI
       </ion-button>
-      
-      <div class="input-container">
-        <ion-input
-          formControlName="nombre"
-          placeholder="Nombre *"
-          fill="outline"
-          [class.ion-invalid]="nombreError"
-          [class.ion-touched]="empleadoForm.get('nombre')?.touched">
-        </ion-input>
-        @if (nombreError) {
-          <ion-text color="danger">
-            <p class="error-text">{{ nombreError }}</p>
-          </ion-text>
-        }
+
+      <!-- PERSONAL DATA CARD -->
+      <div class="gourmet-card">
+        <h3 class="section-title">Datos Personales</h3>
+        
+        <ion-item class="gourmet-input">
+          <ion-label position="floating">Nombre</ion-label>
+          <ion-input type="text" formControlName="nombre"></ion-input>
+          <ion-note slot="error" *ngIf="nombreError">{{ nombreError }}</ion-note>
+        </ion-item>
+
+        <ion-item class="gourmet-input">
+          <ion-label position="floating">Apellido</ion-label>
+          <ion-input type="text" formControlName="apellido"></ion-input>
+          <ion-note slot="error" *ngIf="apellidoError">{{ apellidoError }}</ion-note>
+        </ion-item>
+
+        <ion-item class="gourmet-input">
+          <ion-label position="floating">DNI</ion-label>
+          <ion-input type="number" formControlName="dni"></ion-input>
+          <ion-note slot="error" *ngIf="dniError">{{ dniError }}</ion-note>
+        </ion-item>
+
+        <ion-item class="gourmet-input">
+          <ion-label position="floating">CUIL</ion-label>
+          <ion-input type="text" formControlName="cuil"></ion-input>
+          <ion-note slot="error" *ngIf="cuilError">{{ cuilError }}</ion-note>
+        </ion-item>
       </div>
 
-      <div class="input-container">
-        <ion-input
-          formControlName="apellido"
-          placeholder="Apellido *"
-          fill="outline"
-          [class.ion-invalid]="apellidoError"
-          [class.ion-touched]="empleadoForm.get('apellido')?.touched">
-        </ion-input>
-        @if (apellidoError) {
-          <ion-text color="danger">
-            <p class="error-text">{{ apellidoError }}</p>
-          </ion-text>
-        }
+      <!-- ACCOUNT DATA CARD -->
+      <div class="gourmet-card">
+        <h3 class="section-title">Datos de Cuenta</h3>
+
+        <ion-item class="gourmet-input">
+          <ion-label position="floating">Email</ion-label>
+          <ion-input type="email" formControlName="email"></ion-input>
+          <ion-note slot="error" *ngIf="emailError">{{ emailError }}</ion-note>
+        </ion-item>
+
+        <ion-item class="gourmet-input">
+          <ion-label position="floating">Contraseña</ion-label>
+          <ion-input type="password" formControlName="contrasenia"></ion-input>
+        </ion-item>
+
+        <ion-item class="gourmet-input">
+          <ion-label position="floating">Perfil</ion-label>
+          <ion-select formControlName="perfil" interface="action-sheet" cancelText="Cancelar">
+            @for (perfil of perfilesDisponibles; track perfil) {
+              <ion-select-option [value]="perfil">{{ perfil | titlecase }}</ion-select-option>
+            }
+          </ion-select>
+        </ion-item>
       </div>
 
-      <div class="input-container">
-        <ion-input
-          formControlName="email"
-          type="email"
-          placeholder="Correo electrónico *"
-          fill="outline"
-          [class.ion-invalid]="emailError"
-          [class.ion-touched]="empleadoForm.get('email')?.touched">
-        </ion-input>
-        @if (emailError) {
-          <ion-text color="danger">
-            <p class="error-text">{{ emailError }}</p>
-          </ion-text>
-        }
-      </div>
+      <ion-button type="submit" expand="block" class="btn-gourmet-primary mt-4" [disabled]="empleadoForm.invalid">
+        <ion-icon name="save" slot="start"></ion-icon>
+        Registrar
+      </ion-button>
 
-      <div class="input-container">
-        <ion-input
-          formControlName="dni"
-          type="number"
-          placeholder="DNI (sin puntos) *"
-          fill="outline"
-          [class.ion-invalid]="dniError"
-          [class.ion-touched]="empleadoForm.get('dni')?.touched">
-        </ion-input>
-        @if (dniError) {
-          <ion-text color="danger">
-            <p class="error-text">{{ dniError }}</p>
-          </ion-text>
-        }
-      </div>
-
-      <div class="input-container">
-        <ion-input
-          formControlName="cuil"
-          placeholder="CUIL (XX-XXXXXXXX-X) *"
-          fill="outline"
-          [class.ion-invalid]="cuilError"
-          [class.ion-touched]="empleadoForm.get('cuil')?.touched">
-        </ion-input>
-        @if (cuilError) {
-          <ion-text color="danger">
-            <p class="error-text">{{ cuilError }}</p>
-          </ion-text>
-        }
-      </div>
-
-      <div class="input-container">
-        <ion-input
-          formControlName="contrasenia"
-          type="password"
-          placeholder="Contraseña *"
-          fill="outline"
-          [class.ion-touched]="empleadoForm.get('contrasenia')?.touched">
-        </ion-input>
-      </div>
-
-      <div class="section-title">Perfil del Empleado</div>
-      
-      <div class="input-container">
-        <ion-select 
-          formControlName="perfil" 
-          placeholder="Seleccione un perfil *"
-          fill="outline"
-          interface="action-sheet">
-          @for (perfil of perfilesDisponibles; track perfil) {
-            <ion-select-option [value]="perfil">
-              {{ perfil | titlecase }}
-            </ion-select-option>
-          }
-        </ion-select>
-      </div>
-
-      <div class="button-container">
-        <ion-button 
-          expand="block" 
-          type="submit"
-          class="register-button">
-          <ion-icon name="person-add-outline" slot="start"></ion-icon>
-          @if (cargando) {
-            Agregando empleado...
-          } @else {
-            Agregar Empleado
-          }
-        </ion-button>
-
-        <ion-button 
-          expand="block" 
-          fill="outline"
-          color="medium"
-          (click)="navegarAHome()"
-          class="cancel-button">
-          <ion-icon name="close-outline" slot="start"></ion-icon>
-          Cancelar
-        </ion-button>
-      </div>
     </form>
-    
   </div>
 </ion-content>

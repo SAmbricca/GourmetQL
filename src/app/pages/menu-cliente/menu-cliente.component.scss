@@ -1,297 +1,298 @@
-ion-content {
-  --background: linear-gradient(135deg, #f09850 0%, #cc480b 100%);
+// ------------------------------------------------------------------
+// PALETA & VARIABLES
+// ------------------------------------------------------------------
+$color-bg-dark: #000000;
+$color-gold: #FFD700;
+$color-text: #ffffff;
+$color-gray: #dddddd;
+
+// ------------------------------------------------------------------
+// HEADER & TITULO
+// ------------------------------------------------------------------
+.safe-area-header {
+  background: $color-bg-dark;
+  // Ajuste: Aumentar padding top para bajar los elementos visualmente
+  padding-top: 30px; 
+  padding-bottom: 10px;
 }
 
-.menu-title {
-  padding-top: 30px;
+.custom-toolbar {
+  --background: transparent; // Transparente para usar el fondo del header
+  --border-width: 0;
 }
-.volver-icon {
-  width: 28px;
-  height: 36px;
-  padding-top: 16px;
+
+// Botón volver MÁS GRANDE y ajustado
+.big-back-btn {
+  transform: scale(1.3); // 30% más grande
+  margin-left: 10px;
+  --color: #fff;
+  
+  ion-icon {
+    font-size: 3rem; 
+  }
+}
+
+.menu-main-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem; 
+  font-weight: 800;
+  color: $color-gold; // Dorado para resaltar sobre negro
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 10px;
+}
+
+ion-content.gourmet-content {
+  --background: #000;
 }
 
 .loading-container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+// ------------------------------------------------------------------
+// VISTA PRODUCTO (Layout Dividido)
+// ------------------------------------------------------------------
+.product-full-view {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #111;
+}
+
+// 1. ÁREA DE IMAGEN (50% de la pantalla aprox)
+.image-area {
+  height: 45vh; 
+  width: 100%;
+  position: relative;
+  background-color: #000;
+  flex-shrink: 0;
+
+  .main-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    display: block;
+    opacity: 0.9;
+  }
+
+  .overlay-gradient {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30%;
+    background: linear-gradient(to bottom, transparent, #1a1a1a);
+    pointer-events: none;
+  }
+}
+
+// Badge Categoría
+.category-badge-container {
+  position: absolute;
+  top: 15px;
+  left: 0;
+  width: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 100%;
-  
-  h3 {
-    color: white;
-    font-size: 1.5rem;
+  z-index: 10;
+  pointer-events: none;
+
+  .category-pill {
+    --background: rgba(0,0,0, 0.6);
+    --color: #{$color-gold};
+    border: 1px solid $color-gold;
+    font-size: 1rem;
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    backdrop-filter: blur(5px);
   }
 }
 
-.categorias-container {
-  padding: 15px;
-  padding-bottom: 180px;
+// Indicadores (Dots)
+.photo-indicators {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    z-index: 20;
+
+    .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.3);
+        transition: all 0.3s ease;
+
+        &.active {
+            background-color: $color-gold;
+            transform: scale(1.3);
+            box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+        }
+    }
 }
 
-.categoria-seccion {
-  margin-bottom: 30px;
-
-  .categoria-titulo {
-    color: white;
-    font-size: 1.8rem;
-    font-weight: bold;
-    margin-bottom: 15px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-  }
-}
-
-.menu-horizontal-scroll {
+// 2. ÁREA DE INFORMACIÓN 
+.product-info-card {
+  flex: 1; 
+  background: #1a1a1a;
+  padding: 25px 20px 0 20px; 
   display: flex;
-  overflow-x: auto;
-  gap: 15px;
-  padding-bottom: 10px;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  
-  &::-webkit-scrollbar {
-    height: 8px;
-  }
-  
-  &::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 10px;
-    
-    &:hover {
-      background: rgba(255, 255, 255, 0.5);
-    }
-  }
-}
+  flex-direction: column;
+  border-top-left-radius: 30px;
+  border-top-right-radius: 30px;
+  margin-top: -20px; 
+  z-index: 5;
+  position: relative;
+  box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+  overflow-y: auto; // Permite scroll si el texto es largo
 
-.menu-card {
-  flex: 0 0 85%;
-  max-width: 400px;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  overflow: hidden;
-  scroll-snap-align: start;
-  min-height: 450px;
+  // Título y Precio
+  .title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 5px;
+    gap: 10px;
 
-  ion-card-header {
-    padding-bottom: 10px;
-
-    ion-card-title {
-      font-size: 1.6rem;
-      font-weight: bold;
-      color: #333;
-      margin-bottom: 8px;
+    .product-title {
+      color: $color-text;
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1.1;
+      margin: 0;
+      flex: 1;
     }
 
-    .tipo-badge {
-      margin-top: 8px;
-      
-      ion-badge {
-        font-size: 0.9rem;
-        padding: 6px 12px;
-      }
+    .price-tag {
+      color: $color-gold;
+      font-size: 1.8rem;
+      font-weight: 800;
+      white-space: nowrap;
+      font-family: 'Playfair Display', serif;
     }
   }
 
-  ion-card-content {
-    padding-top: 10px;
-
-    .descripcion {
-      color: #666;
-      font-size: 1rem;
-      line-height: 1.4;
+  .meta-info {
       margin-bottom: 15px;
-      min-height: 40px;
-    }
+      color: #888;
+      font-size: 0.9rem;
+      display: flex;
+      gap: 10px;
+      
+      ion-icon { vertical-align: middle; color: $color-gold; margin-right: 4px; }
+  }
 
-    .info-container {
+  .product-description {
+    color: $color-gray;
+    font-size: 1.1rem;
+    line-height: 1.4;
+    margin-bottom: 20px;
+    opacity: 0.9;
+  }
+
+  // Controles
+  .action-area {
+    margin-top: auto; // Empuja hacia abajo si hay espacio
+    margin-bottom: 20px;
+
+    .quantity-control-large {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 15px;
-      gap: 10px;
-
-      .info-item {
-        display: flex;
-        gap: 8px;
-        font-size: 1rem;
-        color: #555;
-
-        ion-icon {
-          font-size: 1.3rem;
-          color: #f09850;
-        }
-
-        &.precio {
-          font-weight: bold;
-          font-size: 1.3rem;
-          color: #cc480b;
-
-          ion-icon {
-            color: #cc480b;
-          }
-        }
-      }
-    }
-
-    .acciones-container {
-      margin-top: 20px;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 5px 10px;
+      height: 60px;
 
       ion-button {
-        --border-radius: 12px;
-        font-weight: bold;
+        --color: #fff;
+        height: 100%;
+        width: 60px;
+        --padding-start: 0;
+        --padding-end: 0;
+        
+        ion-icon { 
+          font-size: 2.5rem; 
+        }
       }
 
-      .cantidad-controls {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 20px;
-
-        .btn-control {
-          --border-radius: 50%;
-          width: 50px;
-          height: 50px;
-        }
-
-        .cantidad {
-          font-size: 1.8rem;
-          font-weight: bold;
-          color: #333;
-          min-width: 40px;
-          text-align: center;
-        }
+      .qty-number {
+        color: $color-gold;
+        font-size: 2.2rem;
+        font-weight: 800;
+        font-family: 'Playfair Display', serif;
       }
     }
   }
-}
 
-.imagenes-container {
-  width: 100%;
-  height: 220px;
-  overflow: hidden;
-  background: #f5f5f5;
-  position: relative;
-
-  .imagenes-scroll {
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    height: 100%;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-
-    &::-webkit-scrollbar {
-      display: none;
-    }
-
-    .producto-imagen {
-      flex: 0 0 100%;
+  // ESPACIO CRÍTICO PARA EL FOOTER FLOTANTE
+  .footer-spacer {
+      min-height: 110px; // Altura suficiente para que el footer no tape el último elemento
       width: 100%;
-      height: 100%;
-      object-fit: cover;
-      scroll-snap-align: start;
-      scroll-snap-stop: always;
-    }
   }
 }
 
-.pedido-footer {
-  background: linear-gradient(135deg, #333 0%, #555 100%);
-  box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
-  padding: 15px;
+// ------------------------------------------------------------------
+// FOOTER FLOTANTE (Fixed para que no se mueva con el scroll)
+// ------------------------------------------------------------------
+.floating-summary {
+  position: absolute; // Fixed relative to content container
+  bottom: 20px;
+  left: 15px;
+  right: 15px;
+  z-index: 100;
+  
+  .summary-content {
+    background: rgba(20, 20, 20, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid $color-gold;
+    border-radius: 50px;
+    padding: 8px 8px 8px 25px; // Padding ajustado
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
 
-  .pedido-resumen {
-    .resumen-info {
-      margin-bottom: 15px;
-
-      .total-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
-
-        h2 {
-          margin: 0;
-          font-size: 1.8rem;
-          font-weight: bold;
-        }
-
-        ion-badge {
-          font-size: 1rem;
-          padding: 8px 12px;
-        }
-      }
-
-      .tiempo-estimado {
-        display: flex;
-        gap: 8px;
-        font-size: 1.2rem;
-        margin: 0;
-
-        ion-icon {
-          font-size: 1.2rem;
-        }
-      }
-    }
-
-    .acciones-footer {
-      ion-button {
-        --border-radius: 15px;
-        font-size: 1.2rem;
+    .total-info {
+      display: flex;
+      flex-direction: column;
+      
+      .label {
+        font-size: 0.75rem;
+        color: #aaa;
         font-weight: bold;
-        height: 55px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
       }
-    }
-  }
-}
-
-@media (max-width: 768px) {
-  .menu-card {
-    flex: 0 0 90%;
-    
-    ion-card-header {
-      ion-card-title {
+      .amount {
         font-size: 1.4rem;
+        color: #fff;
+        font-weight: 900;
       }
     }
 
-    ion-card-content {
-      .descripcion {
-        font-size: 0.95rem;
-      }
-
-      .info-container {
-        .info-item {
-          font-size: 0.95rem;
-
-          &.precio {
-            font-size: 1.2rem;
-          }
-        }
-      }
-    }
-  }
-
-  .imagenes-container {
-    height: 200px;
-  }
-
-  .pedido-footer {
-    .pedido-resumen {
-      .resumen-info {
-        .total-container {
-          h2 {
-            font-size: 1.5rem;
-          }
-        }
-
-        .tiempo-estimado {
-          font-size: 0.9rem;
-        }
-      }
+    .confirm-btn {
+      margin: 0;
+      --background: #{$color-gold};
+      --color: #000;
+      font-weight: 900;
+      --border-radius: 40px;
+      height: 50px;
+      font-size: 1rem;
+      min-width: 140px;
+      --box-shadow: 0 4px 10px rgba(255, 215, 0, 0.3);
     }
   }
 }

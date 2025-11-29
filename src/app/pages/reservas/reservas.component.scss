@@ -1,0 +1,286 @@
+// Importamos variables
+$color-bg-dark: #121212;
+$color-card: #333232;
+$color-gold: #d4af37;
+$color-text: #f5f5dc;
+$color-gray: #888;
+$color-red-fire: #c0392b;
+
+ion-content.gourmet-content {
+  --background: radial-gradient(circle at top, #2b2b2b 0%, #000000 100%);
+}
+
+.internal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px; // Un poco más de aire
+  background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+
+  .gourmet-title {
+    font-family: 'Playfair Display', serif;
+    color: $color-gold;
+    font-size: 2.2rem;
+    margin: 0;
+    font-weight: 700;
+  }
+
+  .back-btn {
+    --color: #{$color-text};
+    font-size: 1.5rem;
+  }
+}
+
+.reservas-container {
+  padding: 20px;
+  padding-bottom: 40px; // Espacio extra abajo
+}
+
+// Estados vacíos y loading
+.loading-container, .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 40vh;
+  color: $color-gray;
+  text-align: center;
+
+  ion-icon {
+    font-size: 5rem; // Icono más grande
+    margin-bottom: 20px;
+    color: $color-gold;
+    opacity: 0.5;
+  }
+  
+  h3 { 
+    color: $color-text; 
+    margin-bottom: 10px;
+    font-size: 1.8rem;
+  }
+  
+  p {
+    font-size: 1.2rem;
+    max-width: 80%;
+  }
+}
+
+// ==========================================================
+// TARJETAS DE RESERVA GIGANTES
+// ==========================================================
+.menu-card {
+  --background: #{$color-card};
+  border-radius: 16px; // Bordes más redondeados
+  box-shadow: 0 8px 15px rgba(0,0,0,0.6);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 25px; // Más separación entre tarjetas
+  min-height: 160px; // Forzar altura
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 6px; // Línea más gruesa
+    background: linear-gradient(90deg, transparent, $color-gold, transparent);
+  }
+
+  ion-card-header {
+    padding: 25px; // Mucho padding interno
+  }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .status-badge {
+    padding: 8px 12px;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    border-radius: 8px;
+  }
+
+  .comensales {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: $color-text; // Color texto claro para mejor contraste
+    background: rgba(0,0,0,0.3);
+    padding: 5px 12px;
+    border-radius: 20px;
+
+    ion-icon { 
+      font-size: 1.8rem; 
+      color: $color-gold;
+    }
+    span { 
+      font-weight: bold; 
+      font-size: 1.4rem;
+    }
+  }
+
+  ion-card-title {
+    color: $color-text;
+    font-size: 2.2rem; // Título Gigante
+    font-weight: 700;
+    text-transform: capitalize;
+    margin-bottom: 15px;
+    display: block;
+  }
+
+  .hora-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: $color-gold;
+    
+    ion-icon {
+      font-size: 2.4rem; // Reloj grande
+    }
+    
+    .hora-text {
+      font-size: 2.2rem; // Hora grande
+      font-weight: 300;
+      font-family: 'Courier New', monospace; // Toque técnico/ticket
+    }
+  }
+}
+
+// ==========================================================
+// BOTÓN PRINCIPAL "REALIZAR RESERVA"
+// ==========================================================
+.bottom-action-container {
+  margin-top: 30px;
+  margin-bottom: 20px;
+  padding: 0 10px;
+}
+
+.main-action-btn {
+  height: 70px; // Botón alto
+  font-size: 1.4rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  --background: #{$color-gold};
+  --color: #000;
+  --border-radius: 12px;
+  --box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); // Resplandor dorado
+  text-transform: uppercase;
+}
+
+// ==========================================================
+// ESTILOS DEL MODAL (Mantenidos y Ajustados)
+// ==========================================================
+::ng-deep ion-modal.gourmet-modal {
+  --height: 88%;
+  --border-radius: 20px 20px 0 0;
+  box-shadow: 0 -5px 20px rgba(0,0,0,0.8);
+
+  .modal-toolbar {
+    --background: #1e1e1e;
+    --color: #{$color-gold};
+    --border-style: none;
+    
+    ion-title {
+      font-size: 2rem;
+      font-weight: 700;
+      font-family: 'Playfair Display', serif;
+    }
+    
+    ion-button {
+      font-size: 1.1rem;
+    }
+  }
+
+  .modal-content {
+    --background: #121212;
+    --color: #{$color-text};
+    height: 100%; 
+  }
+}
+
+.form-container {
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  height: 100%;
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    label {
+      font-size: 1.6rem;
+      color: $color-gold;
+      text-align: center;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+  }
+
+  .gourmet-datetime {
+    margin: 0 auto;
+    border-radius: 12px;
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    
+    --background: #1e1e1e;
+    --background-rgb: 30, 30, 30;
+    --wheel-fade-background-rgb: 30, 30, 30;
+    
+    --text-color: #f5f5dc;
+    --wheel-text-color: #f5f5dc;
+    
+    --wheel-highlight-background: rgba(212, 175, 55, 0.2);
+    --time-button-active-color: #d4af37;
+    --time-button-active-background: rgba(212, 175, 55, 0.1);
+
+    transform: scale(1.2); 
+    margin-bottom: 30px;
+  }
+
+  .range-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 15px;
+    padding: 10px;
+    
+    .comensales-display {
+      font-size: 4rem;
+      font-weight: bold;
+      color: $color-text;
+      min-width: 60px;
+      text-align: center;
+    }
+    
+    ion-button {
+      --color: #{$color-gold};
+      --border-color: #{$color-gold};
+      --border-width: 2px;
+      width: 60px;
+      height: 60px;
+      font-size: 1.8rem;
+    }
+  }
+
+  .action-btn {
+    margin-top: auto;
+    height: 60px;
+    font-size: 1.5rem;
+    --border-radius: 30px;
+    --background: #{$color-gold};
+    --color: #000;
+    font-weight: 900;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+    margin-bottom: 20px;
+  }
+}

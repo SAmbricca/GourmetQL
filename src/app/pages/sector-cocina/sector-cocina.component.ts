@@ -4,9 +4,7 @@ import { Router } from '@angular/router';
 import { 
   IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, 
   IonButton, IonCard, IonCardContent, IonBadge, IonGrid, 
-  IonRow, IonCol, IonRefresher, IonRefresherContent,
-  IonText, IonIcon 
-} from '@ionic/angular/standalone';
+  IonRow, IonCol, IonRefresher, IonRefresherContent,} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { flame, checkmarkDone } from 'ionicons/icons';
 import { PedidosService, DetallePedido } from '../../services/pedidos';

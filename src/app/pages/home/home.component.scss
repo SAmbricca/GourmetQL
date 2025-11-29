@@ -1,86 +1,160 @@
-ion-content {
-  --background: linear-gradient(135deg, #f09850 0%, #cc480b 100%);
+// ------------------------------------------------------------------
+// PALETA GOURMET
+// ------------------------------------------------------------------
+$color-dark-bg: #121212;
+$color-card-bg: #1e1e1e;
+$color-gold: #d4af37;
+$color-gold-dim: #aa8c2c;
+$color-text-light: #f5f5dc;
+$color-text-dim: #bdbdbd;
+$color-red-fire: #c0392b;
+
+// ------------------------------------------------------------------
+// HEADER VACÍO (Transparente)
+// ------------------------------------------------------------------
+.empty-toolbar {
+  --border-width: 0;
+  // Opcional: min-height pequeña si quieres reducir espacio, 
+  // pero Ionic lo gestiona para el Safe Area.
 }
 
-ion-header{
-  height: 72px;
-}
-.panel-title{
-  margin-top: 20px;
-}
-.salir-icon {
-  width: 40px;
-  height: 40px;
-  margin-top: 20px;
+// ------------------------------------------------------------------
+// CONTENIDO & HEADER INTERNO
+// ------------------------------------------------------------------
+ion-content.gourmet-content {
+  --background: radial-gradient(circle at center, #2c3e50 0%, #000000 100%);
+  --padding-top: 10px;
 }
 
+.internal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px 10px 20px; // Padding lateral alineado con las tarjetas
+
+  .panel-title {
+    font-family: 'Playfair Display', serif;
+    color: $color-gold;
+    font-weight: 700;
+    letter-spacing: 1px;
+    font-size: 1.8rem;
+    margin: 0;
+    margin-left: 50px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    margin-left: 120px;
+  }
+
+  .logout-btn {
+    --color: #{$color-red-fire};
+    margin: 0;
+    --padding-start: 0;
+    --padding-end: 0;
+    z-index: 100%;
+    
+    ion-icon {
+      font-size: 1.8rem;
+    }
+  }
+}
+
+// ------------------------------------------------------------------
+// TARJETA USUARIO
+// ------------------------------------------------------------------
 .user-info-container {
-  padding: 20px 20px 0 20px;
+  padding: 10px 15px 10px 15px;
+}
 
-  ion-card {
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+.user-card {
+  margin: 0;
+  background: rgba(30, 30, 30, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid $color-gold-dim;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
 
-    .user-details {
+  .user-details {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    .avatar-icon {
+      font-size: 3.5rem;
+      color: $color-gold;
+    }
+
+    .text-wrapper {
+      display: flex;
+      flex-direction: column;
+
       ion-card-title {
-        text-align: center;
-        font-size: 1.7rem;
-        font-weight: bold;
-        color: #333;
-        font-family: 'Times New Roman', Times, serif;
+        color: $color-text-light;
+        font-size: 2.5rem;
+        font-weight: 700;
       }
     }
   }
 }
 
+// ------------------------------------------------------------------
+// ACCIONES (GRID)
+// ------------------------------------------------------------------
 .opciones-container {
-  padding: 20px;
+  padding: 10px 15px 40px 15px;
 
-  h2 {
-    margin-bottom: 20px;
-    color: white;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    font-size: 2rem;
-  }
-
-  ion-card {
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
-    cursor: pointer;
-
-    &:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+  .section-title {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+    
+    h2 {
+      margin: 0 15px;
+      color: $color-text-dim;
+      font-size: 2rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
     }
 
-    .opcion-header {
-      ion-card-title {
-        font-size: 1.4rem;
-        font-weight: bold;
-        color: #333;
-      }
+    .line {
+      flex-grow: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, $color-gold-dim, transparent);
     }
   }
 }
 
-@media (max-width: 768px) {
-  .user-info-container {
-    padding: 15px 15px 0 15px;
+.action-card {
+  margin: 8px 0;
+  --background: #{$color-card-bg};
+  border-radius: 12px;
+  border-left: 4px solid $color-gold;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+  transition: transform 0.2s ease;
 
-    ion-card {
-      .user-details {
-        ion-card-title {
-          font-size: 1.5rem;
-        }
-      }
-    }
+  &:active {
+    transform: scale(0.98);
   }
 
-  .opciones-container {
-    padding: 15px;
+  .opcion-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
 
-    h2 {
+    .card-icon {
+      font-size: 2.2rem;
+      color: white;
+      margin-right: 15px;
+    }
+
+    ion-card-title {
+      flex-grow: 1;
+      color: $color-text-light;
+      font-size: 2.2rem;
+      font-weight: 600;
+    }
+
+    .arrow-icon {
+      color: $color-text-dim;
       font-size: 1.2rem;
     }
   }

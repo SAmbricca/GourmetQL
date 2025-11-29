@@ -2,8 +2,8 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { 
-  IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, 
-  IonButton, IonIcon, IonCard, IonCardContent, IonSpinner,
+  IonContent, IonHeader, IonToolbar,
+  IonButton, IonIcon, IonCard, IonCardContent,
   IonSegment, IonSegmentButton, IonLabel 
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
@@ -18,8 +18,8 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [
     CommonModule, FormsModule,
-    IonContent, IonHeader, IonToolbar, IonTitle, IonButtons, 
-    IonButton, IonIcon, IonCard, IonCardContent, IonSpinner,
+    IonContent, IonHeader, IonToolbar,
+    IonButton, IonIcon, IonCard, IonCardContent,
     IonSegment, IonSegmentButton, IonLabel
   ]
 })

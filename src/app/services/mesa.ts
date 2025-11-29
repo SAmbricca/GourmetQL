@@ -98,16 +98,17 @@ export class MesaService {
   obtenerListaEspera(): Observable<ListaEspera[]> {
     return new Observable(observer => {
       const fetchLista = async () => {
+        // CORRECCIÓN: Traer también datos de usuarios registrados
         const { data, error } = await this.supabase
           .from('lista_espera')
-          .select('*, cliente_anonimo:clientes_anonimos(*)')
+          .select('*, cliente_anonimo:clientes_anonimos(*), cliente:usuarios(*)')
           .eq('estado', 'esperando')
           .order('fecha_ingreso');
 
         if (error) {
           observer.error(error);
         } else {
-          observer.next(data as ListaEspera[]);
+          observer.next(data as any[]);
         }
       };
 
@@ -136,13 +137,15 @@ export class MesaService {
     return data || [];
   }
 
-  async asignarMesa(mesaId: number, clienteAnonimoId: number): Promise<Pedido> {
+  async asignarMesa(mesaId: number, clienteAnonimoId: number | null, clienteId: number | null): Promise<Pedido> {
     try {
+      // 1. Crear el Pedido
       const { data: pedidoData, error: pedidoError } = await this.supabase
         .from('pedidos')
         .insert({
           mesa_id: mesaId,
-          cliente_anonimo_id: clienteAnonimoId,
+          cliente_anonimo_id: clienteAnonimoId, // Puede ser null
+          cliente_id: clienteId,               // Puede ser null
           estado: 'pendiente',
           total: 0,
           descuento: 0,
@@ -151,20 +154,27 @@ export class MesaService {
         .select()
         .single();
 
-      if (pedidoError) {
-        throw new Error(`Error al crear pedido: ${pedidoError.message}`);
-      }
+      if (pedidoError) throw new Error(`Error al crear pedido: ${pedidoError.message}`);
 
-      const { error: mesaError } = await this.supabase
+      // 2. Marcar mesa como ocupada
+      await this.supabase
         .from('mesas')
         .update({ estado: 'ocupada' })
         .eq('id', mesaId);
 
-      const { error: listaError } = await this.supabase
+      // 3. Actualizar Lista de Espera (Dinámico según quién sea el cliente)
+      let updateQuery = this.supabase
         .from('lista_espera')
         .update({ estado: 'atendido' })
-        .eq('cliente_anonimo_id', clienteAnonimoId)
         .eq('estado', 'esperando');
+
+      if (clienteId) {
+        updateQuery = updateQuery.eq('cliente_id', clienteId);
+      } else if (clienteAnonimoId) {
+        updateQuery = updateQuery.eq('cliente_anonimo_id', clienteAnonimoId);
+      }
+
+      const { error: listaError } = await updateQuery;
 
       if (listaError) {
         console.warn('Advertencia al actualizar lista de espera:', listaError.message);
@@ -244,19 +254,12 @@ export class MesaService {
     }
 
     const { data, error } = await query.single();
-    
     if (error && error.code !== 'PGRST116') throw error;
     return data?.mesa_id || null;
   }
 
   async obtenerNumeroMesa(mesaId: number): Promise<number | null> {
-    const { data, error } = await this.supabase
-      .from('mesas')
-      .select('numero')
-      .eq('id', mesaId)
-      .single();
-    
-    if (error) return null;
+    const { data } = await this.supabase.from('mesas').select('numero').eq('id', mesaId).single();
     return data?.numero || null;
   }
 }

@@ -1,93 +1,227 @@
+// ------------------------------------------------------------------
+// VARIABLES & PALETA GOURMET (Sincronizada con Login)
+// ------------------------------------------------------------------
+$color-bg-gradient: radial-gradient(circle at center, #2c3e50 0%, #000000 100%);
+$color-card-bg: #1e1e1e;
+$color-card-border: rgba(212, 175, 55, 0.3); // Dorado tenue
+$color-gold: #d4af37;
+$color-gold-bright: #f1c40f;
+$color-text-light: #f5f5dc; // Beige Hueso
+$color-text-dim: #bdbdbd;
+$color-price: #2ecc71; // Verde esmeralda para dinero, o usar Gold
+$font-serif: 'Playfair Display', serif;
+
+// ------------------------------------------------------------------
+// ESTRUCTURA GENERAL
+// ------------------------------------------------------------------
+
 ion-content {
-  --background: #f09850;
+  --background: #{$color-bg-gradient};
+  --color: #{$color-text-light};
 }
 
-ion-toolbar {
-  --background: #f4f5f8; /* Coincide con el inicio del gradiente global */
-  padding-top: 16px;
+// Asegurar que el contenido ocupe todo el alto (Sin espacios vacíos)
+.content-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.2); // Sutil oscurecimiento extra
+}
 
-  ion-title{
-    text-align: center;
-    font-size: 1.5rem;
-    padding-top: 16px;
+// ------------------------------------------------------------------
+// HEADER PERSONALIZADO
+// ------------------------------------------------------------------
+ion-header {
+  ion-toolbar {
+    --background: transparent; // Transparencia total para ver el gradiente
+    --border-width: 0;
+    --color: #{$color-gold};
+
+    ion-icon {
+      color: $color-gold;
+      font-size: 1.5rem;
+    }
+
+    ion-title {
+      font-family: $font-serif;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-size: 1.2rem;
+    }
   }
 }
 
-.top-50 { margin-top: 50px; }
+// ------------------------------------------------------------------
+// ESTADO DE CARGA (Centrado Perfecto)
+// ------------------------------------------------------------------
+.ion-text-center.top-50 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 80vh; // Ocupar pantalla visualmente
+  margin-top: 0; // Reset del margen original
 
-.content-wrapper {
-  padding: 15px;
+  ion-spinner {
+    --color: #{$color-gold};
+    transform: scale(1.5);
+    margin-bottom: 20px;
+  }
+
+  p {
+    color: $color-text-dim;
+    font-size: 1.1rem;
+    font-style: italic;
+    animation: pulseText 2s infinite;
+  }
 }
 
+// ------------------------------------------------------------------
+// TARJETA DE RESUMEN (LA CUENTA)
+// ------------------------------------------------------------------
 .summary-card {
-  background: white;
+  --background: #{$color-card-bg};
+  background: $color-card-bg;
+  border: 1px solid $color-card-border;
   border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  margin: 0 0 20px 0;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6); // Sombra profunda
+  margin: 0 0 25px 0;
+
+  ion-card-content {
+    padding: 20px;
+  }
 
   .header-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 15px;
     
     h1 {
       margin: 0;
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: #333;
+      font-size: 1.8rem;
+      font-family: $font-serif;
+      color: $color-gold;
+      text-shadow: 1px 1px 2px black;
+    }
+
+    // Estilo personalizado para el Badge de Ionic
+    ion-badge {
+      --padding-start: 10px;
+      --padding-end: 10px;
+      --padding-top: 6px;
+      --padding-bottom: 6px;
+      font-size: 0.8rem;
+      border-radius: 6px;
+      letter-spacing: 1px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+    }
+  }
+
+  .time-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    
+    ion-icon { 
+      color: $color-gold; 
+    }
+    small {
+      color: $color-text-dim;
+      font-size: 0.9rem;
     }
   }
 
   .total-row {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-end;
+    margin-top: 15px;
     padding-top: 10px;
-    border-top: 1px dashed #ddd;
+    border-top: 1px dashed rgba(212, 175, 55, 0.2);
 
-    span { font-size: 1rem; color: #666; }
+    span { 
+      font-size: 1rem; 
+      color: $color-text-dim; 
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+    }
+    
     .price { 
-      font-size: 1.5rem; 
-      font-weight: 800; 
-      color: #2dd36f; 
+      margin: 0;
+      font-size: 2rem; 
+      font-weight: 700; 
+      font-family: $font-serif;
+      color: $color-text-light;
+      text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
     }
   }
 }
 
-.section-title h3 {
-  margin-left: 5px;
-  font-size: 1.1rem;
-  color: #555;
-  font-weight: 600;
+// ------------------------------------------------------------------
+// LISTA DE PRODUCTOS
+// ------------------------------------------------------------------
+.section-title {
+  margin-bottom: 15px;
+  
+  h3 {
+    margin: 0;
+    margin-left: 5px;
+    font-size: 1.2rem;
+    color: $color-gold;
+    font-family: $font-serif;
+    border-left: 3px solid $color-gold; // Acento visual
+    padding-left: 10px;
+  }
+}
+
+.products-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  flex-grow: 1; // Ocupar espacio sobrante si hay pocos productos
 }
 
 .product-card {
   display: flex;
-  background: white;
+  background: rgba(30, 30, 30, 0.8); // Ligeramente transparente
+  border: 1px solid rgba(255, 255, 255, 0.05); // Borde muy sutil
   border-radius: 12px;
-  margin: 0 0 12px 0;
-  padding: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin: 0;
+  padding: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  backdrop-filter: blur(5px); // Efecto cristal oscuro
+  transition: transform 0.2s ease;
+
+  &:active {
+    transform: scale(0.98); // Feedback táctil
+  }
 
   .product-img {
-    width: 80px;
-    height: 80px;
+    width: 90px;
+    height: 90px;
     flex-shrink: 0;
     border-radius: 8px;
     overflow: hidden;
-    background: #eee;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    background: #000;
     
     img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      opacity: 0.9; // Mezclar un poco con el fondo oscuro
     }
   }
 
   .product-info {
     flex: 1;
-    padding-left: 12px;
+    padding-left: 15px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -99,40 +233,56 @@ ion-toolbar {
 
       h4 {
         margin: 0;
-        font-size: 1rem;
+        font-size: 1.1rem;
         font-weight: 600;
-        color: #333;
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
+        color: $color-text-light;
+        line-height: 1.2;
       }
 
       .qty {
-        background: #f09850;
-        color: white;
-        padding: 2px 6px;
+        background: $color-gold;
+        color: #000; // Contraste alto sobre dorado
+        padding: 2px 8px;
         border-radius: 4px;
-        font-size: 0.8rem;
-        font-weight: bold;
-        margin-left: 5px;
+        font-size: 0.85rem;
+        font-weight: 800;
+        box-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
       }
     }
 
     .info-price {
-      color: #666;
+      color: $color-gold-bright;
       font-weight: 500;
-      font-size: 0.95rem;
+      font-size: 1rem;
+      margin-top: 5px;
     }
 
     .product-status {
       display: flex;
       justify-content: flex-end;
+      margin-top: 8px;
       
       ion-chip {
         margin: 0;
-        height: 24px;
-        font-size: 0.75rem;
+        height: 26px;
+        font-size: 0.7rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        --background: transparent;
+        border: 1px solid currentColor; // Borde del color del texto/icono
+        opacity: 0.9;
+        
+        ion-icon {
+          font-size: 1rem;
+        }
       }
     }
   }
+}
+
+// Animación suave para texto de carga
+@keyframes pulseText {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
 }

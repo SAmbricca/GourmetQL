@@ -1,29 +1,30 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, NgZone } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MenuService, Menu, ItemPedido } from '../../services/menu';
 import { SupabaseService } from '../../services/supabase';
 import { ClienteAnonimoService } from '../../services/cliente-anonimo';
 import { ToastService } from '../../services/toast';
 import { ChatService } from '../../services/chat';
-// 1. Importar NotificacionesService
 import { NotificacionesService } from '../../services/notificaciones';
 import { 
-  IonContent, IonHeader, IonToolbar, IonTitle, IonButton, 
-  IonCard, IonCardHeader, IonCardTitle, IonCardContent,
-  IonText, IonIcon, IonButtons, IonBadge, IonFooter,
-  LoadingController
+  IonContent, IonHeader, IonToolbar, IonButton, 
+  IonIcon, IonBadge, IonSpinner, Platform, IonTitle, IonButtons
 } from '@ionic/angular/standalone';
 import { CommonModule } from '@angular/common';
-import { register } from 'swiper/element/bundle';
 import { addIcons } from 'ionicons';
-import { timeOutline, cashOutline, remove, add, timerOutline, cartOutline } from 'ionicons/icons';
+import { 
+  timeOutline, removeCircleOutline, addCircleOutline, 
+  arrowBackCircle, phonePortraitOutline, swapHorizontalOutline,
+  removeOutline, addOutline
+} from 'ionicons/icons';
 
-register();
+import { Motion } from '@capacitor/motion';
+import { PluginListenerHandle } from '@capacitor/core';
 
 export interface Pedido {
   mesa_id: number;
-  cliente_id?: number;
-  cliente_anonimo_id?: number;
+  cliente_id?: number | null;
+  cliente_anonimo_id?: number | null;
   estado: string;
   total: number;
   descuento: number;
@@ -38,21 +39,33 @@ export interface Pedido {
   standalone: true,
   imports: [
     CommonModule,
-    IonContent, IonHeader, IonToolbar, IonTitle, IonButton,
-    IonCard, IonCardHeader, IonCardTitle, IonCardContent,
-    IonText, IonIcon, IonButtons, IonBadge, IonFooter
+    IonContent, IonHeader, IonToolbar, IonButton,
+    IonIcon, IonBadge, IonSpinner, IonTitle, IonButtons
   ]
 })
-export class MenuClienteComponent implements OnInit {
-  @ViewChild(IonContent) content!: IonContent;
+export class MenuClienteComponent implements OnInit, OnDestroy {
   
-  menu: Menu[] = [];
-  menuPorTipo: { tipo: string; items: Menu[] }[] = [];
+  menuCompleto: Menu[] = [];
   itemsSeleccionados: ItemPedido[] = [];
   cargando: boolean = true;
   mesaId!: number;
   numeroMesa?: number;
   pedidoId: number | null = null;
+
+  currentProductIndex: number = 0;
+  currentImageIndex: number = 0;
+  
+  // Variables Movimiento
+  private motionListener: PluginListenerHandle | undefined;
+  private lastUpdate: number = 0;
+  private shakeCounter: number = 0;
+  private lastShakeTime: number = 0;
+  private isDebouncing: boolean = false; 
+  private debounceTimeMs: number = 1000; // Reducido levemente para mejor respuesta
+
+  // Variables Swipe
+  private touchStartX: number = 0;
+  private touchEndX: number = 0;
 
   constructor(
     private menuService: MenuService,
@@ -60,13 +73,17 @@ export class MenuClienteComponent implements OnInit {
     private clienteAnonimoService: ClienteAnonimoService,
     private router: Router,
     private route: ActivatedRoute,
-    private loadingController: LoadingController,
     private toastService: ToastService,
     private chatService: ChatService,
-    // 2. Inyectar servicio
-    private notificacionesService: NotificacionesService
+    private notificacionesService: NotificacionesService,
+    private platform: Platform,
+    private ngZone: NgZone
   ) {
-    addIcons({ timeOutline, cashOutline, remove, add, timerOutline, cartOutline });
+    addIcons({ 
+        timeOutline, removeCircleOutline, addCircleOutline, 
+        arrowBackCircle, phonePortraitOutline, swapHorizontalOutline,
+        removeOutline, addOutline 
+    });
   }
 
   async ngOnInit() {
@@ -78,81 +95,211 @@ export class MenuClienteComponent implements OnInit {
 
     await this.cargarMenu();
     await this.obtenerPedidoActual();
+    
     if (this.pedidoId) {
        await this.restaurarPedidoPrevio();
     }
+
+    if (this.platform.is('capacitor') || this.platform.is('hybrid') || this.platform.is('mobile')) {
+      this.iniciarDeteccionMovimiento();
+    }
   }
 
-  async obtenerPedidoActual() {
-      const usuario = await this.supabaseService.obtenerUsuarioActual();
-      const anonimo = !usuario ? await this.clienteAnonimoService.obtenerClienteAnonimoActual() : null;
+  ngOnDestroy() {
+    if (this.motionListener) {
+      this.motionListener.remove();
+    }
+  }
 
-      const validacion = await this.chatService.obtenerPedidoActivo(
-          usuario?.id, 
-          anonimo?.id
-      );
+  // ----------------------------------------------------------------------
+  // GESTIÓN DE SWIPE (TÁCTIL)
+  // ----------------------------------------------------------------------
+  onTouchStart(e: TouchEvent) {
+    this.touchStartX = e.changedTouches[0].screenX;
+  }
 
-      if (validacion.success && validacion.pedidoId) {
-          this.pedidoId = validacion.pedidoId;
-          console.log('Pedido activo encontrado:', this.pedidoId);
+  onTouchEnd(e: TouchEvent) {
+    this.touchEndX = e.changedTouches[0].screenX;
+    this.handleSwipe();
+  }
+
+  handleSwipe() {
+    const threshold = 50; 
+    const swipeDistance = this.touchEndX - this.touchStartX;
+
+    if (Math.abs(swipeDistance) > threshold) {
+      if (swipeDistance < 0) {
+        this.cambiarProducto('siguiente');
+      } else {
+        this.cambiarProducto('anterior');
       }
+    }
   }
 
+  // ----------------------------------------------------------------------
+  // LÓGICA DE MOVIMIENTO (ACELERÓMETRO)
+  // ----------------------------------------------------------------------
+  async iniciarDeteccionMovimiento() {
+    try {
+      this.motionListener = await Motion.addListener('accel', event => {
+        this.ngZone.run(() => {
+          this.procesarMovimiento(event.acceleration.x, event.acceleration.y, event.acceleration.z);
+        });
+      });
+    } catch (e) {
+      console.error('Error iniciando acelerómetro', e);
+    }
+  }
+
+  procesarMovimiento(x: number, y: number, z: number) {
+    const now = Date.now();
+    
+    if (this.isDebouncing && (now - this.lastUpdate) < this.debounceTimeMs) return;
+
+    // 1. SHAKE LATERAL (Izquierda/Derecha repetidas veces) -> Reset al inicio
+    // Detectamos movimientos fuertes en el eje X
+    if (Math.abs(x) > 25) { // Umbral ajustado para "agitar"
+      if ((now - this.lastShakeTime) < 600) {
+        this.shakeCounter++;
+      } else {
+        this.shakeCounter = 1;
+      }
+      this.lastShakeTime = now;
+
+      // Si agita 3 veces seguidas (izquierda-derecha-izquierda)
+      if (this.shakeCounter >= 3) {
+        this.resetearAlPrincipio();
+        this.shakeCounter = 0; // Reset counter
+        this.activarDebounce(now);
+        return;
+      }
+    }
+
+    // 2. TILT VERTICAL (Cambiar Producto - Adelante/Atrás)
+    if (y < -5) { 
+      this.cambiarProducto('siguiente');
+      this.activarDebounce(now);
+      return;
+    } 
+    if (y > 11 && z > 5) { 
+       this.cambiarProducto('anterior');
+       this.activarDebounce(now);
+       return;
+    }
+
+    // 3. TILT HORIZONTAL (Cambiar Foto - Izquierda/Derecha suave)
+    // Solo si NO se está agitando violentamente (para no confundir con el reset)
+    if (Math.abs(x) < 20) { 
+        if (x > 7) {
+            this.cambiarFoto('anterior'); // Invertido para sensación natural
+            this.activarDebounce(now);
+        } else if (x < -7) {
+            this.cambiarFoto('siguiente');
+            this.activarDebounce(now);
+        }
+    }
+  }
+
+  activarDebounce(timestamp: number) {
+    this.isDebouncing = true;
+    this.lastUpdate = timestamp;
+    setTimeout(() => {
+      this.isDebouncing = false;
+    }, this.debounceTimeMs);
+  }
+
+  // ----------------------------------------------------------------------
+  // NAVEGACIÓN
+  // ----------------------------------------------------------------------
+  resetearAlPrincipio() {
+    if (this.currentProductIndex !== 0) {
+        this.currentProductIndex = 0;
+        this.currentImageIndex = 0;
+        this.toastService.mostrarToastInfo('¡Menú reiniciado al principio!');
+    }
+  }
+
+  cambiarProducto(direccion: 'siguiente' | 'anterior') {
+    if (direccion === 'siguiente') {
+      if (this.currentProductIndex < this.menuCompleto.length - 1) {
+        this.currentProductIndex++;
+        this.currentImageIndex = 0;
+        this.precargarSiguienteImagen();
+      } else {
+        this.toastService.mostrarToastInfo('Estás en el último producto');
+      }
+    } else {
+      if (this.currentProductIndex > 0) {
+        this.currentProductIndex--;
+        this.currentImageIndex = 0;
+      }
+    }
+  }
+
+  cambiarFoto(direccion: 'siguiente' | 'anterior') {
+    const producto = this.productoActual;
+    if (!producto.foto_url || producto.foto_url.length <= 1) return;
+
+    if (direccion === 'siguiente') {
+      this.currentImageIndex = (this.currentImageIndex + 1) % producto.foto_url.length;
+    } else {
+      this.currentImageIndex = (this.currentImageIndex - 1 + producto.foto_url.length) % producto.foto_url.length;
+    }
+  }
+
+  precargarSiguienteImagen() {
+    if (this.currentProductIndex < this.menuCompleto.length - 1) {
+      const siguienteProd = this.menuCompleto[this.currentProductIndex + 1];
+      if (siguienteProd.foto_url && siguienteProd.foto_url.length > 0) {
+        const img = new Image();
+        img.src = siguienteProd.foto_url[0];
+      }
+    }
+  }
+
+  get productoActual(): Menu {
+    return this.menuCompleto[this.currentProductIndex];
+  }
+
+  obtenerImagenActual(): string {
+    const producto = this.productoActual;
+    if (!producto || !producto.foto_url || producto.foto_url.length === 0) {
+      return 'assets/placeholder.jpg'; // Asegúrate de tener esta imagen o cambiarla
+    }
+    return producto.foto_url[this.currentImageIndex];
+  }
+
+  // ----------------------------------------------------------------------
+  // DATA & CARRITO
+  // ----------------------------------------------------------------------
   async cargarMenu(): Promise<void> {
     this.cargando = true;
     const resultado = await this.menuService.obtenerMenu();
-    
     if (resultado.success && resultado.data) {
-      this.menu = resultado.data;
-      this.agruparMenuPorTipo();
+      this.menuCompleto = resultado.data;
+      this.precargarSiguienteImagen();
     } else {
       await this.toastService.mostrarToastError(resultado.message || 'Error al cargar el menú');
     }
-    
     this.cargando = false;
   }
-  
+
+  async obtenerPedidoActual() {
+    const usuario = await this.supabaseService.obtenerUsuarioActual();
+    const anonimo = !usuario ? await this.clienteAnonimoService.obtenerClienteAnonimoActual() : null;
+    const validacion = await this.chatService.obtenerPedidoActivo(usuario?.id, anonimo?.id);
+    if (validacion.success && validacion.pedidoId) this.pedidoId = validacion.pedidoId;
+  }
+
   async restaurarPedidoPrevio() {
     if (!this.pedidoId) return;
-
     const detallesPrevios = await this.menuService.obtenerDetallesPedido(this.pedidoId);
-    
     if (detallesPrevios.length > 0) {
-      this.toastService.mostrarToastInfo('Podes modificar tu pedido.');
-
       this.itemsSeleccionados = detallesPrevios.map(detalle => {
-        const productoEnMenu = this.menu.find(m => m.id === detalle.menu.id);
-        if (productoEnMenu) {
-          return {
-            menu: productoEnMenu,
-            cantidad: detalle.cantidad
-          };
-        }
-        return null;
+        const productoEnMenu = this.menuCompleto.find(m => m.id === detalle.menu.id);
+        return productoEnMenu ? { menu: productoEnMenu, cantidad: detalle.cantidad } : null;
       }).filter((item): item is ItemPedido => item !== null);
     }
-  }
-
-  agruparMenuPorTipo(): void {
-    const tipos = [...new Set(this.menu.map(item => item.tipo))];
-    
-    const etiquetas: { [key: string]: string } = {
-      'comida': 'Comida',
-      'bebida': 'Bebidas',
-      'postre': 'Postres'
-    };
-
-    this.menuPorTipo = tipos.map(tipo => ({
-      tipo: etiquetas[tipo] || tipo, 
-      items: this.menu.filter(item => item.tipo === tipo)
-    }));
-  }
-
-  obtenerImagenActual(item: Menu, index: number): string {
-    if (!item.foto_url || item.foto_url.length === 0) {
-      return 'assets/placeholder.jpg';
-    }
-    return item.foto_url[index % item.foto_url.length];
   }
 
   getCantidadItem(menuItem: Menu): number {
@@ -162,26 +309,15 @@ export class MenuClienteComponent implements OnInit {
 
   agregarItem(menuItem: Menu): void {
     const itemExistente = this.itemsSeleccionados.find(i => i.menu.id === menuItem.id);
-    
-    if (itemExistente) {
-      itemExistente.cantidad++;
-    } else {
-      this.itemsSeleccionados.push({
-        menu: menuItem,
-        cantidad: 1
-      });
-    }
+    if (itemExistente) itemExistente.cantidad++;
+    else this.itemsSeleccionados.push({ menu: menuItem, cantidad: 1 });
   }
 
   quitarItem(menuItem: Menu): void {
     const itemExistente = this.itemsSeleccionados.find(i => i.menu.id === menuItem.id);
-    
     if (itemExistente) {
-      if (itemExistente.cantidad > 1) {
-        itemExistente.cantidad--;
-      } else {
-        this.itemsSeleccionados = this.itemsSeleccionados.filter(i => i.menu.id !== menuItem.id);
-      }
+      if (itemExistente.cantidad > 1) itemExistente.cantidad--;
+      else this.itemsSeleccionados = this.itemsSeleccionados.filter(i => i.menu.id !== menuItem.id);
     }
   }
 
@@ -189,30 +325,16 @@ export class MenuClienteComponent implements OnInit {
     return this.menuService.calcularTotalPedido(this.itemsSeleccionados);
   }
 
-  get tiempoTotal(): number {
-    return this.menuService.calcularTiempoTotal(this.itemsSeleccionados);
-  }
-
   get cantidadTotalItems(): number {
     return this.itemsSeleccionados.reduce((total, item) => total + item.cantidad, 0);
   }
 
   async confirmarPedido(): Promise<void> {
-    if (this.itemsSeleccionados.length === 0) {
-      await this.toastService.mostrarToastAdvertencia('Debe seleccionar al menos un producto');
-      return;
-    }
-
+    if (this.itemsSeleccionados.length === 0) return;
     await this.enviarPedido();
   }
 
   private async enviarPedido(): Promise<void> {
-    const loading = await this.loadingController.create({
-      message: this.pedidoId ? 'Actualizando pedido...' : 'Enviando pedido...',
-      spinner: 'crescent'
-    });
-    await loading.present();
-
     try {
       let clienteId: number | undefined = undefined;
       let clienteAnonimoId: number | undefined = undefined;
@@ -230,9 +352,9 @@ export class MenuClienteComponent implements OnInit {
         if (clienteAnonimo) clienteAnonimoId = clienteAnonimo.id;
       }
 
-      const pedido: Pedido = { // Usar la interfaz Pedido
+      const pedido: Pedido = { 
         mesa_id: this.mesaId,
-        cliente_id: clienteId, // El servicio ahora maneja si es undefined convirtiéndolo a null
+        cliente_id: clienteId, 
         cliente_anonimo_id: clienteAnonimoId,
         estado: 'realizado',
         total: this.totalPedido,
@@ -243,38 +365,27 @@ export class MenuClienteComponent implements OnInit {
 
       const resultado = await this.menuService.crearPedido(pedido);
 
-      await loading.dismiss();
-
       if (resultado.success) {
-        await this.toastService.mostrarToastExito(this.pedidoId ? '¡Pedido modificado y enviado!' : '¡Pedido realizado!');
+        await this.toastService.mostrarToastExito('¡Pedido realizado!');
         
-        // --------------------------------------------------------------------
-        // NOTIFICAR A MOZOS
-        // --------------------------------------------------------------------
+        // Notificación a mozos... (misma lógica)
         const { data: mozos } = await this.supabaseService.supabase
-          .from('usuarios')
-          .select('id')
-          .eq('perfil', 'mozo')
-          .eq('estado', 'habilitado');
+          .from('usuarios').select('id').eq('perfil', 'mozo').eq('estado', 'habilitado');
 
         if (mozos && mozos.length > 0) {
           const accion = this.pedidoId ? 'Actualización' : 'Nuevo Pedido';
           const promesas = mozos.map(m => 
              this.notificacionesService.enviarNotificacion({
-                 tipo: 'pedido_modificado', // Reutilizamos tipo existente o "pedido_nuevo" si lo agregas
+                 tipo: 'pedido_modificado',
                  titulo: `Mesa ${this.numeroMesa} - ${accion}`,
-                 mensaje: `Se ha enviado un pedido por $${this.totalPedido}`,
+                 mensaje: `Se realizó un pedido por $${this.totalPedido}`,
                  destinatario_id: m.id,
                  destinatario_perfil: 'mozo',
-                 datos: { 
-                   pedido_id: resultado.pedido_id,
-                   mesa_id: this.mesaId 
-                 }
+                 datos: { pedido_id: resultado.pedido_id, mesa_id: this.mesaId }
              })
           );
           await Promise.all(promesas);
         }
-        // --------------------------------------------------------------------
 
         this.router.navigate(['/mesa-opciones'], {
           queryParams: { 
@@ -288,7 +399,6 @@ export class MenuClienteComponent implements OnInit {
       }
       
     } catch (error) {
-      await loading.dismiss();
       await this.toastService.mostrarToastError('Error crítico al procesar');
       console.error(error);
     }

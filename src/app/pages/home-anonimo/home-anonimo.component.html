@@ -1,51 +1,52 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title class="ion-text-center bienvenido-title">
-      Bienvenido
-    </ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="cerrarSesion()">
-        <img src="assets/salir-icono.jpeg" alt="Salir" class="salir-icon">
-      </ion-button>
-    </ion-buttons>
+<ion-header class="ion-no-border">
+  <ion-toolbar class="empty-toolbar">
+    <!-- Header vacío -->
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content [fullscreen]="true" class="gourmet-content">
+  
+  <!-- Header Interno Integrado -->
+  <div class="internal-header">
+    <h1 class="gourmet-title">Bienvenido</h1>
+    <ion-button (click)="cerrarSesion()" fill="clear" class="logout-btn">
+      <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+    </ion-button>
+  </div>
+
   <div class="user-info-container">
-    <ion-card>
-      <ion-card-header>
-        <div class="user-details">
-          <div class="avatar-container">
-            <img 
-              [src]="clienteActual?.foto_url || 'assets/avatar-default.png'" 
-              alt="Foto de perfil"
-              class="user-avatar"
-            >
-          </div>
-          <ion-card-title>{{ nombreCliente }}</ion-card-title>
-          
-          @if (verificandoEstado) {
-            <div class="estado-container">
-              <ion-spinner name="crescent"></ion-spinner>
-              <p class="estado-text">Verificando estado...</p>
-            </div>
-          } @else {
-            <div class="estado-container">
-              <div class="estado-badge" [style.background]="estadoColorHex">
-                <span>{{ estadoTexto }}</span>
-              </div>
-            </div>
-          }
+    <div class="avatar-wrapper">
+      <div class="avatar-ring">
+        <img 
+          [src]="clienteActual?.foto_url || 'assets/avatar-default.png'" 
+          alt="Foto de perfil"
+          class="user-avatar"
+        >
+      </div>
+    </div>
+    
+    <div class="welcome-text">
+      <h2>{{ nombreCliente }}</h2>
+      
+      <!-- Estado Estilizado -->
+      @if (verificandoEstado) {
+        <div class="status-pill loading">
+          <ion-spinner name="dots" color="dark"></ion-spinner>
+          <span>Sincronizando...</span>
         </div>
-      </ion-card-header>
-    </ion-card>
+      } @else {
+        <div class="status-pill" [style.border-color]="estadoColorHex">
+          <div class="dot" [style.background]="estadoColorHex"></div>
+          <span [style.color]="estadoColorHex">{{ estadoTexto }}</span>
+        </div>
+      }
+    </div>
   </div>
 
   <div class="opciones-container">
-    <ion-text class="ion-text-center" color="medium">
-      <h2>Acciones disponibles</h2>
-    </ion-text>
+    <div class="section-divider">
+      <span>Menu & Servicios</span>
+    </div>
 
     <ion-grid>
       <ion-row>
@@ -55,6 +56,7 @@
               button 
               (click)="!opcion.deshabilitado && opcion.accion()"
               [class.card-disabled]="opcion.deshabilitado"
+              class="menu-card"
             >
               <ion-card-header>
                 <div class="opcion-header">
@@ -67,15 +69,10 @@
                     }
                   </div>
                   
-                  @if (opcion.descripcion) {
-                    <p class="opcion-descripcion" 
-                       [class.deshabilitada]="opcion.deshabilitado">
-                      {{ opcion.descripcion }}
-                    </p>
-                  }
-                  
                   @if (opcion.deshabilitado) {
-                    <p class="opcion-deshabilitada">No disponible actualmente</p>
+                    <div class="lock-overlay">
+                      <ion-icon name="lock-closed"></ion-icon>
+                    </div>
                   }
                 </div>
               </ion-card-header>
@@ -84,24 +81,5 @@
         }
       </ion-row>
     </ion-grid>
-  </div>
-
-  <!-- Indicador de estado del flujo -->
-  <div class="flujo-info">
-    <ion-text color="medium">
-      <p class="flujo-texto">
-        @switch (estadoActual) {
-          @case ('sin_registrar') {
-            <span>Escanee el QR de ingreso para unirse a la lista de espera</span>
-          }
-          @case ('esperando_mesa') {
-            <span>Aguarde mientras le asignan una mesa. Recibirá una notificación</span>
-          }
-          @case ('mesa_asignada') {
-            <span>¡Mesa asignada! Escanee el QR de su mesa para continuar</span>
-          }
-        }
-      </p>
-    </ion-text>
   </div>
 </ion-content>

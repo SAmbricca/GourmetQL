@@ -3,14 +3,15 @@ import { Router } from '@angular/router';
 import { 
   IonContent, IonCard, IonCardContent, IonItem, IonLabel, IonInput, 
   IonButton, IonIcon, IonSelect, IonSelectOption, IonHeader, IonToolbar, 
-  IonTitle, IonButtons, IonBackButton, IonGrid, IonRow, IonCol, IonSpinner 
-} from '@ionic/angular/standalone';
+  IonTitle, IonButtons, IonBackButton, IonGrid, IonRow, IonCol, LoadingController, IonSpinner, IonText } from '@ionic/angular/standalone';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MesaService } from '../../../../services/mesa';
 import { ToastService } from '../../../../services/toast';
 import { ImagenesService } from '../../../../services/imagenes';
 import QRCode from 'qrcode';
+import { addIcons } from 'ionicons';
+import { camera, images, save, closeCircle } from 'ionicons/icons';
 
 interface FotoMesa {
   url: string;
@@ -23,9 +24,8 @@ interface FotoMesa {
   styleUrls: ['./agregar-mesa.component.scss'],
   standalone: true,
   imports: [
-    IonContent, IonCard, IonCardContent, IonItem, IonLabel, IonInput, 
-    IonButton, IonIcon, IonSelect, IonSelectOption, IonHeader, IonToolbar, 
-    IonTitle, IonButtons, IonBackButton, IonGrid, IonRow, IonCol, IonSpinner,
+    IonContent, IonItem, IonLabel, IonInput, 
+    IonButton, IonIcon, IonSelect, IonSelectOption, IonHeader, IonToolbar,  IonButtons, IonBackButton,
     FormsModule, CommonModule
   ]
 })
@@ -35,55 +35,43 @@ export class AgregarMesaComponent implements OnInit {
   tipo: string = 'estandar';
   foto: FotoMesa | null = null;
 
-  // Variables para el loading
-  isLoading: boolean = false;
-  loadingMessage: string = '';
-
   constructor(
     private router: Router,
     private mesaService: MesaService,
     private toastService: ToastService,
-    private imagenesService: ImagenesService
-  ) {}
+    private imagenesService: ImagenesService,
+    private loadingController: LoadingController
+  ) {
+    addIcons({ camera, images, save, closeCircle });
+  }
 
   ngOnInit() {}
 
+  // --- LOADING PERSONALIZADO GOURMET ---
+  async mostrarLoading() {
+    const loading = await this.loadingController.create({
+      cssClass: 'custom-loading-gourmet', 
+      message: undefined, 
+      spinner: null, 
+      duration: 15000 // Un poco más largo por si la subida de fotos tarda
+    });
+    await loading.present();
+    return loading;
+  }
+
   validarFormulario(): { valido: boolean; mensaje: string } {
-    if (this.numero === null || this.numero === undefined) {
-      return { valido: false, mensaje: 'El número de mesa es obligatorio' };
-    }
-    if (typeof this.numero !== 'number' || isNaN(this.numero)) {
-      return { valido: false, mensaje: 'El número de mesa debe ser un número válido' };
+    if (this.numero === null || this.numero === undefined || this.numero <= 0) {
+      return { valido: false, mensaje: 'Número de mesa inválido' };
     }
     if (!Number.isInteger(this.numero)) {
-      return { valido: false, mensaje: 'El número de mesa debe ser un número entero' };
+      return { valido: false, mensaje: 'El número debe ser entero' };
     }
-    if (this.numero <= 0) {
-      return { valido: false, mensaje: 'El número de mesa debe ser mayor a 0' };
+    if (this.cantidadComensales === null || this.cantidadComensales <= 0 || this.cantidadComensales > 20) {
+      return { valido: false, mensaje: 'Comensales inválidos (1-20)' };
     }
-
-    if (this.cantidadComensales === null || this.cantidadComensales === undefined) {
-      return { valido: false, mensaje: 'La cantidad de comensales es obligatoria' };
-    }
-
-    if (!Number.isInteger(this.cantidadComensales)) {
-      return { valido: false, mensaje: 'La cantidad de comensales debe ser un número entero' };
-    }
-    if (this.cantidadComensales <= 0) {
-      return { valido: false, mensaje: 'La cantidad de comensales debe ser mayor a 0' };
-    }
-    if (this.cantidadComensales > 20) {
-      return { valido: false, mensaje: 'La cantidad de comensales no puede superar 20 personas' };
-    }
-
-    if (!this.tipo || (this.tipo !== 'estandar' && this.tipo !== 'vip' && this.tipo !== 'movilidad_reducida')) {
-      return { valido: false, mensaje: 'Debe seleccionar un tipo válido de mesa' };
-    }
-
     if (!this.foto) {
-      return { valido: false, mensaje: 'Debe agregar una foto de la mesa' };
+      return { valido: false, mensaje: 'La foto de la mesa es obligatoria' };
     }
-
     return { valido: true, mensaje: '' };
   }
 
@@ -100,7 +88,7 @@ export class AgregarMesaComponent implements OnInit {
         blob: imageResult.blob 
       };
       
-      this.toastService.mostrarToastExito('Foto agregada y optimizada');
+      this.toastService.mostrarToastExito('Foto agregada');
     } catch (error) {
       console.error('Error al tomar foto:', error);
       this.toastService.mostrarToastError('Error al capturar la foto');
@@ -115,10 +103,9 @@ export class AgregarMesaComponent implements OnInit {
   private async generarCodigoQR(mesaNumero: number): Promise<Blob> {
     try {
       const qrContent = `MESA_${mesaNumero}`;
-      
       return await this.imagenesService.generarQRCode(qrContent, QRCode, 512);
     } catch (error) {
-      console.error('Error al generar código QR:', error);
+      console.error('Error QR:', error);
       throw new Error('No se pudo generar el código QR');
     }
   }
@@ -130,24 +117,19 @@ export class AgregarMesaComponent implements OnInit {
       return;
     }
 
-    this.isLoading = true;
-    this.loadingMessage = 'Preparando...';
+    const loading = await this.mostrarLoading();
 
     try {
-      this.loadingMessage = 'Subiendo foto de la mesa...';
-      
+      // 1. Subir Foto Mesa
       const nombreArchivoFoto = `mesa-${this.numero}-${Date.now()}.jpg`;
       const resultadoFoto = await this.mesaService.subirImagenMesa(
         nombreArchivoFoto,
         this.foto!.blob!
       );
 
-      if (!resultadoFoto.success || !resultadoFoto.url) {
-        throw new Error(resultadoFoto.message || 'Error al subir la foto');
-      }
+      if (!resultadoFoto.success || !resultadoFoto.url) throw new Error('Error al subir foto');
 
-      this.loadingMessage = 'Guardando información de la mesa...';
-
+      // 2. Crear Registro BD
       const mesaData = {
         numero: this.numero!,
         cantidad_comensales: this.cantidadComensales!,
@@ -157,50 +139,38 @@ export class AgregarMesaComponent implements OnInit {
       };
 
       const mesaCreada = await this.mesaService.agregarMesa(mesaData);
-      
-      if (!mesaCreada || !mesaCreada.id) {
-        throw new Error('Error al crear la mesa en la base de datos');
-      }
+      if (!mesaCreada || !mesaCreada.id) throw new Error('Error al guardar en BD');
 
-      this.loadingMessage = 'Generando código QR...';
-      
+      // 3. Generar y Subir QR
       const qrBlob = await this.generarCodigoQR(mesaCreada.numero);
-      this.loadingMessage = 'Subiendo código QR...';
-
       const nombreArchivoQR = `qr-mesa-${mesaCreada.numero}-${Date.now()}.png`;
       const resultadoQR = await this.mesaService.subirCodigoQR(
         nombreArchivoQR,
         qrBlob
       );
 
-      if (!resultadoQR.success || !resultadoQR.url) {
-        throw new Error(resultadoQR.message || 'Error al subir el código QR');
-      }
+      if (!resultadoQR.success || !resultadoQR.url) throw new Error('Error al subir QR');
 
-      this.loadingMessage = 'Finalizando...';
-
+      // 4. Actualizar Mesa con QR
       await this.mesaService.actualizarMesa(mesaCreada.id, {
         codigo_qr: resultadoQR.url
       });
 
       this.toastService.mostrarToastExito('¡Mesa agregada!');
+      await loading.dismiss();
       this.router.navigate(['/home']);
+
     } catch (error) {
+      await loading.dismiss();
       console.error('Error al guardar mesa:', error);
       
-      let mensajeError = 'Error al guardar la mesa. Intente nuevamente.';
+      let mensajeError = 'Error al guardar la mesa';
       if (error instanceof Error) {
         if (error.message.includes('unique') || error.message.includes('duplicate')) {
-          mensajeError = 'Ya existe una mesa con ese número';
-        } else if (error.message) {
-          mensajeError = error.message;
+          mensajeError = 'El número de mesa ya existe';
         }
       }
-      
       this.toastService.mostrarToastError(mensajeError);
-    } finally {
-      this.isLoading = false;
-      this.loadingMessage = '';
     }
   }
 }

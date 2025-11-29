@@ -1,19 +1,20 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, AlertController } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SupabaseService } from '../../services/supabase';
 import { ToastService } from '../../services/toast';
-// 1. Importar el servicio de notificaciones
 import { NotificacionesService } from '../../services/notificaciones';
-import { Subscription, interval } from 'rxjs';
+import { EncuestasService } from '../../services/encuestas'; 
+import { Subscription } from 'rxjs';
 import { addIcons } from 'ionicons';
 import { 
   gameControllerOutline, listOutline, chatbubblesOutline, 
   restaurantOutline, cashOutline, clipboardOutline, 
-  timeOutline, checkmarkCircleOutline, warningOutline, bookOutline 
+  timeOutline, checkmarkCircleOutline, warningOutline, 
+  bookOutline, chevronForwardOutline, starOutline, // <--- AGREGADO
+  receiptOutline, personCircleOutline, arrowBackOutline // <--- AGREGADO
 } from 'ionicons/icons';
-import { EncuestasService } from '../../services/encuestas'; 
 
 interface EstadoPedido {
   estado: 'pendiente' | 'confirmado' | 'preparacion' | 'listo' | 'entregado' | 'pagado';
@@ -45,21 +46,21 @@ export class MesaOpcionesComponent implements OnInit, OnDestroy {
   mostrarJuegos: boolean = false;
   mostrarEncuesta: boolean = false;
   mostrarCuenta: boolean = false;
-  yaJugoDescuento: boolean = false; // TODO: Recuperar de BD si ya ganó descuento
-
+  
   private supabase = inject(SupabaseService).supabase;
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private toastService = inject(ToastService);
   private encuestasService = inject(EncuestasService);
-  // 2. Inyectar NotificacionesService
   private notificacionesService = inject(NotificacionesService);
 
   constructor() {
+    // REGISTRO COMPLETO DE ICONOS
     addIcons({ 
       gameControllerOutline, listOutline, chatbubblesOutline, 
       restaurantOutline, cashOutline, clipboardOutline, 
-      timeOutline, checkmarkCircleOutline, warningOutline, bookOutline
+      timeOutline, checkmarkCircleOutline, warningOutline, bookOutline,
+      chevronForwardOutline, starOutline, receiptOutline, personCircleOutline, arrowBackOutline
     });
   }
 
@@ -71,10 +72,11 @@ export class MesaOpcionesComponent implements OnInit, OnDestroy {
         this.numeroMesa = Number(params['numeroMesa']);
         if (params['clienteNombre']) this.clienteNombre = params['clienteNombre'];
         
+        // Carga inicial rápida si vienen parámetros
         if (params['estado']) {
            this.actualizarUI({
              estado: params['estado'],
-             total: 0,
+             total: params['total'] || 0,
              tiempo_estimado: 0
            });
         }
@@ -94,7 +96,7 @@ export class MesaOpcionesComponent implements OnInit, OnDestroy {
     this.supabase.removeAllChannels();
   }
 
-async cargarDatosPedido() {
+  async cargarDatosPedido() {
     this.cargando = true;
     try {
       const { data, error } = await this.supabase
@@ -110,7 +112,7 @@ async cargarDatosPedido() {
         .single();
 
       if (data) {
-        const tiempos = data.detalles_pedido.map((d: any) => d.menu?.tiempo_elaboracion || 0);
+        const tiempos = data.detalles_pedido?.map((d: any) => d.menu?.tiempo_elaboracion || 0) || [];
         const maxTiempo = tiempos.length > 0 ? Math.max(...tiempos) : 0;
 
         this.actualizarUI({
@@ -119,7 +121,7 @@ async cargarDatosPedido() {
         });
       }
     } catch (error) {
-      console.error('Error cargando pedido', JSON.stringify(error));
+      console.error('Error cargando pedido', error);
     } finally {
       this.cargando = false;
     }
@@ -134,11 +136,9 @@ async cargarDatosPedido() {
         table: 'pedidos', 
         filter: `id=eq.${this.pedidoId}` 
       }, (payload) => {
-        console.log('Cambio en pedido:', payload.new);
         this.actualizarUI(payload.new);
         const nuevoEstado = payload.new['estado'] as string;
-        
-        this.toastService.mostrarToastInfo(`El estado de tu pedido cambió a: ${nuevoEstado.toUpperCase()}`);
+        this.toastService.mostrarToastInfo(`Estado actualizado: ${nuevoEstado.toUpperCase()}`);
       })
       .subscribe();
   }
@@ -150,8 +150,11 @@ async cargarDatosPedido() {
       tiempoEstimado: data.tiempo_estimado
     };
 
-    // Lógica de visualización según estado (Puntos 14-19)
+    // Lógica de visualización (Estado puro)
     switch (this.infoPedido.estado) {
+      case 'pendiente':
+        this.mostrarJuegos = false;
+        break;
       case 'confirmado':
       case 'preparacion':
         this.mostrarJuegos = true;
@@ -162,23 +165,23 @@ async cargarDatosPedido() {
         
       case 'listo':
         this.mostrarJuegos = true;
-        this.mostrarConfirmarEntrega = true; // Mozo trae comida
+        this.mostrarConfirmarEntrega = true; 
         break;
 
       case 'entregado':
         this.mostrarConfirmarEntrega = false;
-        this.mostrarJuegos = true; // Puede seguir jugando libremente
+        this.mostrarJuegos = true;
         this.mostrarEncuesta = true;
         this.mostrarCuenta = true;
         break;
 
       case 'pagado':
-        this.router.navigate(['/home-anonimo']); // O pantalla despedida
+        this.router.navigate(['/home-anonimo']);
         break;
     }
   }
 
-  // --- ACCIONES ---
+  // --- ACCIONES DE NAVEGACIÓN ---
 
   irAlChat() {
     this.router.navigate(['/consulta-mozo'], {
@@ -187,18 +190,15 @@ async cargarDatosPedido() {
   }
 
   irAJuegos() {
-    // Punto 15: Verificar si ya ganó descuento
     this.router.navigate(['/juegos-dashboard'], {
-      queryParams: { pedidoId: this.pedidoId, anonimo: false } // Anónimo NO gana descuento según PDF
+      queryParams: { pedidoId: this.pedidoId, anonimo: false }
     });
   }
 
   async irAEncuesta() {
-    // 2. Consultar BD si ya existe la encuesta
     const yaExiste = await this.encuestasService.verificarEncuestaExistente(this.pedidoId);
-
     if (yaExiste) {
-      this.toastService.mostrarToastInfo('Ya realizaste la encuesta, navegando a todas las encuestas');
+      this.toastService.mostrarToastInfo('Encuesta ya realizada. Podes ver todas las encuestas');
       this.router.navigate(['/encuesta-resultados']);
     } else {
       this.router.navigate(['/encuesta-alta'], {
@@ -208,14 +208,12 @@ async cargarDatosPedido() {
   }
 
   irAlMenu() {
-    // Asumo que tu ruta de menú es '/menu' o '/home' filtrado. 
-    // Ajusta la ruta según tu configuración de rutas.
-    this.router.navigate(['/menu-cliente'], { // O la ruta que uses para mostrar la carta
+    this.router.navigate(['/menu-cliente'], { 
        queryParams: { mesaId: this.mesaId, numeroMesa: this.numeroMesa, pedidoId: this.pedidoId }
     });
   }
 
- verDetallePedido() {
+  verDetallePedido() {
     this.router.navigate(['/estado-pedido'], {
       queryParams: { 
         pedidoId: this.pedidoId,
@@ -226,7 +224,6 @@ async cargarDatosPedido() {
   }
 
   confirmarRecepcion() {
-    // Punto 19: Cliente confirma recepción
     this.mostrarConfirmarEntrega = false;
     this.mostrarEncuesta = true;
     this.mostrarCuenta = true;
@@ -234,75 +231,34 @@ async cargarDatosPedido() {
   }
 
   async pedirCuenta() {
-    // -------------------------------------------------------------------------
-    // 3. Notificar al Mozo
-    // -------------------------------------------------------------------------
     try {
       const { data: mozos } = await this.supabase
         .from('usuarios')
         .select('id')
         .eq('perfil', 'mozo')
-        .eq('estado', 'habilitado');
+        .eq('estado', 'habilitado'); // Asumiendo que existe estado habilitado/trabajando
 
       if (mozos && mozos.length > 0) {
         const promesas = mozos.map(m => 
            this.notificacionesService.enviarNotificacion({
-              tipo: 'consulta_mozo' as any, // Reutilizamos el tipo consulta
-              titulo: 'Solicitud de Cuenta',
-              mensaje: `La Mesa ${this.numeroMesa} ha solicitado la cuenta.`,
-              destinatario_id: m.id,
-              destinatario_perfil: 'mozo',
-              datos: { 
-                 pedido_id: this.pedidoId,
-                 accion: 'cobrar'
-              }
+             tipo: 'consulta_mozo' as any,
+             titulo: 'Solicitud de Cuenta',
+             mensaje: `Mesa ${this.numeroMesa} pide la cuenta.`,
+             destinatario_id: m.id,
+             destinatario_perfil: 'mozo',
+             datos: { pedido_id: this.pedidoId, accion: 'cobrar' }
            })
         );
         await Promise.all(promesas);
-        
-        this.toastService.mostrarToastExito('Se ha notificado al mozo.');
+        this.toastService.mostrarToastExito('Mozo notificado.');
       }
     } catch (error) {
-      console.error('Error al notificar pedido de cuenta:', error);
-      // No bloqueamos la navegación si falla la notificación
+      console.error('Error notificando mozo:', error);
     }
-    // -------------------------------------------------------------------------
-
+    
+    // Navegar aunque falle la notificación
     this.router.navigate(['/pedir-cuenta'], {
       queryParams: { pedidoId: this.pedidoId, total: this.infoPedido?.total }
     });
-  }
-
-  // --- HELPERS VISUALES ---
-
-  get textoEstado(): string {
-    switch (this.infoPedido?.estado) {
-      case 'confirmado': return 'Pedido Confirmado';
-      case 'preparacion': return 'En Cocina';
-      case 'listo': return '¡Listo para servir!';
-      case 'entregado': return 'Disfrutando';
-      default: return 'Sin realizar';
-    }
-  }
-
-  get colorEstado(): string {
-    switch (this.infoPedido?.estado) {
-      case 'confirmado': return 'warning';
-      case 'preparacion': return 'secondary';
-      case 'listo': return 'success';
-      case 'entregado': return 'primary';
-      default: return 'medium';
-    }
-  }
-
-  get porcentajeProgreso(): number {
-    switch (this.infoPedido?.estado) {
-      case 'pendiente': return 0.1;
-      case 'confirmado': return 0.3;
-      case 'preparacion': return 0.6;
-      case 'listo': return 0.9;
-      case 'entregado': return 1;
-      default: return 0;
-    }
   }
 }

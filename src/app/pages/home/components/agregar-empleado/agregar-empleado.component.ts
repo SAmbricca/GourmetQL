@@ -1,18 +1,24 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { IonButton, IonContent, IonHeader, IonTitle, IonToolbar, IonAvatar, IonIcon, IonText, IonInput, IonSelect, IonSelectOption, IonButtons, IonBackButton } from '@ionic/angular/standalone';
+import { 
+  IonButton, IonContent, IonHeader, IonTitle, IonToolbar,  IonIcon, IonText, IonInput, IonSelect, 
+  IonSelectOption, IonButtons, IonBackButton, LoadingController, IonItem, IonLabel, IonNote 
+} from '@ionic/angular/standalone';
 import { Router } from '@angular/router';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+
 import { EscaneoQRService, ResultadoEscaneo } from '../../../../services/escaneo-qr';
 import { ToastService } from '../../../../services/toast';
 import { SupabaseService } from '../../../../services/supabase';
 import { UsuariosService } from 'src/app/services/usuarios';
 import { ImagenesService } from '../../../../services/imagenes';
-// 1. Importamos el servicio de notificaciones
 import { NotificacionesService } from '../../../../services/notificaciones';
+import { addIcons } from 'ionicons';
+import { camera, trash, save, scan, images } from 'ionicons/icons';
 
 interface FotoEmpleado {
-  url: string;
+  url: SafeUrl | string;
   blob?: Blob;
 }
 
@@ -22,16 +28,16 @@ interface FotoEmpleado {
   styleUrls: ['./agregar-empleado.component.scss'],
   standalone: true,
   imports: [
-    CommonModule, ReactiveFormsModule, IonButton, IonContent, IonHeader, IonTitle, IonToolbar, IonAvatar, IonIcon, IonText, IonInput, IonSelect, IonSelectOption, IonButtons, IonBackButton
+    CommonModule, ReactiveFormsModule, IonButton, IonContent, IonHeader, IonToolbar, IonIcon, IonText, IonInput, 
+    IonSelect, IonSelectOption, IonButtons, IonBackButton, IonItem, IonLabel, IonNote 
   ]
 })
 export class AgregarEmpleadoComponent implements OnInit {
   empleadoForm!: FormGroup;
   foto: FotoEmpleado | null = null;
   fotoError: string = '';
-  cargando: boolean = false;
   
-  perfilesDisponibles: string[] = ['cocinero', 'bartender', 'mozo', 'maitre'];
+  perfilesDisponibles: string[] = ['cocinero', 'bartender', 'mozo', 'maitre', 'cliente'];
 
   constructor(
     private fb: FormBuilder,
@@ -41,12 +47,27 @@ export class AgregarEmpleadoComponent implements OnInit {
     private supabaseService: SupabaseService,
     private usuariosService: UsuariosService,
     private imagenesService: ImagenesService,
-    // 2. Inyectamos el servicio en el constructor
-    private notificacionesService: NotificacionesService
-  ) {}
+    private notificacionesService: NotificacionesService,
+    private sanitizer: DomSanitizer,
+    private loadingController: LoadingController
+  ) {
+    addIcons({ camera, trash, save, scan, images });
+  }
 
   ngOnInit() {
     this.inicializarFormulario();
+  }
+
+  // --- LOADING PERSONALIZADO GOURMET ---
+  async mostrarLoading() {
+    const loading = await this.loadingController.create({
+      cssClass: 'custom-loading-gourmet', 
+      message: undefined, 
+      spinner: null, 
+      duration: 10000 
+    });
+    await loading.present();
+    return loading;
   }
 
   private inicializarFormulario(): void {
@@ -111,8 +132,8 @@ export class AgregarEmpleadoComponent implements OnInit {
   }
 
   async escanearDNI(): Promise<void> {
+    const loading = await this.mostrarLoading();
     try {
-      this.cargando = true;
       const resultado: ResultadoEscaneo = await this.escaneoQRService.escanearCodigoBarras();
       
       if (resultado.exito && resultado.datos) {
@@ -137,7 +158,7 @@ export class AgregarEmpleadoComponent implements OnInit {
       console.error('Error al escanear DNI:', error);
       this.toastService.mostrarToastError('Error al escanear el código QR del DNI');
     } finally {
-      this.cargando = false;
+      await loading.dismiss();
     }
   }
 
@@ -151,8 +172,10 @@ export class AgregarEmpleadoComponent implements OnInit {
         quality: 0.8
       });
 
+      const safeUrl = this.sanitizer.bypassSecurityTrustUrl(imageResult.url);
+
       this.foto = {
-        url: imageResult.url,
+        url: safeUrl,
         blob: imageResult.blob
       };
       
@@ -185,7 +208,7 @@ export class AgregarEmpleadoComponent implements OnInit {
       return;
     }
 
-    this.cargando = true;
+    const loading = await this.mostrarLoading();
 
     try {
       const formData = this.empleadoForm.value;
@@ -217,24 +240,17 @@ export class AgregarEmpleadoComponent implements OnInit {
       const resultado = await this.usuariosService.crearUsuario(nuevoEmpleado);
 
       if (resultado.success) {
-        // -----------------------------------------------------------------------
-        // 3. Lógica de Notificaciones a Dueños y Supervisores
-        // -----------------------------------------------------------------------
-        
-        // A. Buscamos a todos los usuarios con perfil 'dueño' o 'supervisor'
+        // Notificaciones
         const { data: administradores } = await this.supabaseService.supabase
           .from('usuarios')
           .select('id, perfil')
           .in('perfil', ['dueño', 'supervisor']);
 
-        // B. Enviamos notificación a cada uno
         if (administradores && administradores.length > 0) {
             for (const admin of administradores) {
                 await this.notificacionesService.enviarNotificacion({
-                    // Nota: Usamos 'as any' temporalmente porque 'nuevo_empleado' 
-                    // no está explícito en tu interfaz actual, pero la BD lo acepta.
-                    tipo: 'mesa_asignada' as any, // Reutilizo uno existente o idealmente agrega 'nuevo_empleado' a tu interface
-                    titulo: 'Nuevo Empleado Pendiente',
+                    tipo: 'nuevo_cliente' as any, // Ajustar tipo según corresponda
+                    titulo: 'Nuevo Cliente Pendiente',
                     mensaje: `${formData.nombre} ${formData.apellido} se ha registrado como ${formData.perfil}.`,
                     destinatario_id: admin.id,
                     destinatario_perfil: admin.perfil,
@@ -245,79 +261,47 @@ export class AgregarEmpleadoComponent implements OnInit {
                 });
             }
         }
-        // -----------------------------------------------------------------------
 
-        this.toastService.mostrarToastExito('Empleado agregado');
+        this.toastService.mostrarToastExito('Usuario agregado');
         this.empleadoForm.reset();
         this.foto = null;
+        await loading.dismiss();
         this.router.navigate(['/home']);
       } else {
         throw new Error(resultado.message);
       }
 
     } catch (error: any) {
+      await loading.dismiss();
       console.error('Error al agregar empleado:', error);
-      let mensajeError = 'Error al agregar el empleado';
-      
-      if (error.message) {
-        mensajeError = error.message;
-      }
-      
+      const mensajeError = error.message || 'Error al agregar el empleado';
       this.toastService.mostrarToastError(mensajeError);
-    } finally {
-      this.cargando = false;
     }
   }
 
+  // Helpers para errores en HTML (getters)
   get nombreError(): string {
     const control = this.empleadoForm.get('nombre');
-    if (!control?.touched) return '';
-    
-    if (control?.hasError('required')) return 'El nombre es obligatorio';
-    return '';
+    return control?.touched && control?.hasError('required') ? 'Requerido' : '';
   }
-
+  
   get apellidoError(): string {
     const control = this.empleadoForm.get('apellido');
-    if (!control?.touched) return '';
-    
-    if (control?.hasError('required')) return 'El apellido es obligatorio';
-    return '';
-  }
-
-  get emailError(): string {
-    const control = this.empleadoForm.get('email');
-    if (!control?.touched) return '';
-    
-    if (control?.hasError('required')) return 'El correo electrónico es obligatorio';
-    if (control?.hasError('email') || control?.hasError('pattern')) {
-      return 'Ingrese un correo electrónico válido';
-    }
-    return '';
+    return control?.touched && control?.hasError('required') ? 'Requerido' : '';
   }
 
   get dniError(): string {
     const control = this.empleadoForm.get('dni');
-    if (!control?.touched) return '';
-    
-    if (control?.hasError('required')) return 'El DNI es obligatorio';
-    if (control?.hasError('pattern')) return 'El DNI debe tener 8 dígitos numéricos';
-    if (control?.hasError('min') || control?.hasError('max')) {
-      return 'Ingrese un número de DNI válido';
-    }
-    return '';
+    return control?.touched && (control?.errors ? 'DNI inválido' : '') || '';
+  }
+
+  get emailError(): string {
+    const control = this.empleadoForm.get('email');
+    return control?.touched && (control?.errors ? 'Email inválido' : '') || '';
   }
 
   get cuilError(): string {
     const control = this.empleadoForm.get('cuil');
-    if (!control?.touched) return '';
-    
-    if (control?.hasError('required')) return 'El CUIL es obligatorio';
-    if (control?.hasError('pattern')) return 'El CUIL debe tener el formato XX-XXXXXXXX-X';
-    return '';
-  }
-
-  navegarAHome(): void {
-    this.router.navigate(['/home']);
+    return control?.touched && (control?.errors ? 'CUIL inválido' : '') || '';
   }
 }

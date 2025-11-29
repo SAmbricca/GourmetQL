@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Platform } from '@ionic/angular';
+import { SupabaseService } from './supabase';
 
 // Declaramos 'require' para que TypeScript permita la importación dinámica de librerías JS antiguas
 declare var require: any;
@@ -11,7 +12,10 @@ export class FacturaService {
   
   private pdfMake: any;
 
-  constructor(private platform: Platform) { }
+  constructor(
+    private platform: Platform,
+    private supabaseService: SupabaseService
+  ) { }
 
   // --- 1. INICIALIZACIÓN DE LA LIBRERÍA ---
   // Se carga bajo demanda para no bloquear el inicio de la app ni causar errores de "chunk load"
@@ -90,14 +94,48 @@ export class FacturaService {
     });
   }
 
+async subirFacturaStorage(blob: Blob, pedidoId: number): Promise<string | null> {
+    try {
+      const fileName = `factura_pedido_${pedidoId}_${Date.now()}.pdf`;
+      const filePath = `${fileName}`;
+
+      // 1. Subir el archivo al bucket 'facturas'
+      const { data, error } = await this.supabaseService.supabase
+        .storage
+        .from('facturas')
+        .upload(filePath, blob, {
+          contentType: 'application/pdf',
+          upsert: true
+        });
+
+      if (error) {
+        console.error('Error subiendo factura a Supabase:', error);
+        return null;
+      }
+
+      // 2. Obtener la URL pública
+      const { data: publicUrlData } = this.supabaseService.supabase
+        .storage
+        .from('facturas')
+        .getPublicUrl(filePath);
+
+      return publicUrlData.publicUrl;
+
+    } catch (error) {
+      console.error('Excepción subiendo factura:', error);
+      return null;
+    }
+  }
+
+  // Modificamos abrirFactura para que sea más robusto en Android
   async abrirFactura(pedido: any): Promise<void> {
     const pdfObj = await this.crearObjetoPDF(pedido);
 
-    if (this.platform.is('capacitor') || this.platform.is('android') || this.platform.is('ios')) {
-      // En móviles, descargamos el archivo. El usuario deberá abrirlo desde descargas/notificaciones.
-      pdfObj.download(`factura-mesa-${pedido.mesa.numero}.pdf`);
+    if (this.platform.is('capacitor') || this.platform.is('android')) {
+      // Opción A: Descarga directa (depende de permisos de Android)
+      pdfObj.download(`factura-${pedido.id}.pdf`);
     } else {
-      // En Web (Escritorio), es seguro abrir en nueva pestaña
+      // Web
       pdfObj.open();
     }
   }

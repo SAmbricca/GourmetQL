@@ -176,7 +176,7 @@ export class PedirCuentaComponent implements OnInit {
              this.notificacionesService.enviarNotificacion({
                 tipo: 'pedido_aceptado' as any, // O un tipo 'pago_realizado' si prefieres
                 titulo: '¡Pago Recibido!',
-                mensaje: `Se ha registrado un pago de $${this.totalPedido} (Propina: $${this.propina}).`,
+                mensaje: `Se registró un pago de $${this.totalPedido} (Propina: $${this.propina}).`,
                 destinatario_id: usuario.id,
                 destinatario_perfil: usuario.perfil, // Asignamos el perfil dinámicamente
                 datos: { 

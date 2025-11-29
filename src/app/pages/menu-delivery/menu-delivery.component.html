@@ -1,0 +1,97 @@
+<ion-header class="ion-no-border safe-area-header">
+  <ion-toolbar class="custom-toolbar">
+    
+    <ion-title class="ion-text-center menu-main-title">DELIVERY</ion-title>
+
+    <ion-buttons slot="start">
+      <ion-button (click)="volver()" color="light" class="big-back-btn">
+        <ion-icon slot="icon-only" name="arrow-back-circle"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="false" class="gourmet-content">
+  
+  @if (cargando) {
+      <div class="loading-container">
+          <ion-spinner name="crescent" color="warning"></ion-spinner>
+      </div>
+  } @else {
+    
+    <div class="product-full-view" *ngIf="productoActual" 
+         (touchstart)="onTouchStart($event)" 
+         (touchend)="onTouchEnd($event)">
+      
+      <div class="image-area">
+        
+        <div class="category-badge-container">
+          <ion-badge class="category-pill animate__animated animate__fadeInDown">
+            {{ productoActual.tipo | uppercase }}
+          </ion-badge>
+        </div>
+
+        <img [src]="obtenerImagenActual()" class="main-image" alt="Foto del producto">
+          
+        <div class="overlay-gradient"></div>
+
+        <div class="photo-indicators" *ngIf="productoActual.foto_url && productoActual.foto_url.length > 1">
+            <div *ngFor="let img of productoActual.foto_url; let i = index" 
+                 class="dot" 
+                 [class.active]="i === currentImageIndex">
+            </div>
+        </div>
+      </div>
+
+      <div class="product-info-card">
+        
+        <div class="title-row">
+           <h1 class="product-title">{{ productoActual.nombre }}</h1>
+           <span class="price-tag">${{ productoActual.precio | number:'1.0-0' }}</span>
+        </div>
+
+        <div class="meta-info">
+           <span *ngIf="productoActual.tiempo_elaboracion">
+             <ion-icon name="time-outline"></ion-icon> 
+             {{ productoActual.tiempo_elaboracion }} min
+           </span>
+        </div>
+
+        <p class="product-description">
+            {{ productoActual.descripcion }}
+        </p>
+
+        <div class="action-area">
+            <div class="quantity-control-large">
+                <ion-button fill="clear" (click)="quitarItem(productoActual)">
+                  <ion-icon name="remove-outline"></ion-icon>
+                </ion-button>
+                
+                <span class="qty-number">{{ getCantidadItem(productoActual) }}</span>
+                
+                <ion-button fill="clear" (click)="agregarItem(productoActual)">
+                  <ion-icon name="add-outline"></ion-icon>
+                </ion-button>
+            </div>
+        </div>
+        
+        <div class="footer-spacer"></div>
+      </div>
+
+    </div>
+  }
+
+  <div class="floating-summary animate__animated animate__slideInUp">
+      <div class="summary-content">
+        <div class="total-info">
+          <span class="label">TOTAL</span>
+          <span class="amount">${{ totalPedido | number:'1.0-0' }}</span>
+        </div>
+        <ion-button class="confirm-btn" (click)="confirmarPedido()" [disabled]="totalPedido === 0">
+          ENVIAR ({{ cantidadTotalItems }})
+        </ion-button>
+      </div>
+  </div>
+
+</ion-content>

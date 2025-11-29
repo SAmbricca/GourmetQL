@@ -1,118 +1,186 @@
-ion-content {
-  --background: linear-gradient(135deg, #f09850 0%, #cc480b 100%);
+// PALETA GOURMET
+$color-bg-gradient-start: #2c3e50;
+$color-bg-gradient-end: #000000;
+$color-gold: #d4af37;
+$color-gold-dim: #aa8c2c;
+$color-text-light: #f5f5dc;
+$color-text-dim: #bdbdbd;
+$color-red: #c0392b;
+$color-card-bg: rgba(30, 30, 30, 0.9);
+
+// HEADER TRANSPARENTE
+.header-transparente {
+  ion-toolbar {
+    --border-width: 0;
+  }
 }
 
-.empleado-container {
-  padding: 20px;
+.gourmet-content {
+  --background: radial-gradient(circle at top, #{$color-bg-gradient-start} 0%, #{$color-bg-gradient-end} 100%);
+}
 
-  form {
-    background: white;
-    border-radius: 20px;
-    padding: 25px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+
+// HEADER INTERNO (Dentro del contenido)
+.inner-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+  position: relative;
+
+  ion-buttons {
+    margin-right: 15px;
   }
+
+  .custom-back-btn {
+    --color: #{$color-gold};
+    --icon-font-size: 24px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+  }
+
+  .inner-title {
+    font-family: 'Playfair Display', serif;
+    color: $color-gold;
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    margin-left:30px;
+  }
+}
+
+// FOTO SECTION
+.foto-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 25px;
+
+  .avatar-wrapper {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    border: 3px solid $color-gold;
+    background: #000;
+    position: relative;
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+    overflow: visible;
+
+    .avatar-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .avatar-placeholder {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: $color-text-dim;
+      cursor: pointer;
+
+      ion-icon { font-size: 3rem; margin-bottom: 5px; color: $color-gold-dim; }
+      span { font-size: 0.8rem; text-transform: uppercase; }
+    }
+
+    .btn-delete-photo {
+      position: absolute;
+      bottom: -5px;
+      right: -5px;
+      --padding-start: 8px;
+      --padding-end: 8px;
+      height: 35px;
+      width: 35px;
+    }
+
+    &.has-error {
+      border-color: $color-red;
+      box-shadow: 0 0 15px rgba(192, 57, 43, 0.4);
+    }
+  }
+
+  .error-text-center {
+    margin-top: 8px;
+    font-weight: bold;
+  }
+}
+
+// CARDS & INPUTS
+.gourmet-card {
+  background: $color-card-bg;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
 
   .section-title {
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: #333;
-    margin: 20px 0 15px 0;
-    font-family: 'Times New Roman', Times, serif;
-
-    &:first-child {
-      margin-top: 0;
-    }
-  }
-
-  .foto-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 20px;
-
-    .avatar-grande {
-      width: 120px;
-      height: 120px;
-      cursor: pointer;
-      position: relative;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-
-      &.avatar-vacio {
-        border: 2px dashed #ccc;
-      }
-
-      .camera-overlay {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 2rem;
-        color: #999;
-      }
-    }
-
-    .btn-foto {
-      --border-radius: 10px;
-    }
-
-    .error-text {
-      font-size: 0.85rem;
-      margin: 0;
-      text-align: center;
-    }
-  }
-
-  .qr-button {
-    margin-bottom: 20px;
-    --border-radius: 10px;
-  }
-
-  .input-container {
+    color: $color-gold;
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    margin-top: 0;
     margin-bottom: 15px;
-
-    ion-input,
-    ion-select {
-      --border-radius: 10px;
-    }
-
-    .error-text {
-      font-size: 0.85rem;
-      margin: 5px 0 0 10px;
-    }
-  }
-
-  .button-container {
-    margin-top: 25px;
-
-    .register-button {
-      --border-radius: 10px;
-      margin-bottom: 10px;
-    }
-
-    .cancel-button {
-      --border-radius: 10px;
-    }
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+    padding-bottom: 5px;
   }
 }
 
-@media (max-width: 768px) {
-  .empleado-container {
-    padding: 15px;
+.gourmet-input {
+  --background: transparent;
+  --color: #{$color-text-light};
+  --border-color: #555;
+  --highlight-color-focused: #{$color-gold};
+  --placeholder-color: #777;
+  margin-bottom: 10px;
+  font-size: 1.6rem;
 
-    form {
-      padding: 20px;
-    }
+  ion-label {
+    color: $color-text-dim !important;
+  }
 
-    .section-title {
-      font-size: 1rem;
-    }
-
-    .foto-container {
-      .avatar-grande {
-        width: 100px;
-        height: 100px;
-      }
-    }
+  ion-note[slot="error"] {
+    color: $color-red;
+    font-size: 1rem;
   }
 }
+
+// BUTTONS
+.btn-scan {
+  --background: #34495e;
+  --color: #fff;
+  --border-radius: 8px;
+  --box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.btn-gourmet-primary {
+  --background: linear-gradient(90deg, #{$color-gold-dim} 0%, #{$color-gold} 100%);
+  --color: #000;
+  --border-radius: 8px;
+  --box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  height: 50px;
+  margin-top: 20px;
+  font-size: 1.6rem;
+
+  &[disabled] {
+    --background: #555;
+    --color: #888;
+    opacity: 0.6;
+  }
+}
+
+.mt-4 { margin-top: 1.5rem; }
+.mb-4 { margin-bottom: 1.5rem; }

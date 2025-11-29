@@ -5,6 +5,7 @@ import { environment } from '../../environments/environment';
 import { Preferences } from '@capacitor/preferences';
 import { CapacitorService } from './capacitor';
 import { NotificacionesService } from './notificaciones';
+import { Email } from './email';
 
 export interface Usuario {
   id: number;
@@ -59,6 +60,7 @@ export class SupabaseService {
     }
   }
 
+  // --- LOGIN ORIGINAL ---
   async iniciarSesion(email: string, contrasenia: string): Promise<{ success: boolean; message: string; usuario?: Usuario }> {
     try {
       const { data, error } = await this.supabase
@@ -73,7 +75,37 @@ export class SupabaseService {
       }
 
       const usuario = data[0];
+      return this.procesarUsuarioLogin(usuario);
+      
+    } catch (error) {
+      return { success: false, message: 'Error al conectar con el servidor' };
+    }
+  }
 
+  // --- NUEVO: LOGIN SIMULADO GOOGLE (Solo Email) ---
+  async iniciarSesionConGoogleSimulado(email: string): Promise<{ success: boolean; message: string; usuario?: Usuario }> {
+    try {
+      // Buscamos SOLO por email, ignorando la contraseña
+      const { data, error } = await this.supabase
+        .from('usuarios')
+        .select('*')
+        .eq('email', email)
+        .limit(1);
+
+      if (!data || !Array.isArray(data) || data.length === 0) {
+        return { success: false, message: 'Este correo de Google no está registrado en el sistema.' };
+      }
+
+      const usuario = data[0];
+      return this.procesarUsuarioLogin(usuario);
+
+    } catch (error) {
+      return { success: false, message: 'Error de conexión con Google (Simulado)' };
+    }
+  }
+
+  // Refactoricé esto para reutilizar lógica entre ambos logins
+  private async procesarUsuarioLogin(usuario: Usuario): Promise<{ success: boolean; message: string; usuario?: Usuario }> {
       if (usuario.estado === 'pendiente') {
         return { success: false, message: 'Su registro aún está pendiente de aprobación.' };
       }
@@ -90,10 +122,6 @@ export class SupabaseService {
 
       await this.notificacionesService.suscribirNotificaciones(usuario.id.toString());
       return { success: true, message: 'Inicio de sesión exitoso', usuario };
-      
-    } catch (error) {
-      return { success: false, message: 'Error al conectar con el servidor' };
-    }
   }
 
   async cerrarSesion(): Promise<void> {
@@ -196,5 +224,24 @@ export class SupabaseService {
     
     if (error) throw error;
     return data;
+  }
+
+  async iniciarSesionConGoogle(email: string): Promise<{ success: boolean; message: string; usuario?: Usuario }> {
+
+    try {
+      // 1. Buscar si el usuario ya existe en TU tabla personalizada
+      const { data, error } = await this.supabase
+        .from('usuarios')
+        .select('*')
+        .eq('email', email)
+        .limit(1);
+
+      if (error) throw error;
+      return { success: true, message: 'Ingreso exitoso con Google. Bienvenido/a SANTIAGO AMBRICCA CIMINIERI' };
+
+    } catch (error: any) {
+      console.error('Error Google Login Service:', error);
+      return { success: false, message: 'Error de conexión con Google Auth' };
+    }
   }
 }

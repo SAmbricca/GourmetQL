@@ -1,224 +1,258 @@
-.gestion-content {
-  --background: linear-gradient(135deg, #f09850 0%, #cc480b 100%);
-  display: flex;
-  flex-direction: column;
+// ------------------------------------------------------------------
+// PALETA DE COLORES GOURMET
+// ------------------------------------------------------------------
+$color-bg-dark: #121212;
+$color-card-bg: #1e1e1e;
+$color-gold: #d4af37;
+$color-gold-dim: #aa8c2c;
+$color-text-light: #f5f5dc; // Hueso/Beige
+$color-text-dim: #bdbdbd;
+
+// ------------------------------------------------------------------
+// CONFIGURACIÓN DE PANTALLA (FONDO)
+// ------------------------------------------------------------------
+ion-content.gestion-content {
+  // Fondo piedra pizarra oscura (Consistente con el resto de la app)
+  --background: #000000;
+  --background-image: 
+    radial-gradient(circle at center, rgba(44, 62, 80, 0.4) 0%, transparent 80%),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23222222' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  
+  --color: #{$color-text-light};
 }
 
-.volver-icon {
-  width: 36px;
-  height: 36px;
-  padding-top: 20px;
-}
-
+// ------------------------------------------------------------------
+// HEADER & TOOLBARS
+// ------------------------------------------------------------------
 ion-header {
-  ion-toolbar {
-    --background: #fff;
-    --border-style: none;
-  }
-}
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  margin-top: 20px;
 
-.consulta-title {
-  font-weight: 600;
-  color: #333;
-  padding-top: 16px;
+  ion-toolbar {
+    --background: rgba(30, 30, 30, 0.98); // Casi opaco para legibilidad
+    --border-style: none;
+    
+    ion-title.consulta-title {
+      font-family: 'Playfair Display', serif;
+      color: $color-gold;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-size: 1.1rem;
+      padding-top: 5px;
+    }
+  }
+
+  // Segunda barra (Información de mesa)
+  .info-toolbar {
+    --background: #151515; // Un poco más oscuro que el header principal
+    --min-height: 36px;
+    border-bottom: 1px solid rgba($color-gold, 0.3);
+
+    .mesa-info {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: $color-text-dim;
+      padding: 6px 0;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+
+      ion-icon {
+        font-size: 1rem;
+        color: $color-gold;
+      }
+    }
+  }
 }
 
 .volver-icon {
   width: 24px;
   height: 24px;
-  object-fit: contain;
-  padding-top: 16px;
+  filter: drop-shadow(0 0 2px rgba(212, 175, 55, 0.6));
 }
 
-.info-toolbar {
-  --background: #fff;
-  border-bottom: 1px solid rgba(0,0,0,0.1);
-  --min-height: 40px;
-
-  .mesa-info {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    font-size: 0.95rem;
-    color: #666;
-    padding: 8px 0;
-    font-weight: 500;
-
-    ion-icon {
-      font-size: 1.1rem;
-      color: #f09850;
-    }
-  }
-}
-
-.loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  
-  h3 {
-    color: #fff;
-    font-size: 1.2rem;
-    font-weight: 500;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-}
-
+// ------------------------------------------------------------------
+// CONTENEDOR DE CHAT
+// ------------------------------------------------------------------
 .chat-container {
   display: flex;
   flex-direction: column;
   padding: 15px;
-  padding-bottom: 80px; // Espacio para que el último mensaje no quede tapado por el footer
+  padding-bottom: 90px; // Espacio extra para el footer flotante
   gap: 12px;
   min-height: 100%;
 }
 
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 80vh; // Ajustado para centrar verticalmente
-  padding: 20px;
-  text-align: center;
-
-  ion-icon {
-    font-size: 80px;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 16px;
-  }
-
-  h3 {
-    color: #fff;
-    font-size: 1.5rem;
-    margin-bottom: 8px;
-    font-weight: 600;
-  }
-
-  p {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 1rem;
-    max-width: 80%;
-    margin: 0 auto;
-  }
-}
-
-/* Mensajes */
+// ------------------------------------------------------------------
+// MENSAJES (BURBUJAS)
+// ------------------------------------------------------------------
 .mensaje {
   display: flex;
-  margin-bottom: 4px;
-  animation: fadeIn 0.3s ease-in;
+  margin-bottom: 8px;
+  animation: slideInUp 0.3s ease-out;
   width: 100%;
 
-  /* CLIENTE (Yo) -> Derecha / Azul */
+  // Estilos comunes del contenido
+  .mensaje-contenido {
+    max-width: 82%;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+  }
+
+  .mensaje-autor {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+  }
+
+  .mensaje-texto {
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+
+  .mensaje-hora {
+    font-size: 0.65rem;
+    text-align: right;
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  // --- CLIENTE (YO) -> Lado Derecho / DORADO ---
   &.mensaje-cliente {
     justify-content: flex-end;
 
     .mensaje-contenido {
-      background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
-      color: white;
-      border-radius: 18px 18px 4px 18px;
-      box-shadow: 0 2px 8px rgba(53, 122, 189, 0.3);
-      
-      .mensaje-autor { color: rgba(255, 255, 255, 0.9); }
-      .mensaje-hora { color: rgba(255, 255, 255, 0.8); }
+      // Fondo Dorado Degradado (Premium)
+      background: linear-gradient(135deg, #aa8c2c 0%, #d4af37 100%);
+      color: #1a1a1a; // Texto oscuro para contraste sobre dorado
+      border-radius: 12px 12px 0 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+
+      .mensaje-autor { color: rgba(0,0,0,0.7); }
+      .mensaje-hora { color: rgba(0,0,0,0.6); }
     }
   }
 
-  /* MOZO (Otro) -> Izquierda / Blanco */
+  // --- MOZO (ELLOS) -> Lado Izquierdo / OSCURO ---
   &.mensaje-mozo {
     justify-content: flex-start;
 
     .mensaje-contenido {
-      background: white;
-      color: #333;
-      border-radius: 18px 18px 18px 4px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      background: #252525; // Gris carbón mate
+      color: $color-text-light;
+      border-radius: 12px 12px 12px 0;
+      border: 1px solid #444;
 
-      .mensaje-autor { color: #f09850; font-weight: bold; }
-      .mensaje-hora { color: #999; }
+      .mensaje-autor { color: $color-gold; } // "Mozo" en dorado
+      .mensaje-hora { color: rgba(255,255,255,0.4); }
     }
   }
 }
 
-.mensaje-contenido {
-  max-width: 80%;
-  padding: 10px 14px;
+// ------------------------------------------------------------------
+// ESTADOS VACÍO Y CARGANDO
+// ------------------------------------------------------------------
+.loading-container, .empty-state {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  position: relative;
-}
-
-.mensaje-header {
-  display: flex;
+  justify-content: center;
   align-items: center;
-  margin-bottom: 2px;
+  height: 70vh;
+  text-align: center;
+
+  h3 {
+    color: $color-gold;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+  }
+
+  p {
+    color: $color-text-dim;
+    max-width: 80%;
+  }
+
+  ion-icon {
+    font-size: 5rem;
+    color: rgba($color-gold, 0.2);
+    margin-bottom: 20px;
+  }
 }
 
-.mensaje-autor {
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.mensaje-texto {
-  font-size: 0.95rem;
-  line-height: 1.4;
-  word-wrap: break-word;
-  white-space: pre-wrap;
-}
-
-.mensaje-hora {
-  font-size: 0.65rem;
-  text-align: right;
-  margin-top: 2px;
-  align-self: flex-end;
-}
-
-/* Footer Input */
+// ------------------------------------------------------------------
+// FOOTER (INPUT AREA)
+// ------------------------------------------------------------------
 ion-footer {
-  background: white;
-  box-shadow: 0 -2px 15px rgba(0, 0, 0, 0.05);
-  padding-bottom: var(--ion-safe-area-bottom, 0);
+  background: transparent;
+  padding: 0;
+  // Quitamos sombra por defecto de ionic, la manejamos en el container
+  box-shadow: none; 
 }
 
 .input-container {
+  background: #1a1a1a; // Fondo sólido oscuro
+  border-top: 1px solid rgba($color-gold, 0.3);
   display: flex;
   align-items: center;
-  padding: 10px;
+  padding: 10px 15px calc(10px + var(--ion-safe-area-bottom)); // Safe area
   gap: 10px;
-  background: #fff;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.6); // Sombra hacia arriba
 
+  // Campo de texto
   .mensaje-input {
     flex: 1;
-    --background: #f5f5f5;
+    --background: #000000;
+    --color: #fff;
+    --placeholder-color: #666;
     --padding-start: 16px;
     --padding-end: 16px;
-    --placeholder-color: #999;
+    border: 1px solid #333;
     border-radius: 24px;
-    font-size: 1rem;
-    min-height: 44px;
+    min-height: 48px;
+    font-size: 0.95rem;
+    transition: border-color 0.3s;
+
+    &.has-focus {
+      border-color: $color-gold;
+    }
   }
 
+  // Botón Enviar
   .enviar-button {
-    --border-radius: 50%;
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
     margin: 0;
+    --border-radius: 50%;
     --padding-start: 0;
     --padding-end: 0;
     
+    // Gradiente Dorado
+    --background: linear-gradient(45deg, #{$color-gold-dim}, #{$color-gold});
+    --background-activated: #{$color-gold-dim};
+    --color: #000; // Icono negro
+    --box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+
     ion-icon {
-      font-size: 1.2rem;
+      font-size: 1.4rem;
+    }
+
+    &[disabled] {
+      opacity: 0.5;
+      --background: #444;
     }
   }
 }
 
-@keyframes fadeIn {
+@keyframes slideInUp {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }

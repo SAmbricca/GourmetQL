@@ -67,6 +67,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/menu-cliente/menu-cliente.component').then(m => m.MenuClienteComponent)
   },
   {
+    path: 'menu-delivery',
+    loadComponent: () => import('./pages/menu-delivery/menu-delivery.component').then(m => m.MenuDeliveryComponent)
+  },
+  {
     path: 'mesa-opciones',
     loadComponent: () => import('./pages/mesa-opciones/mesa-opciones.component').then(m => m.MesaOpcionesComponent)
   },
@@ -93,5 +97,17 @@ export const routes: Routes = [
   {
     path: 'pedir-cuenta',
     loadComponent: () => import('./pages/pedir-cuenta/pedir-cuenta.component').then(m => m.PedirCuentaComponent)
+  },
+  {
+    path: 'reservas',
+    loadComponent: () => import('./pages/reservas/reservas.component').then(m => m.ReservasComponent)
+  },
+  {
+    path: 'delivery',
+    loadComponent: () => import('./pages/delivery/delivery.component').then(m => m.DeliveryComponent)
+  },
+  {
+    path: 'lista-reservas',
+    loadComponent: () => import('./pages/lista-reservas/lista-reservas.component').then(m => m.ListaReservasComponent)
   },
 ];

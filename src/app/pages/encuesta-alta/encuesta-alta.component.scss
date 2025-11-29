@@ -1,108 +1,215 @@
+// ------------------------------------------------------------------
+// VARIABLES & PALETA GOURMET
+// ------------------------------------------------------------------
+$color-bg-gradient: radial-gradient(circle at center, #2c3e50 0%, #000000 100%);
+$color-card-bg: #1e1e1e;
+$color-card-border: rgba(212, 175, 55, 0.3); // Dorado tenue
+$color-gold: #d4af37;
+$color-gold-dim: #8a7122;
+$color-text-light: #f5f5dc; // Beige Hueso
+$color-text-dim: #999;
+$font-serif: 'Playfair Display', serif;
+
+// ------------------------------------------------------------------
+// LAYOUT GENERAL
+// ------------------------------------------------------------------
 ion-content {
-  --background: linear-gradient(135deg, #f09850 0%, #cc480b 100%);
+  --background: #{$color-bg-gradient};
+  --color: #{$color-text-light};
 }
 
+// Contenedor principal para evitar espacios vacíos
+.encuesta-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 10px 20px 40px 20px;
+  background: rgba(0, 0, 0, 0.3); // Capa extra para oscurecer y dar profundidad
+}
+
+// ------------------------------------------------------------------
+// HEADER & TEXTOS INTRODUCTORIOS
+// ------------------------------------------------------------------
 ion-toolbar {
   --background: transparent;
-  --color: white;
-}
+  --border-width: 0;
+  
+  ion-title {
+    font-family: $font-serif;
+    color: $color-gold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 1.2rem;
+  }
 
-.encuesta-container {
-  padding: 10px 20px 40px 20px;
+  ion-button {
+    color: $color-gold;
+  }
 }
 
 .header-text {
-  color: white;
   text-align: center;
-  margin-bottom: 25px;
-  
+  margin-bottom: 30px;
+  padding-top: 10px;
+  animation: fadeIn 1s ease-out;
+
   h2 {
-    font-weight: 800;
-    margin-bottom: 5px;
+    font-family: $font-serif;
+    font-weight: 700;
+    color: $color-text-light;
+    margin-bottom: 8px;
+    font-size: 1.8rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
   }
+
   p {
     margin: 0;
+    color: $color-gold; // Dorado para resaltar la invitación a la acción
+    font-size: 1rem;
+    font-style: italic;
     opacity: 0.9;
-    font-size: 0.95rem;
   }
 }
 
+// ------------------------------------------------------------------
+// TARJETAS DE CALIFICACIÓN
+// ------------------------------------------------------------------
 .rating-card {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 20px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-  margin-bottom: 15px;
+  --background: #{$color-card-bg};
+  background: $color-card-bg;
+  border: 1px solid $color-card-border;
+  border-radius: 16px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.5); // Sombra profunda elegante
+  margin-bottom: 20px;
+
+  ion-card-content {
+    padding: 16px;
+  }
 
   .rating-label {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 8px;
     
     h3 {
       margin: 0;
-      font-weight: 700;
-      color: #444;
-      font-size: 1.1rem;
+      font-family: $font-serif;
+      font-weight: 600;
+      color: $color-text-light;
+      font-size: 1.2rem;
+      letter-spacing: 0.5px;
     }
+
     .score {
-      background: #f09850;
-      color: white;
-      padding: 2px 8px;
-      border-radius: 10px;
-      font-weight: bold;
+      background: $color-gold;
+      color: #000; // Contraste Negro sobre Oro
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-weight: 800;
       font-size: 0.9rem;
+      box-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
     }
   }
 
+  // ESTRELLAS INTERACTIVAS
   .stars-container {
     display: flex;
     justify-content: center;
-    gap: 10px;
-    margin-bottom: 5px;
+    gap: 12px; // Más separación para facilitar el toque
+    margin-bottom: 10px;
+    padding: 10px 0;
 
     ion-icon {
-      font-size: 2rem;
-      color: #ddd;
-      transition: transform 0.2s, color 0.2s;
+      font-size: 2.2rem;
+      color: #444; // Color apagado (inactivo)
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); // Rebote suave
 
       &.active {
-        color: #ffc409;
-        transform: scale(1.1);
+        color: $color-gold;
+        filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.6));
+        transform: scale(1.15);
       }
     }
   }
 
+  // SLIDER (RANGE) ESTILIZADO
   ion-range {
-    --bar-background: #eee;
-    --bar-background-active: #f09850;
-    --knob-background: #cc480b;
-    padding-top: 0;
+    --bar-background: #333;
+    --bar-background-active: #{$color-gold};
+    --bar-height: 4px;
+    --knob-background: #{$color-text-light};
+    --knob-size: 16px;
+    --knob-box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+    padding-top: 5px;
   }
 }
 
+// ------------------------------------------------------------------
+// INPUT COMENTARIOS
+// ------------------------------------------------------------------
 .input-card {
-  background: white;
-  border-radius: 20px;
-  margin-bottom: 25px;
+  --background: #{$color-card-bg};
+  background: $color-card-bg;
+  border: 1px solid $color-card-border;
+  border-radius: 16px;
+  margin-bottom: 30px;
 
   ion-label {
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
+    font-family: $font-serif;
     font-weight: 600;
-    color: #555;
+    color: $color-gold;
+    font-size: 1.1rem;
   }
 
   ion-textarea {
-    --background: #f9f9f9;
-    --padding-start: 10px;
-    border-radius: 10px;
-    border: 1px solid #eee;
+    --background: rgba(0, 0, 0, 0.3); // Fondo input más oscuro
+    --color: #{$color-text-light};
+    --placeholder-color: #666;
+    --padding-start: 15px;
+    --padding-end: 15px;
+    --padding-top: 15px;
+    --padding-bottom: 15px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    min-height: 120px;
+    
+    &.has-focus {
+      border-color: $color-gold;
+    }
   }
 }
 
+// ------------------------------------------------------------------
+// BOTÓN DE ACCIÓN
+// ------------------------------------------------------------------
+.submit-section {
+  margin-top: auto; // Empuja el botón al final si hay espacio
+  padding-bottom: 20px;
+}
+
 .btn-enviar {
-  --color: #cc480b;
-  font-weight: bold;
-  --box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  --background: linear-gradient(90deg, #{$color-gold-dim} 0%, #{$color-gold} 100%);
+  --background-activated: #{$color-gold-dim};
+  --color: #000; // Texto negro para máximo contraste
+  --border-radius: 8px;
+  --box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  height: 55px;
+
+  ion-icon {
+    font-size: 1.4rem;
+    margin-right: 10px;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

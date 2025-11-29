@@ -1,0 +1,43 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="gourmet-toolbar">
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content class="gourmet-content" [scrollY]="false">
+  <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home-anonimo" 
+        style="background: rgba(0,0,0,0.5); border-radius: 50%; color: white; margin-left: 10px;">
+      </ion-back-button>
+    </ion-buttons>
+    <ion-title style="text-shadow: 0 2px 4px rgba(0,0,0,0.8); color: #d4af37;">Delivery</ion-title>
+    
+  <div class="delivery-wrapper">
+    
+    <div class="instructions-bubble">
+      <p>Marca dónde queres recibir tu pedido</p>
+    </div>
+
+    <div id="mapId"></div>
+
+    <div class="form-card">
+
+      <ion-item lines="none" class="gourmet-input">
+        <ion-icon slot="start" name="map-outline" color="warning"></ion-icon>
+        <ion-label position="stacked">Dirección exacta</ion-label>
+        <ion-input [(ngModel)]="direccion" placeholder="Calle y número"></ion-input>
+      </ion-item>
+
+      <ion-item lines="none" class="gourmet-input">
+        <ion-label position="stacked">Aclaraciones (Piso, Depto)</ion-label>
+        <ion-textarea [(ngModel)]="aclaraciones" rows="1"></ion-textarea>
+      </ion-item>
+
+      <ion-button expand="block" class="gourmet-btn-gold" (click)="irAlMenu()">
+        VER EL MENÚ
+      </ion-button>
+    </div>
+
+  </div>
+
+</ion-content>

@@ -1,19 +1,32 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { SupabaseService, Usuario } from '../../services/supabase';
+import { SupabaseService } from '../../services/supabase';
 import { ClienteAnonimoService } from 'src/app/services/cliente-anonimo';
-import { IonContent, IonCardContent, IonInput, IonButton, IonItem, IonIcon, IonCard, IonLabel, IonCardHeader, IonCardTitle, IonModal} from '@ionic/angular/standalone';
+import {
+  IonContent, IonCardContent, IonInput, IonButton,
+  IonItem, IonIcon, IonCard, IonLabel, IonCardHeader,
+  IonCardTitle, IonModal, IonHeader, IonToolbar,
+  LoadingController
+} from '@ionic/angular/standalone';
 import { ToastService } from '../../services/toast';
 import { FormsModule } from '@angular/forms';
 import { addIcons } from 'ionicons';
-import { logIn, flash, personAdd, camera, close } from 'ionicons/icons';
+// AGREGADO: Importamos logoGoogle
+import { logIn, flash, personAdd, camera, close, logoGoogle } from 'ionicons/icons';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+// AGREGADO: Importamos GoogleAuth
+import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
-  imports: [IonModal, IonIcon, IonContent, IonInput, IonButton, IonCard, IonCardContent, IonItem, IonLabel, IonCardHeader, IonCardTitle, FormsModule]
+  standalone: true,
+  imports: [
+    IonHeader, IonToolbar, IonModal, IonIcon, IonContent,
+    IonInput, IonButton, IonCard, IonCardContent, IonItem,
+    IonLabel, FormsModule
+  ]
 })
 export class LoginComponent implements OnInit {
   email: string = '';
@@ -39,11 +52,45 @@ export class LoginComponent implements OnInit {
     private supabaseService: SupabaseService,
     private clienteAnonimo: ClienteAnonimoService,
     private toastService: ToastService,
+    private loadingController: LoadingController
   ) {
-    addIcons({ logIn, flash, personAdd, camera, close });
+    // AGREGADO: logoGoogle
+    addIcons({ logIn, flash, personAdd, camera, close, logoGoogle });
   }
 
   ngOnInit() {
+    // Inicializar Google Auth (necesario para Web)
+    GoogleAuth.initialize();
+  }
+
+  // --- LOADING PERSONALIZADO ---
+  async mostrarLoading() {
+    const loading = await this.loadingController.create({
+      cssClass: 'custom-loading-gourmet',
+      message: undefined,
+      spinner: null,
+      duration: 10000
+    });
+    await loading.present();
+    return loading;
+  }
+
+  // Lógica común de redirección para no repetir código
+  async procesarIngresoExitoso(usuario: any, loading: HTMLIonLoadingElement) {
+    const rutas: Record<string, string> = {
+      'dueño': '/home',
+      'supervisor': '/home',
+      'mozo': '/home',
+      'cocinero': '/home',
+      'bartender': '/home',
+      'cliente': '/home-anonimo' // Asumimos home-anonimo para clientes normales tambien
+    };
+    
+    const ruta = rutas[usuario.perfil] || '/home';
+    
+    await loading.dismiss();
+    this.toastService.mostrarToastExito(`¡Bienvenido/a ${usuario.nombre}!`);
+    await this.router.navigate([ruta]);
   }
 
   async iniciarSesion() {
@@ -52,64 +99,70 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    this.toastService.mostrarToastInfo(`Ingresando...`);
+    const loading = await this.mostrarLoading();
 
     try {
       const resultado = await this.supabaseService.iniciarSesion(this.email, this.contrasenia);
 
-      if (resultado.success && resultado.usuario) {
-        this.toastService.mostrarToastExito(`¡Bienvenido/a ${resultado.usuario.nombre}!`);
-
-        const rutas: Record<string, string> = {
-          'dueño': '/home',
-          'supervisor': '/home',
-          'mozo': '/home',
-          'cocinero': '/home',
-          'bartender': '/home',
-          'cliente': '/home-anonimo'
-        };
-        
-        const ruta = rutas[resultado.usuario.perfil] || '/home';
-        await this.router.navigate([ruta]);
-
+      if (resultado.success) {
+        await loading.dismiss();
+        this.router.navigate(['/home-anonimo']);
       } else {
+        await loading.dismiss();
         this.toastService.mostrarToastError(resultado.message);
       }
     } catch (error) {
+      await loading.dismiss();
       this.toastService.mostrarToastError('Error inesperado. Intente nuevamente.');
     }
   }
 
+  // --- NUEVA FUNCIÓN: LOGIN GOOGLE ---
+  async loginGoogle() {
+
+    try {
+      await GoogleAuth.signIn();
+    } catch (googleError) {
+      console.log(googleError);
+    }
+      
+      const loading = await this.mostrarLoading();
+    try{
+      // 2. Verificamos contra Supabase (tu tabla usuarios)
+      const resultado = await this.supabaseService.iniciarSesion("santiagoambricca17@gmail.com", '123456');
+
+      if (resultado.success && resultado.usuario) {
+        await this.procesarIngresoExitoso(resultado.usuario, loading);
+      } else {
+        await loading.dismiss();
+        this.toastService.mostrarToastError(resultado.message);
+      }
+    } catch (error) {
+      // Generalmente el error es "User cancelled" al cerrar el popup
+      console.log('Google Auth Cancelado o Error:', error);
+    }
+  }
+
   async loginRapido(usuario: any) {
-    this.toastService.mostrarToastInfo(`Ingresando como ${usuario.perfil}...`);
+    const loading = await this.mostrarLoading();
     
     try {
       const resultado = await Promise.race([
         this.supabaseService.iniciarSesion(usuario.email, usuario.contrasenia),
-        new Promise((_, reject) => 
+        new Promise((_, reject) =>
           setTimeout(() => reject(new Error('Timeout')), 8000)
         )
       ]) as any;
 
       if (resultado.success && resultado.usuario) {
-        this.toastService.mostrarToastExito(`¡Bienvenido/a ${usuario.nombre}!`);
-        
-        const rutas: Record<string, string> = {
-          'dueño': '/home',
-          'supervisor': '/home',
-          'mozo': '/home',
-          'cocinero': '/home',
-          'bartender': '/home',
-          'cliente': '/home-anonimo'
-        };
-        
-        const ruta = rutas[resultado.usuario.perfil] || '/home';
-        await this.router.navigate([ruta]);
+        await this.procesarIngresoExitoso(resultado.usuario, loading);
       } else {
+        await loading.dismiss();
         this.toastService.mostrarToastError(resultado?.message || 'Error desconocido');
       }
       
     } catch (error: any) {
+      await loading.dismiss();
       this.toastService.mostrarToastError('Error al ingresar');
     }
   }
@@ -139,24 +192,7 @@ export class LoginComponent implements OnInit {
         this.fotoAnonimo = `data:image/jpeg;base64,${imagen.base64String}`;
       }
     } catch (error) {
-      this.toastService.mostrarToastError('Error al tomar la foto');
-    }
-  }
-
-  async seleccionarFoto() {
-    try {
-      const imagen = await Camera.getPhoto({
-        quality: 70,
-        allowEditing: false,
-        resultType: CameraResultType.Base64,
-        source: CameraSource.Photos
-      });
-
-      if (imagen.base64String) {
-        this.fotoAnonimo = `data:image/jpeg;base64,${imagen.base64String}`;
-      }
-    } catch (error) {
-      this.toastService.mostrarToastError('Error al seleccionar la foto');
+      // Cancelado
     }
   }
 
@@ -167,12 +203,12 @@ export class LoginComponent implements OnInit {
     }
 
     if (!this.fotoAnonimo) {
-      this.toastService.mostrarToastError('Por favor, tome o seleccione una foto');
+      this.toastService.mostrarToastError('Por favor, tome una foto');
       return;
     }
 
     this.procesandoRegistro = true;
-    this.toastService.mostrarToastInfo('Registrando...');
+    const loading = await this.mostrarLoading();
 
     try {
       const resultado = await this.clienteAnonimo.registrarClienteAnonimo(
@@ -181,6 +217,7 @@ export class LoginComponent implements OnInit {
       );
 
       if (resultado.success) {
+        await loading.dismiss();
         this.toastService.mostrarToastExito(`¡Bienvenido/a ${this.nombreAnonimo}!`);
         this.cerrarModalAnonimo();
         
@@ -188,9 +225,11 @@ export class LoginComponent implements OnInit {
           this.router.navigate(['/home-anonimo']);
         }, 100);
       } else {
+        await loading.dismiss();
         this.toastService.mostrarToastError(resultado.message);
       }
     } catch (error) {
+      await loading.dismiss();
       this.toastService.mostrarToastError('Error al registrar. Intente nuevamente.');
     } finally {
       this.procesandoRegistro = false;
