@@ -4,7 +4,7 @@ import emailjs from '@emailjs/browser';
   providedIn: 'root'
 })
 export class Email {
-  private servicioId = 'service_gourmet'; //ID de tu servicio
+  private servicioId = 'service_gourmetql'; //ID de tu servicio
   private llavePublica = 'WpFJizV6vcIfkX2Uw'; //public key de emailjs
 
   //Metodo async encargado de enviar le correo de aprobación
@@ -27,7 +27,7 @@ export class Email {
           nombre: usuario.nombre,
           apellido: usuario.apellido,
           email: usuario.email,
-          logo: 'https://i.postimg.cc/FzM41B6Z/logo.png' // Logo de la empresa (utilice POSTIMAGE: ahi cargas la foto del logo y tomas el link del enlace directo)
+          logo: 'https://i.postimg.cc/pXF9Zbp7/logo.png' // Logo de la empresa (utilice POSTIMAGE: ahi cargas la foto del logo y tomas el link del enlace directo)
         },
         this.llavePublica
       );
