@@ -1,0 +1,79 @@
+<h1 class="titulo"> Selecciona un Juego</h1>
+
+<div class="cards-container">
+
+  <!-- CARD JUEGO 1 -->
+  <div class="card" (click)="goToGame('juego1-memoria')"
+    [class.disabled]="yaTieneDescuento">
+    <div class="card-img memoria"></div>
+    <h3>Juego de Memoria</h3>
+    <p>Encuentra las parejas</p>
+  </div>
+
+  <!-- CARD JUEGO 2 -->
+  <div class="card" (click)="goToGame('juego2-quiz')"
+    [class.disabled]="yaTieneDescuento">
+    <div class="card-img quiz"></div>
+    <h3>Preguntas y Respuestas</h3>
+    <p>Responde correctamente</p>
+  </div>
+
+  <!-- CARD JUEGO 3 -->
+  <div class="card"(click)="goToGame('juego3-math')"
+    [class.disabled]="yaTieneDescuento">
+    <div class="card-img math"></div>
+    <h3>Desafío Matemático</h3>
+    <p>¿Cuánto es la respuesta?</p>
+  </div>
+
+  <!-- CARD JUEGO 4 -->
+  <div class="card"  (click)="goToGame('juego4-reflejos')"
+    [class.disabled]="yaTieneDescuento">
+    <div class="card-img reflejos"></div>
+    <h3>Test de Reflejos</h3>
+    <p>Reacciona a tiempo</p>
+  </div>
+
+</div>
+
+<!-- Aquí cargan los hijos -->
+<div class="game-container">
+@switch (juegoSeleccionado) {
+
+
+  @case ('memoria') {
+    <app-juego1-memoria
+      [pedidoId]="pedidoId"
+      [clienteId]="clienteId"
+      (juegoTerminado)="guardarResultado($event)">
+    </app-juego1-memoria>
+  }
+  @case ('quiz') {
+    <app-juego2-quiz
+      [pedidoId]="pedidoId"
+      [clienteId]="clienteId"
+      (juegoTerminado)="guardarResultado($event)">
+    </app-juego2-quiz>
+  }
+
+    @case ('mozo') {
+    <app-juego4-reflejos 
+      [pedidoId]="pedidoId"
+      [clienteId]="clienteId"
+      (juegoTerminado)="guardarResultado($event)">
+    </app-juego4-reflejos>
+  }
+
+    @case ('math') {
+    <app-juego3-math 
+      [pedidoId]="pedidoId"
+      [clienteId]="clienteId"
+      (juegoTerminado)="guardarResultado($event)">
+    </app-juego3-math>
+  }
+
+}
+</div>
+
+<!-- Aquí cargan los hijos -->
+

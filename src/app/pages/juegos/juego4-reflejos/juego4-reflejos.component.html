@@ -1,0 +1,44 @@
+<div class="game-container">
+
+  <!-- Mensaje de pérdida -->
+  @if (gameOver || gameError) {
+    <div class="message game-over">
+      @if (gameOver) {
+        <h2>¡Perdiste!</h2>
+      }
+      @if (gameError) {
+        <h2>¡Chocaste con un objeto!</h2>
+      }
+      <button (click)="restartGame()">Reintentar</button>
+    </div>
+  }
+
+  <!-- Mensaje de victoria -->
+  @if (gameWin) {
+    <div class="message game-win">
+      <h2>¡Llegaste a la mesa!</h2>
+      <button (click)="restartGame()">Jugar de nuevo</button>
+    </div>
+  }
+
+  <!-- Escenario del juego -->
+  @if (!gameOver && !gameWin && !gameError) {
+    <div class="play-area" [style.width.px]="width" [style.height.px]="height">
+
+      <!-- Mozo -->
+      <div class="mozo" [style.left.px]="mozoX" [style.top.px]="mozoY"></div>
+
+      <!-- Mesa -->
+      <div class="mesa" [style.left.px]="mesaX" [style.top.px]="mesaY"></div>
+
+      <!-- Objetos -->
+      @for (obj of objects; track i ; let i = $index) {
+        <div class="object" [style.left.px]="obj.x" [style.top.px]="obj.y">
+          <img [src]="obj.image" alt="{{ obj.name }}" />
+        </div>
+      }
+
+    </div>
+  }
+
+</div>

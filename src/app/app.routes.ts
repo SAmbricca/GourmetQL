@@ -110,4 +110,25 @@ export const routes: Routes = [
     path: 'lista-reservas',
     loadComponent: () => import('./pages/lista-reservas/lista-reservas.component').then(m => m.ListaReservasComponent)
   },
+  {
+    path: 'juegos',
+    loadComponent: () => import('./pages/juegos/juegos.page').then( m => m.JuegosPage)
+  },
+  { 
+    path: 'juego1-memoria',
+    loadComponent: () => import('./pages/juegos/juego1-memoria/juego1-memoria.component').then((m)=> m.Juego1MemoriaComponent),
+  },
+  { 
+    path: 'juego2-quiz',
+    loadComponent: () => import('./pages/juegos/juego2-quiz/juego2-quiz.component').then((m)=> m.Juego2QuizComponent),
+  },
+  { 
+    path: 'juego3-math',
+    loadComponent: () => import('./pages/juegos/juego3-math/juego3-math.component').then((m)=> m.Juego3MathComponent),
+  },
+  { 
+    path: 'juego4-reflejos',
+    loadComponent: () => import('./pages/juegos/juego4-reflejos/juego4-reflejos.component').then((m)=> m.Juego4ReflejosComponent),
+  },
+
 ];

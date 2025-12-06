@@ -1,0 +1,104 @@
+/* Título general */
+.titulo {
+  text-align: center;
+  font-size: 38px;
+  margin-top: 20px;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0px 0px 20px #3f8cff;
+}
+
+/* Contenedor de cards */
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  max-height: 80vh; /* Limita altura para scroll si hay muchos juegos */
+  overflow-y: auto; /* Scroll vertical bonito */
+  padding: 10px 20px;
+}
+
+/* Scroll personalizado */
+.cards-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.cards-container::-webkit-scrollbar-track {
+  background: #161a25;
+  border-radius: 10px;
+}
+
+.cards-container::-webkit-scrollbar-thumb {
+  background-color: #3f8cffaa;
+  border-radius: 10px;
+  border: 2px solid #161a25;
+}
+
+/* Card estilo videojuego */
+.card {
+  width: 100%;
+  height: 300px;
+  background: #161a25;
+  border: 3px solid #282e3d;
+  border-radius: 20px;
+  box-shadow: 0px 0px 15px #0008;
+  overflow: hidden;
+  cursor: pointer;
+  transition: 0.25s ease-in-out;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card:hover {
+  transform: scale(1.06);
+  border-color: #3f8cff;
+  box-shadow: 0px 0px 30px #3f8cffaa;
+}
+
+/* Imagen superior */
+.card-img {
+  width: 100%;
+  height: 160px;
+  background-size: cover;
+  background-position: center;
+  border-bottom: 2px solid #282e3d;
+}
+
+/* IMÁGENES DE LOS JUEGOS */
+.memoria {
+  background-image: url('/assets/games/LOGO-MEMORIA.png');
+}
+
+.quiz {
+  background-image: url('/assets/games/LOGO-QUIZ.png');
+}
+
+.math {
+  background-image: url('/assets/games/LOGO-MATH.png');
+}
+
+.reflejos {
+  background-image: url('/assets/games/LOGO-REFLEJOS.png');
+}
+
+/* Texto */
+.card h3 {
+  margin: 10px 0 5px;
+  color: #fff;
+  font-size: 22px;
+}
+
+.card p {
+  color: #9bb0d0;
+  font-size: 15px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .cards-container {
+    grid-template-columns: 1fr; /* Una columna en móvil */
+    max-height: none; /* Scroll opcional si quieres */
+  }
+}

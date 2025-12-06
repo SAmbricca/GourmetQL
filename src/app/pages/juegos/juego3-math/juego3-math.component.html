@@ -1,0 +1,41 @@
+<div class="quiz-container">
+
+  @if (!quizFinished){
+    <h2>Pregunta {{ currentQuestionIndex + 1 }} de {{ questions.length }}</h2>
+    <p class="question">{{ questions[currentQuestionIndex].question }}</p>
+
+    <input type="number" placeholder="Ingresa tu respuesta" [(ngModel)]="userAnswer" 
+      [disabled]="showFeedback" class="answer-input">
+
+    <button class="submit-btn" (click)="submitAnswer()" 
+      [disabled]="userAnswer === null || showFeedback">
+      Enviar
+    </button>
+  
+  
+
+  @if (showFeedback){
+    <p class="feedback" [class.correct]="correctAnswer" [class.wrong]="!correctAnswer">
+      @if (correctAnswer){
+        ¡Correcto!
+      }@else{
+        Incorrecto. La respuesta correcta es {{ questions[currentQuestionIndex].answer }}.
+
+      }
+    </p>
+  }
+
+  }
+
+  @if (quizFinished){
+    <div class="result">
+      <h2>¡Quiz terminado!</h2>
+      <p>Tu puntuación: {{ score }} / {{ questions.length }}</p>
+      <button class="restart-btn" (click)="restartQuiz()">Volver a jugar</button>
+       <button class="finish-btn" (click)="terminarJuego()">
+        Terminar juego
+      </button>
+    </div>
+  }
+
+</div>

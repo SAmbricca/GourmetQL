@@ -1,0 +1,113 @@
+.game-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(to bottom, #1b2735, #090a0f);
+  font-family: 'Press Start 2P', cursive;
+  overflow: hidden;
+}
+
+.play-area {
+  position: relative;
+  background: url('/assets/games/RESTAURANTE.png');
+  border: 4px solid #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  touch-action: none;
+}
+
+/*IMAGENES*/
+.object {
+  position: absolute;
+  width: 40px;   /* ancho de la imagen */
+  height: 70px;  /* alto de la imagen */
+  transition: transform 0.2s;
+}
+
+.object img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* asegura que la imagen no se deforme */
+}
+
+.object:hover {
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+/* Mozo */
+.mozo {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  background: url('/assets/games/LOGO-MOZO(1).png') no-repeat center/contain;
+  transition: left 0.1s linear, top 0.1s linear;
+}
+
+/* Mesa */
+.mesa {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  background: url('/assets/games/FOTO-MESITA(1).png') no-repeat center/contain;
+}
+
+/* Objetos */
+.object {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  transition: transform 0.2s;
+}
+
+.object:hover {
+  transform: scale(1.6);
+  cursor: pointer;
+}
+
+/* Mensajes */
+.message {
+  position: absolute;
+  z-index: 10;
+  width: 80%;
+  max-width: 400px;
+  text-align: center;
+  padding: 20px;
+  border-radius: 15px;
+  color: white;
+  font-size: 1.4rem;
+  background: rgba(0,0,0,0.7);
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.game-win {
+  background: rgba(0, 200, 50, 0.8);
+}
+
+.game-over {
+  background: rgba(200, 0, 50, 0.8);
+}
+
+/* Botones */
+button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  background: #ffcc00;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+button:hover {
+  transform: scale(1.1);
+}
+
+/* Animación */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px);}
+  to { opacity: 1; transform: translateY(0);}
+}

@@ -1,0 +1,44 @@
+<div class="quiz-container">
+
+  @if (!quizFinished) {
+
+    <h2 class="title">Pregunta {{ currentQuestionIndex + 1 }} / {{ questions.length }}</h2>
+
+    <p class="question">{{ questions[currentQuestionIndex].question }}</p>
+
+    <div class="options">
+      @for(option of questions[currentQuestionIndex].options; let i = $index; track i) {
+
+        <button
+          class="
+            option-btn
+            {{ selectedOption === i ? 'selected' : '' }}
+            {{ showAnswer && isCorrect(i) ? 'correct' : '' }}
+            {{ showAnswer && isWrong(i) ? 'wrong' : '' }}
+          "
+          (click)="selectOption(i)"
+        >
+          {{ option }}
+        </button>
+
+      }
+    </div>
+
+    <button class="next-btn" [disabled]="selectedOption === null" (click)="nextQuestion()">
+      Siguiente
+    </button>
+
+  }
+
+  @if (quizFinished) {
+    <div class="result-box">
+      <h2>¡Preguntados terminado!</h2>
+      <p>Tu puntuación: {{ score }} / {{ questions.length }}</p>
+
+      <button class="finish-btn" (click)="terminarJuego()">
+        Terminar juego
+      </button>
+    </div>
+  }
+
+</div>

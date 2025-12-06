@@ -36,6 +36,10 @@ export class MesaOpcionesComponent implements OnInit, OnDestroy {
   pedidoId: number = 0;
   clienteNombre: string = 'Cliente';
 
+  //Parte JUEGOS
+  yaGanoDescuento: boolean = false;
+  descuentoGanado: number = 0;
+
   // Estado
   infoPedido: EstadoPedido | null = null;
   cargando: boolean = true;
@@ -83,6 +87,7 @@ export class MesaOpcionesComponent implements OnInit, OnDestroy {
 
         this.cargarDatosPedido();
         this.suscribirseACambiosPedido();
+        this.verificarDescuento();
       } else {
         this.router.navigate(['/home-anonimo']);
       }
@@ -190,10 +195,24 @@ export class MesaOpcionesComponent implements OnInit, OnDestroy {
   }
 
   irAJuegos() {
-    this.router.navigate(['/juegos-dashboard'], {
-      queryParams: { pedidoId: this.pedidoId, anonimo: false }
+    this.router.navigate(['/juegos'], {
+      queryParams: { pedidoId: this.pedidoId, anonimo: false, yaTieneDescuento: this.yaGanoDescuento }
     });
   }
+
+  //VERIFICACION DE JUEGOS-----------------------------------------------------------------------
+  async verificarDescuento() {
+    const { data } = await this.supabase
+      .from('juegos')
+      .select('descuento_obtenido')
+      .eq('pedido_id', this.pedidoId)
+      .gt('descuento_obtenido', 0)
+      .maybeSingle();
+
+    this.yaGanoDescuento = !!data;
+    this.descuentoGanado = data ? data.descuento_obtenido : 0;
+  }
+
 
   async irAEncuesta() {
     const yaExiste = await this.encuestasService.verificarEncuestaExistente(this.pedidoId);

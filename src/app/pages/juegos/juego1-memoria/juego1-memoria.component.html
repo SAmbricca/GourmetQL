@@ -1,0 +1,35 @@
+<div class="header">
+  <h1>Juego de Memoria</h1>
+</div>
+
+<div class="game-container">
+
+  <div class="grid">
+    @for (card of cards; track i; let i = $index) {
+      <div
+        class="card"
+        (click)="flipCard(i)"
+        [class.flipped]="card.flipped || card.matched"
+      >
+        <div class="card-inner">
+          <div class="card-front"></div>
+
+          <div class="card-back">
+            <img [src]="card.image" />
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="score-panel">
+    <h2>Intentos: {{ attempts }}</h2>
+
+    <button class="btn-reset" (click)="resetGame()">
+      Reiniciar
+    </button>
+    @if(matches === images.length) {
+      <button class="finish-btn" (click)="terminarJuego(true)">Finalizar</button>
+    }
+  </div>
+</div>
